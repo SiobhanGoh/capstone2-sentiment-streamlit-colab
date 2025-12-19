@@ -1,3 +1,11 @@
-# Streamlit Analytics Application
+---
+title: Malay Emotion Detection Demo
+emoji: 💬
+colorFrom: pink
+colorTo: indigo
+sdk: streamlit
+sdk_version: 1.32.0
+app_file: src/streamlit_app.py
+pinned: false
+---
 
-This folder contains the Streamlit-based analytics application deployed on Hugging Face Spaces.
