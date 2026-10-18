@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="338" viewBox="0 0 1200 338">
+<rect width="1200" height="338" rx="18" fill="#171A24"/>
+<text x="55" y="44" font-size="23" font-weight="700" font-family="Arial" fill="#F9F7FA">Inference and analytics workflow</text>
+<g font-family="Arial" font-size="17" text-anchor="middle">
+<rect x="40" y="105" width="230" height="80" rx="12" fill="#273047" stroke="#D88BA7"/><text x="155" y="138" fill="#fff">Text input</text><text x="155" y="161" fill="#EBC2D0" font-size="14">or YouTube comments</text>
+<rect x="337" y="105" width="235" height="80" rx="12" fill="#273047" stroke="#AE92BA"/><text x="454" y="138" fill="#fff">Tokenization</text><text x="454" y="161" fill="#EBC2D0" font-size="14">Hugging Face</text>
+<rect x="637" y="105" width="250" height="80" rx="12" fill="#273047" stroke="#D88BA7"/><text x="762" y="137" fill="#fff">Transformer classifier</text><text x="762" y="161" fill="#EBC2D0" font-size="14">Negative · Neutral · Positive</text>
+<rect x="955" y="105" width="210" height="80" rx="12" fill="#273047" stroke="#AE92BA"/><text x="1060" y="137" fill="#fff">Streamlit charts</text><text x="1060" y="161" fill="#EBC2D0" font-size="14">+ CSV / PDF reports</text>
+</g><path d="M272 145 H330 M574 145 H629 M889 145 H948" stroke="#D88BA7" stroke-width="3" fill="none"/><g fill="#D88BA7"><path d="M330 145l-9 -6v12z"/><path d="M629 145l-9 -6v12z"/><path d="M948 145l-9 -6v12z"/></g>
+<text x="58" y="290" font-family="Arial" font-size="14" fill="#B8C2D1">Model probabilities are not calibrated confidence; previous saved benchmark results have split-overlap limitations.</text></svg>

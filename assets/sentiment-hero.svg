@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="310" viewBox="0 0 1320 310" role="img" aria-label="Malay–English Sentiment">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#111622"/><stop offset="70%" stop-color="#1E2433"/><stop offset="100%" stop-color="#312536"/></linearGradient>
+      <linearGradient id="rose" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#D88BA7"/><stop offset="100%" stop-color="#AE92BA"/></linearGradient>
+      <radialGradient id="halo"><stop stop-color="#D88BA7" stop-opacity="0.24"/><stop offset="100%" stop-color="#D88BA7" stop-opacity="0"/></radialGradient>
+      <style>
+        .title{font-family:Arial,'DejaVu Sans',sans-serif;font-size:54px;font-weight:700;fill:#F9F7FA;letter-spacing:0.15px}
+        .sub{font-family:Arial,'DejaVu Sans',sans-serif;font-size:21px;fill:#D4D3DD}
+        .tag{font-family:Arial,'DejaVu Sans',sans-serif;font-size:14px;fill:#F1C7D6;letter-spacing:3px}
+        .orb{transform-origin:1140px 151px;animation:orbit 22s linear infinite}
+        .glow{animation:pulse 6s ease-in-out infinite}
+        @keyframes orbit{to{transform:rotate(360deg)}}
+        @keyframes pulse{0%,100%{opacity:.45}50%{opacity:.85}}
+        @media (prefers-reduced-motion:reduce){.orb,.glow{animation:none}}
+      </style>
+    </defs>
+    <rect width="1320" height="310" rx="24" fill="url(#bg)" />
+    <circle cx="1140" cy="154" r="235" fill="url(#halo)" class="glow"/>
+    <path d="M0 280 C210 236 295 330 525 273 S880 265 1320 212" stroke="#D88BA7" stroke-width="1" fill="none" opacity=".28" />
+    <path d="M0 301 C265 250 390 330 635 281 S1100 235 1320 250" stroke="#AE92BA" stroke-width="1" fill="none" opacity=".25" />
+    <g class="orb" opacity=".85">
+      <circle cx="1140" cy="154" r="93" stroke="url(#rose)" fill="none" stroke-width="1.5" stroke-dasharray="3 11"/>
+      <circle cx="1140" cy="154" r="67" stroke="#D88BA7" fill="none" stroke-width="1" opacity=".5"/>
+      <circle cx="1140" cy="61" r="7" fill="#F5D8E3" />
+      <circle cx="1233" cy="154" r="5" fill="#AE92BA" />
+      <circle cx="1073" cy="154" r="4" fill="#D88BA7" />
+    </g>
+    <circle cx="1140" cy="154" r="31" fill="#D88BA7" opacity=".16"/>
+    <path d="M1121 154h38M1140 135v38" stroke="#F5D8E3" stroke-width="2.5" opacity=".7"/>
+    <rect x="65" y="55" width="34" height="5" rx="3" fill="url(#rose)"/>
+    <text x="65" y="91" class="tag">NATURAL LANGUAGE PROCESSING</text>
+    <text x="65" y="172" class="title">Malay–English Sentiment</text>
+    <text x="67" y="224" class="sub">Transformer NLP · Interactive Analysis</text>
+    <circle cx="70" cy="263" r="3" fill="#D88BA7"/><circle cx="84" cy="263" r="3" fill="#AE92BA"/><circle cx="98" cy="263" r="3" fill="#F5D8E3"/>
+    </svg>
