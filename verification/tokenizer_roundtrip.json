@@ -1,0 +1,6 @@
+{
+  "training_inputs_checked": 4577,
+  "tokenizer_class": "BertTokenizerFast",
+  "identical_encoded_inputs": true,
+  "note": "Transformers 4.57.6 emits a Mistral-specific warning for this locally saved BERT tokenizer. No regex patch was applied. Base and saved tokenizers produce identical input_ids, token_type_ids and attention_mask on all training inputs."
+}
