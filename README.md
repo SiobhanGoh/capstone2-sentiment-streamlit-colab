@@ -102,4 +102,4 @@ The default inference checkpoint is set by the `MODEL_ID` environment variable. 
 
 ---
 
-**Siobhan Goh** · Master of Artificial Intelligence, Monash University Malaysia · [LinkedIn](https://www.linkedin.com/in/siobhangoh/)
+**Siobhan Goh** · Master of Artificial Intelligence, Monash University Malaysia · [LinkedIn](https://www.linkedin.com/in/siobhan-goh/)
