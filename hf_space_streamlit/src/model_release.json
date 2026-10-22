@@ -1,0 +1,11 @@
+{
+  "repo_id": "SiobhanGoh/CP2_Emotion_Model_New",
+  "revision": "9bc6645ce7a8e02761c59386ffd16969bed1bc55",
+  "subfolder": "corrected-2026-10",
+  "model_sha256": "771a19b8c14865f8d8d8c7adc7df95d859b08a866195f5b7bfe3ac44723ec61b",
+  "protocol": "sentiment-disjoint-v1",
+  "max_length": 128,
+  "release_date": "2026-10-23",
+  "test_accuracy": 0.7604485219164119,
+  "test_macro_f1": 0.7556863945342297
+}

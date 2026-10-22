@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-23",
+  "model_revision": "9bc6645ce7a8e02761c59386ffd16969bed1bc55",
+  "space_revision": "132259889c7f6601d7251b3d655c639e6d2f2ae5",
+  "public_browser_checks": {
+    "startup_and_effective_model_provenance": "passed",
+    "single_text_real_model": "passed functionally; prediction quality has known errors",
+    "long_text_128_token_warning": "passed",
+    "youtube_real_retrieval": "30 top-level comments retrieved and analysed; API key already configured",
+    "youtube_csv_export": "downloaded; 30 rows and pinned model provenance verified",
+    "youtube_pdf_export": "downloaded; all 30 comments across 3 pages; glyph issue subsequently repaired and verified locally",
+    "pasted_comments": "3 analysed; 1 URL/mention-only input excluded",
+    "sentiment_filter": "NEGATIVE correctly displayed an empty table when all three predictions were POSITIVE",
+    "empty_input_and_stale_results": "warning displayed and previous comment results removed",
+    "session_csv": "downloaded",
+    "session_clear": "empty history confirmed in public browser"
+  },
+  "automated_checks": {
+    "suite_cases": 32,
+    "coverage": ["shared preprocessing", "duplicate/split protocol", "YouTube URL validation", "pagination and deduplication", "retrieval failure handling", "empty-input exclusion", "CSV formula neutralisation", "PDF pagination, escaping and Unicode fallbacks", "session and Streamlit interaction behaviour"],
+    "limitations": "API failures and model responses are mocked for automated UI tests; real inference and successful retrieval were checked separately. Live quota, disabled-comment and outage scenarios were not induced."
+  },
+  "pdf_final_patch": {
+    "verification": "Final deployed reports.py downloaded and byte-matched local source. A 30-comment report regenerated locally from the actual downloaded public result, all 3 pages visually checked, all comment numbers and supplementary/CJK Unicode fallback strings verified.",
+    "raw_public_comments": "Kept out of the repository."
+  },
+  "prediction_limitations": [
+    {"synthetic_input": "Servis lambat dan sangat mengecewakan. 😭", "expected_reading": "negative", "prediction": "POSITIVE", "model_score": 0.8927122354507446},
+    {"synthetic_input": "Kedai dibuka pada pukul sembilan.", "expected_reading": "neutral", "prediction": "POSITIVE", "model_score": 0.818967878818512}
+  ],
+  "interpretation": "Feature operation is verified separately from prediction quality. These few synthetic probes are not a benchmark. Internal retrospective accuracy does not establish external generalisation or calibration; do not claim production-ready general sentiment classification."
+}

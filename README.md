@@ -15,7 +15,7 @@ The evaluation pipeline was repaired in October 2026 to use **one shared, disjoi
 |---|---|
 | Transformer inference | Hugging Face tokenizer and sequence classifier, three logits and softmax |
 | Single-text analysis | Sentiment label and class-score distribution |
-| Comment analytics | YouTube Data API v3 ingestion when an authorised API key is configured |
+| Comment analytics | YouTube Data API v3 retrieval or up to 50 pasted comments |
 | Reporting | Aggregate sentiment, comment tables, session views and PDF/CSV exports |
 | Reproducible modelling | Deterministic preprocessing, duplicate controls, frozen split fingerprints, validation-based selection and common final evaluation |
 
@@ -68,23 +68,25 @@ python -m training.run evaluate --data runs/data --baseline runs/baseline --mber
 
 Prepared partitions and final results reject silent overwrites. Choose a new run directory for a genuinely new experiment, and keep the previous result. Do not tune against the final test result. On Windows, a short `HF_HOME` path can avoid long-cache-path errors. CUDA is optional but substantially faster; install the appropriate official PyTorch build for your hardware.
 
-The [Colab notebook](colab_notebooks/CP2_malaybert_training.ipynb) runs the same pipeline. Run `python -m pip install pytest` then `python -m pytest -q tests` for the five preprocessing, partition and baseline-selection checks. GitHub Actions runs these checks without downloading model weights or the private corpus.
+The [Colab notebook](colab_notebooks/CP2_malaybert_training.ipynb) runs the same pipeline. GitHub Actions runs 32 protocol and app checks without downloading model weights or the private corpus. Install the app requirements plus scikit-learn, joblib, pytest and pypdf, then run `python -m pytest -q tests`.
 
 ## App and model status
 
-The public Space was woken and returned **Positive** for its built-in positive example on **22 October 2026**. This confirms that the single-text demo works; it is not an accuracy test. YouTube retrieval and its report exports were not exercised in this live check.
+The corrected checkpoint was deployed on **23 October 2026**. The app pins model revision `9bc6645ce7a8e02761c59386ffd16969bed1bc55`, subfolder `corrected-2026-10`, in `SiobhanGoh/CP2_Emotion_Model_New`. It verifies weights SHA-256 `771a19b8c14865f8d8d8c7adc7df95d859b08a866195f5b7bfe3ac44723ec61b` before loading, checks label order and uses the same normalisation and 128-token limit as the corrected training pipeline. The running app exposes the effective revision and checksum.
 
-The public Space source at revision `af938930b0426fe4c12afafa98a847a8f5733285` defaults to `SiobhanGoh/CP2_Emotion_Model_New`. Its public model repository resolved to revision `cc32f08fdce15925a79c799d02a75888fc194e23` on 22 October 2026. The app does not expose its effective loaded revision, so these metadata observations do not prove a checksum match to the running weights.
+Public checks confirmed a single-text prediction, retrieval and analysis of 30 real YouTube comments, and CSV/PDF downloads. This establishes feature operation, not predictive accuracy on YouTube. The app rejects empty cleaned input, excludes unusable comments, clears stale results, handles retrieval failures explicitly and supports pasted comments without an API key. Session history remains per session; reruns do not duplicate predictions.
 
-**The newly evaluated checkpoint has not replaced the public demo model.** Do not attribute the corrected comparison's scores to that older demo. A model promotion should include matching text preprocessing, label mapping, pinned revision and app regression checks.
+The summaries show sentiment counts and class scores. Unvalidated emotion-intensity, engagement and business-risk scores have been removed. Softmax values are labelled as uncalibrated model outputs. PDFs paginate and escape comment text; characters unsupported by the PDF font use explicit names/codes, while CSV preserves original text and neutralises spreadsheet-formula prefixes.
 
-![Actual public single-text demo using the existing checkpoint](assets/app-live.png)
+Live exploratory checks also found errors: the straightforward negative Malay sentence “Servis lambat dan sangat mengecewakan. 😭” was predicted Positive (model score 0.8927), and “Kedai dibuka pada pukul sembilan.” was predicted Positive (0.8190). These hand-written probes are not an accuracy benchmark, but they demonstrate that the internal test score does not establish reliable everyday-domain behaviour. Do not treat the demonstration as a production-ready general sentiment service.
 
-Screenshot: 22 October 2026. The displayed confidence is an uncalibrated model score, not a measured success rate.
+![Public single-text demo using the corrected checkpoint, 23 October 2026](assets/app-live.png)
+
+Screenshot: a functional positive example, not accuracy evidence. [Deployment file verification](verification/deployment_source.json) records the exact deployed Space revision and file checksums. [Feature checks](verification/app_feature_checks.json) separates public browser checks, automated checks and observed prediction limitations.
 
 ## Run the app
 
-The existing app environment is separate from the Python 3.12 training environment. Its Dockerfile uses Python 3.10 and its original dependency file. From the repository root:
+The app uses Python 3.12 with pinned dependencies. The Docker Space installs the CPU build of PyTorch. From the repository root:
 
 ```bash
 cd hf_space_streamlit
@@ -94,7 +96,7 @@ python -m pip install -r requirements.txt
 python -m streamlit run src/streamlit_app.py
 ```
 
-`MODEL_ID` optionally selects a compatible Hugging Face model. `YOUTUBE_API_KEY` enables comment retrieval and must be stored privately as an environment variable or Hugging Face Space secret. The existing app dependencies are older; the corrected training environment does not certify their installation on other Python versions. The public demo check is recorded separately above.
+`src/model_release.json` fixes the model revision, subfolder, checksum and evaluation provenance. `SENTIMENT_MODEL_PATH` can point to a local copy of the same checkpoint for local testing; the checksum is still enforced. `YOUTUBE_API_KEY` enables comment retrieval and must be stored privately as an environment variable or Hugging Face Space secret. Never commit it. Paste comments works without a key.
 
 ## Explainability and original work
 
@@ -107,18 +109,18 @@ The corrected notebook replaces the old independent splits. Original CP2 code is
 ```text
 training/                 # Shared preprocessing, selection and final evaluation
 requirements-training.txt # Tested training dependencies
-tests/                    # Protocol and baseline checks
+tests/                    # Protocol, inference helpers, exports and app checks
 verification/             # Aggregate results; no raw social text
 colab_notebooks/           # Corrected workflow and historical source
-hf_space_streamlit/       # Existing demo app source and environment
+hf_space_streamlit/       # Verified deployed app source and pinned environment
 assets/                   # Architecture and real app screenshot
 ```
 
 ## Remaining work
 
 - Assess near-duplicates, source/time-based generalisation and probability calibration.
-- Promote a verified checkpoint through matching app preprocessing and pinned model revision.
-- Exercise YouTube retrieval and all report exports with an authorised API key.
+- Evaluate a new external sample before making broader deployment-performance claims.
+- Rerun explainability experiments for the corrected checkpoint if needed; historical explanations do not describe this release.
 
 Scope: sentiment analysis and social-comment analytics; no clinical inference, validated fine-grained emotion detection or live Twitter streaming.
 
