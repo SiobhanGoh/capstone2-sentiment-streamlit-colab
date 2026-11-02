@@ -6,6 +6,7 @@ import glyphs from './pdf_glyphs.json';
 import release from '../model_release.json';
 import { LABELS } from './inference.js';
 import { SAMPLE_NOTE, SCORE_NOTE, pct, summarise, title } from './analysis.js';
+import { NOTES_DISCLAIMER, creatorNotes } from './insights.js';
 
 function supported(cp) {
   let lo = 0;
@@ -66,7 +67,12 @@ export async function buildReport(rows, meta) {
   const spec = release.browser_model;
   write('Sentiment analysis report', { size: 18, bold: true, gap: 10 });
   write(meta.title || 'Comment analysis', { size: 11, bold: true });
-  write(`Source: ${meta.source}${meta.channel ? ` · ${meta.channel}` : ''}`);
+  write(`Source: ${meta.source}${meta.channel ? `, ${meta.channel}` : ''}`);
+  if (meta.url) {
+    const facts = [meta.views != null && `${meta.views.toLocaleString()} views`, meta.likes != null && `${meta.likes.toLocaleString()} likes`,
+      meta.comment_count != null && `${meta.comment_count.toLocaleString()} comments`, meta.published_at && `published ${meta.published_at.slice(0, 10)}`].filter(Boolean);
+    write(`${meta.url}${facts.length ? ` | ${facts.join(', ')}` : ''}`);
+  }
   write(meta.sampling || 'User-supplied comments; not a representative sample.');
   write(`Analysed comments: ${s.total}. Excluded empty inputs: ${meta.excluded ?? 0}. Inputs truncated to 128 tokens: ${s.truncated}.`);
   write(SCORE_NOTE);
@@ -93,11 +99,27 @@ export async function buildReport(rows, meta) {
   y += 14;
   write(`Mean top-class model score: ${pct(s.meanScore)}. This is not accuracy or sentiment intensity.`);
   write('Review individual comments before acting. Sarcasm, code-switching and new topics may produce errors. This classifier does not assess business risk or mental health.');
-  write('Comment details', { size: 12, bold: true, gap: 8 });
-  rows.forEach((r) => {
-    write(`${r.no}. ${title(r.sentiment)} | Model score ${pct(r.score)}${r.truncated ? ' | truncated' : ''}`, { bold: true, gap: 2 });
-    write(r.comment, { size: 8.5, gap: 10, color: [74, 68, 96] });
-  });
+  const n = creatorNotes(rows);
+  write(meta.source === 'YouTube' ? 'Notes for the creator' : 'What to look at', { size: 12, bold: true, gap: 8 });
+  n.notes.forEach((t) => write(`• ${t}`, { gap: 4 }));
+  const quotes = (heading, list) => {
+    if (!list.length) return;
+    write(heading, { bold: true, gap: 2 });
+    list.forEach((r) => write(`#${r.no}${Number.isFinite(r.likes) ? ` (${r.likes} likes)` : ''}: ${r.comment}`, { size: 8.5, gap: 4, color: [74, 68, 96] }));
+  };
+  quotes('Read these first', n.readFirst);
+  quotes('Viewer questions', n.questions.slice(0, 3));
+  quotes('What viewers enjoyed', n.highlights);
+  write(NOTES_DISCLAIMER, { size: 7.5, gap: 10 });
+  for (const label of LABELS) {
+    const group = rows.filter((r) => r.sentiment === label);
+    write(`${title(label)} comments (${group.length})`, { size: 12, bold: true, gap: 8 });
+    if (!group.length) write('None in this set.');
+    group.forEach((r) => {
+      write(`#${r.no} | Model score ${pct(r.score)}${Number.isFinite(r.likes) ? ` | ${r.likes} likes` : ''}${r.truncated ? ' | truncated' : ''}`, { bold: true, gap: 2 });
+      write(r.comment, { size: 8.5, gap: 10, color: [74, 68, 96] });
+    });
+  }
   write('Model release', { size: 12, bold: true, gap: 8 });
   write(`${spec.repo_id} | Revision ${spec.revision || 'unreleased'} | ${spec.dtype}`, { size: 7 });
   write(`Converted from ${release.source_checkpoint.repo_id} (weights SHA-256 ${release.source_checkpoint.model_sha256}).`, { size: 7 });

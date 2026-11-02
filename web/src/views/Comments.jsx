@@ -1,12 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Download, FileText, Search, Upload } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { useModel } from '../lib/useModel.js';
-import { MAX_COMMENTS, SAMPLE_NOTE, SCORE_NOTE, buildRows, pct, splitPasted, summarise, title, usableComments } from '../lib/analysis.js';
-import { download, guessTextColumn, parseCsvFile, rowsToRecords, toCsv } from '../lib/csv.js';
+import { MAX_COMMENTS, buildRows, splitPasted, usableComments } from '../lib/analysis.js';
+import { download, guessTextColumn, parseCsvFile } from '../lib/csv.js';
 import { fetchComments } from '../lib/youtube.js';
-import { LABELS } from '../lib/inference.js';
-import { Badge, Card, Notice, Ripple, ScoreBars, TONE, Tilt } from '../components/ui.jsx';
+import { Card, Notice, Ripple } from '../components/ui.jsx';
+import CommentResults from '../components/CommentResults.jsx';
 
 const SOURCES = [
   { id: 'paste', name: 'Paste comments' },
@@ -25,115 +25,6 @@ function SourceTabs({ value, onChange }) {
         </button>
       ))}
     </div>
-  );
-}
-
-function Summary({ analysis }) {
-  const s = summarise(analysis.rows);
-  const meanScores = LABELS.map((_, i) => analysis.rows.reduce((a, r) => a + r.scores[i], 0) / s.total);
-  return (
-    <div className="grid gap-5 md:grid-cols-6">
-      <Tilt className="md:col-span-2" max={5}>
-        <Card className="h-full">
-          <p className="text-sm text-ink-soft dark:text-ube-300">{s.tied ? 'Joint most frequent' : 'Most frequent label'}</p>
-          <p className="mt-1 font-display text-4xl font-bold">{s.dominant}</p>
-          <p className="mt-4 text-sm text-ink-soft dark:text-ube-300">
-            {s.total.toLocaleString()} analysed{analysis.meta.excluded ? `, ${analysis.meta.excluded} empty after cleaning` : ''}
-            {s.truncated ? `, ${s.truncated} truncated to 128 tokens` : ''}.
-          </p>
-        </Card>
-      </Tilt>
-      {LABELS.map((l) => (
-        <Tilt key={l} className="md:col-span-1 max-md:col-span-1" max={6}>
-          <Card className={`h-full ${TONE[l].soft} !border-transparent`}>
-            <p className={`text-sm font-semibold ${TONE[l].text}`}>{title(l)}</p>
-            <p className="mt-2 font-display text-3xl font-bold tabular-nums">{pct(s.shares[l], 0)}</p>
-            <p className="mt-1 text-sm text-ink-soft dark:text-ube-300">{s.counts[l].toLocaleString()} {s.counts[l] === 1 ? 'comment' : 'comments'}</p>
-          </Card>
-        </Tilt>
-      ))}
-      <Card className="md:col-span-1">
-        <p className="text-sm text-ink-soft dark:text-ube-300">Mean top score</p>
-        <p className="mt-2 font-display text-3xl font-bold tabular-nums">{pct(s.meanScore, 0)}</p>
-        <p className="mt-1 text-xs text-ink-faint">Not accuracy</p>
-      </Card>
-      <Card className="md:col-span-3">
-        <p className="mb-3 font-semibold">Share of comments</p>
-        <div className="neu-inset flex h-6 overflow-hidden rounded-full" role="img"
-          aria-label={LABELS.map((l) => `${title(l)} ${pct(s.shares[l])}`).join(', ')}>
-          {LABELS.map((l) => (
-            <motion.div key={l} className={TONE[l].bar} initial={{ width: 0 }} animate={{ width: `${s.shares[l] * 100}%` }}
-              transition={{ type: 'spring', stiffness: 80, damping: 18 }} />
-          ))}
-        </div>
-        <div className="mt-3 flex flex-wrap gap-4 text-sm">
-          {LABELS.map((l) => (
-            <span key={l} className="flex items-center gap-2"><span className={`h-3 w-3 rounded-full ${TONE[l].bar}`} />{title(l)}</span>
-          ))}
-        </div>
-        <p className="mt-4 text-xs text-ink-faint">{analysis.meta.source === 'YouTube' ? SAMPLE_NOTE : 'A summary of the supplied comments only.'}</p>
-      </Card>
-      <Card className="md:col-span-3">
-        <p className="mb-3 font-semibold">Average score per class</p>
-        <ScoreBars scores={meanScores} compact />
-        <p className="mt-4 text-xs text-ink-faint">{SCORE_NOTE}</p>
-      </Card>
-    </div>
-  );
-}
-
-function ResultsTable({ rows }) {
-  const [filter, setFilter] = useState('ALL');
-  const [query, setQuery] = useState('');
-  const [sort, setSort] = useState('order');
-  const shown = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    let list = rows.filter((r) => (filter === 'ALL' || r.sentiment === filter) && (!q || r.comment.toLowerCase().includes(q)));
-    if (sort === 'high') list = [...list].sort((a, b) => b.score - a.score);
-    if (sort === 'low') list = [...list].sort((a, b) => a.score - b.score);
-    return list;
-  }, [rows, filter, query, sort]);
-  return (
-    <Card>
-      <div className="flex flex-wrap items-center gap-3">
-        <h2 className="mr-auto text-xl font-semibold">Every comment</h2>
-        <label className="neu-inset flex items-center gap-2 rounded-full px-3 py-1.5">
-          <Search size={15} aria-hidden className="text-ink-faint" />
-          <span className="sr-only">Search comments</span>
-          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search"
-            className="w-36 bg-transparent text-sm outline-none" />
-        </label>
-        <label className="text-sm">
-          <span className="sr-only">Filter by sentiment</span>
-          <select value={filter} onChange={(e) => setFilter(e.target.value)} className="neu-inset rounded-full px-3 py-1.5 text-sm">
-            <option value="ALL">All labels</option>
-            {LABELS.map((l) => <option key={l} value={l}>{title(l)}</option>)}
-          </select>
-        </label>
-        <label className="text-sm">
-          <span className="sr-only">Sort</span>
-          <select value={sort} onChange={(e) => setSort(e.target.value)} className="neu-inset rounded-full px-3 py-1.5 text-sm">
-            <option value="order">Original order</option>
-            <option value="high">Highest score first</option>
-            <option value="low">Lowest score first</option>
-          </select>
-        </label>
-      </div>
-      <p className="mt-3 text-sm text-ink-faint">Showing {shown.length.toLocaleString()} of {rows.length.toLocaleString()}. Low scores are a good place to start checking by hand.</p>
-      <ul className="mt-4 max-h-[560px] space-y-2 overflow-y-auto pr-1">
-        {shown.slice(0, 500).map((r) => (
-          <li key={r.no} className="rounded-xl2 bg-white/50 px-4 py-3 dark:bg-night-raised/70">
-            <div className="flex flex-wrap items-center gap-2 text-xs text-ink-faint">
-              <span className="tabular-nums">#{r.no}</span><Badge label={r.sentiment} />
-              <span className="tabular-nums">{pct(r.score)}</span>
-              {r.truncated && <span className="chip bg-kaya-100 text-kaya-700">truncated</span>}
-            </div>
-            <p className="mt-1.5 whitespace-pre-wrap break-words text-[15px]">{r.comment}</p>
-          </li>
-        ))}
-      </ul>
-      {shown.length > 500 && <p className="mt-3 text-sm text-ink-faint">The first 500 matches are shown here. Downloads include everything.</p>}
-    </Card>
   );
 }
 
@@ -174,6 +65,7 @@ export default function Comments() {
     try {
       let comments;
       let meta;
+      let likes = null;
       if (source === 'paste') {
         comments = splitPasted(pasted);
         meta = { source: 'Pasted comments', title: 'Pasted comment analysis', sampling: 'User-supplied comments; not a representative sample.' };
@@ -181,6 +73,7 @@ export default function Comments() {
         setProgress({ label: 'Fetching comments from YouTube' });
         const data = await fetchComments(video, limit);
         comments = data.comments;
+        likes = Array.isArray(data.likes) ? data.likes : null;
         meta = data.meta;
       } else {
         if (!file) throw new Error('Choose a CSV file first.');
@@ -193,7 +86,8 @@ export default function Comments() {
       if (!valid.length) throw new Error('None of these comments has text left after links and mentions are removed.');
       setProgress({ label: 'Analysing', done: 0, total: valid.length });
       const results = await model.predict(valid.map((v) => v.comment), (done, total) => setProgress({ label: 'Analysing', done, total }));
-      setAnalysis({ rows: buildRows(valid, results), meta: { ...meta, excluded, analysed_at: new Date().toISOString() } });
+      const rows = buildRows(valid, results).map((r) => (likes ? { ...r, likes: likes[r.no - 1] ?? 0 } : r));
+      setAnalysis({ rows, meta: { ...meta, excluded, analysed_at: new Date().toISOString() } });
     } catch (e) {
       setMessage(e.message || 'This analysis could not be completed. Try fewer or shorter comments.');
     } finally {
@@ -286,24 +180,7 @@ export default function Comments() {
         {message && <div className="mt-4"><Notice tone="warn">{message}</Notice></div>}
       </Card>
 
-      {analysis && (
-        <>
-          <div className="flex flex-wrap items-end gap-3">
-            <div className="mr-auto">
-              <h2 className="text-2xl font-semibold">{analysis.meta.title}</h2>
-              <p className="text-sm text-ink-soft dark:text-ube-300">{analysis.meta.channel ? `${analysis.meta.channel} · ` : ''}{analysis.meta.sampling}</p>
-            </div>
-            <Ripple className="btn-soft" onClick={() => download('comment_sentiment.csv', toCsv(rowsToRecords(analysis.rows, analysis.meta)), 'text/csv;charset=utf-8')}>
-              <Download size={15} aria-hidden /> Download CSV
-            </Ripple>
-            <Ripple className="btn-soft" onClick={exportPdf} disabled={exporting}>
-              <FileText size={15} aria-hidden /> {exporting ? 'Building PDF…' : 'Download PDF report'}
-            </Ripple>
-          </div>
-          <Summary analysis={analysis} />
-          <ResultsTable rows={analysis.rows} />
-        </>
-      )}
+      {analysis && <CommentResults analysis={analysis} exporting={exporting} onPdf={exportPdf} />}
     </div>
   );
 }

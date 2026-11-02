@@ -24,6 +24,7 @@ export function rowsToRecords(rows, meta) {
     'Model score': r.score,
     ...Object.fromEntries(LABELS.map((l, i) => [`${title(l)} score`, r.scores[i]])),
     Truncated: r.truncated,
+    ...(Number.isFinite(r.likes) ? { Likes: r.likes } : {}),
     Source: meta.source,
     Title: meta.title,
     Model: spec.repo_id,

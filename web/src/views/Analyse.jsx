@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { RotateCcw, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { useModel } from '../lib/useModel.js';
 import { cleanText } from '../lib/clean.js';
 import { SCORE_NOTE, pct } from '../lib/analysis.js';
@@ -13,65 +13,57 @@ const EXAMPLES = {
   NEGATIVE: ['Service lambat, order salah, memang mengecewakan.', 'I am disappointed. I waited a long time and the problem is still unresolved.'],
 };
 
+// A gentle wave across the three sentiment dots; faster while the model is reading.
+function Dots({ busy }) {
+  const reduce = useReducedMotion();
+  return (
+    <div className="flex gap-2.5" aria-hidden>
+      {['bg-pandan-300', 'bg-kaya-300', 'bg-jambu-300'].map((c, i) => (
+        <motion.span key={c} className={`h-10 w-10 rounded-full ${c}`}
+          animate={reduce ? undefined : { y: [0, busy ? -16 : -9, 0], scale: [1, busy ? 1.08 : 1.03, 1] }}
+          transition={reduce ? undefined : { repeat: Infinity, duration: busy ? 0.6 : 1.4, delay: i * (busy ? 0.12 : 0.22), ease: 'easeInOut' }} />
+      ))}
+    </div>
+  );
+}
+
 function ResultCard({ result, busy }) {
   const reduce = useReducedMotion();
-  const [showBack, setShowBack] = useState(false);
-  useEffect(() => setShowBack(false), [result]);
   const tone = result ? TONE[result.sentiment] : null;
   return (
-    <Tilt className="h-full min-h-[360px]">
-      <div className="flip-scene h-full min-h-[360px]">
-        <motion.div className="flip-inner" animate={{ rotateY: showBack ? 180 : 0 }}
-          transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 120, damping: 16 }}>
-          <div className="flip-face glass flex flex-col rounded-xl3 p-6">
-            <AnimatePresence mode="wait">
-              {result ? (
-                <motion.div key={result.cleaned_text + result.score} className="flex h-full flex-col"
-                  initial={reduce ? false : { rotateY: -90, opacity: 0 }} animate={{ rotateY: 0, opacity: 1 }}
-                  exit={reduce ? undefined : { rotateY: 90, opacity: 0 }} transition={{ duration: 0.32 }}>
-                  <p className="text-sm text-ink-soft dark:text-ube-300">Predicted sentiment</p>
-                  <p className={`mt-2 font-display text-6xl font-bold sm:text-7xl ${tone.text}`}>{tone.word}</p>
-                  <div className={`mt-5 inline-flex w-fit items-baseline gap-2 rounded-xl2 px-4 py-2 ${tone.soft}`}>
-                    <span className="font-display text-2xl font-semibold tabular-nums">{pct(result.score)}</span>
-                    <span className="text-sm text-ink-soft dark:text-ube-100">top-class model score</span>
-                  </div>
-                  {result.truncated && <div className="mt-4"><Notice tone="warn">Long input: only the first 128 model tokens were read.</Notice></div>}
-                  <p className="mt-auto pt-6 text-sm text-ink-soft dark:text-ube-300">
-                    A suggested label, not a verdict. Sarcasm, slang and unfamiliar topics can change the meaning.
-                  </p>
-                  <Ripple className="btn-soft mt-4 self-start" onClick={() => setShowBack(true)}>See all three scores</Ripple>
-                </motion.div>
-              ) : (
-                <motion.div key="empty" className="flex h-full flex-col items-start justify-center gap-4" initial={false}>
-                  <div className="flex gap-2" aria-hidden>
-                    {['bg-pandan-300', 'bg-kaya-300', 'bg-jambu-300'].map((c, i) => (
-                      <motion.span key={c} className={`h-10 w-10 rounded-full ${c}`}
-                        animate={busy && !reduce ? { y: [0, -10, 0] } : { y: 0 }}
-                        transition={{ repeat: busy ? Infinity : 0, duration: 0.7, delay: i * 0.12 }} />
-                    ))}
-                  </div>
-                  <p className="max-w-[26ch] font-display text-2xl font-semibold">
-                    {busy ? 'Reading the mood…' : 'Your result lands here.'}
-                  </p>
-                  <p className="text-sm text-ink-soft dark:text-ube-300">Pick an example or write your own, then analyse.</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-          <div className="flip-face flip-back glass flex flex-col rounded-xl3 p-6">
-            {result && (
-              <>
-                <p className="mb-5 font-display text-xl font-semibold">How the model split its scores</p>
+    <Tilt className="h-full">
+      <Card className="flex h-full min-h-[360px] flex-col">
+        <AnimatePresence mode="wait">
+          {result ? (
+            <motion.div key={result.cleaned_text + result.score} className="flex h-full flex-col"
+              initial={reduce ? false : { rotateY: -90, opacity: 0 }} animate={{ rotateY: 0, opacity: 1 }}
+              exit={reduce ? undefined : { rotateY: 90, opacity: 0 }} transition={{ duration: 0.32 }}>
+              <p className="text-sm text-ink-soft dark:text-ube-300">Predicted sentiment</p>
+              <div className="mt-1 flex flex-wrap items-end gap-x-4 gap-y-2">
+                <p className={`font-display text-6xl font-bold sm:text-7xl ${tone.text}`}>{tone.word}</p>
+                <div className={`mb-2 inline-flex items-baseline gap-2 rounded-xl2 px-4 py-2 ${tone.soft}`}>
+                  <span className="font-display text-2xl font-semibold tabular-nums">{pct(result.score)}</span>
+                  <span className="text-sm text-ink-soft dark:text-ube-100">top-class score</span>
+                </div>
+              </div>
+              {result.truncated && <div className="mt-4"><Notice tone="warn">Long input: only the first 128 model tokens were read.</Notice></div>}
+              <div className="mt-6">
+                <p className="mb-3 text-sm font-semibold">How the model split its scores</p>
                 <ScoreBars scores={result.scores} />
-                <p className="mt-5 text-xs leading-relaxed text-ink-soft dark:text-ube-300">{SCORE_NOTE}</p>
-                <Ripple className="btn-soft mt-auto self-start" onClick={() => setShowBack(false)}>
-                  <RotateCcw size={15} aria-hidden /> Back to the label
-                </Ripple>
-              </>
-            )}
-          </div>
-        </motion.div>
-      </div>
+              </div>
+              <p className="mt-auto pt-6 text-xs leading-relaxed text-ink-soft dark:text-ube-300">
+                A suggested label, not a verdict. Sarcasm, slang and unfamiliar topics can change the meaning. {SCORE_NOTE}
+              </p>
+            </motion.div>
+          ) : (
+            <motion.div key="empty" className="flex h-full flex-col items-start justify-center gap-4" initial={false}>
+              <Dots busy={busy} />
+              <p className="max-w-[26ch] font-display text-2xl font-semibold">{busy ? 'Reading the mood…' : 'Your result lands here.'}</p>
+              <p className="text-sm text-ink-soft dark:text-ube-300">Pick an example or write your own, then analyse.</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </Card>
     </Tilt>
   );
 }

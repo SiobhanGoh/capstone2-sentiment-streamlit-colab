@@ -9,23 +9,27 @@ function fakeYouTube(pages, { video = true } = {}) {
   const fetcher = async (url) => {
     calls.push(url);
     const u = new URL(url);
-    if (u.pathname.endsWith('/videos')) return ok({ items: video ? [{ snippet: { title: 'T', channelTitle: 'C' } }] : [] });
+    if (u.pathname.endsWith('/videos')) return ok({ items: video ? [{ snippet: { title: 'T', channelTitle: 'C', thumbnails: { high: { url: 'https://i.ytimg.com/vi/x/hq.jpg' } } }, statistics: { viewCount: '1200', likeCount: '30' } }] : [] });
     const page = pages.shift();
     return typeof page === 'function' ? page() : ok(page);
   };
   return { fetcher, calls };
 }
-const thread = (id, text) => ({ id, snippet: { topLevelComment: { id, snippet: { textOriginal: text } } } });
+const thread = (id, text, likeCount = 0) => ({ id, snippet: { topLevelComment: { id, snippet: { textOriginal: text, likeCount } } } });
 
 describe('YouTube Pages Function', () => {
   it('pages through results, skips duplicates and blanks, and stops at the limit', async () => {
     const { fetcher, calls } = fakeYouTube([
-      { items: [thread('a', 'one'), thread('b', '  '), thread('a', 'one again')], nextPageToken: 'p2' },
-      { items: [thread('c', 'two'), thread('d', 'three')], nextPageToken: 'p3' },
+      { items: [thread('a', 'one', 7), thread('b', '  '), thread('a', 'one again')], nextPageToken: 'p2' },
+      { items: [thread('c', 'two', 3), thread('d', 'three')], nextPageToken: 'p3' },
     ]);
-    const { meta, comments } = await getComments('dQw4w9WgXcQ', 2, 'KEY', fetcher);
+    const { meta, comments, likes } = await getComments('dQw4w9WgXcQ', 2, 'KEY', fetcher);
     expect(comments).toEqual(['one', 'two']);
+    expect(likes).toEqual([7, 3]);
     expect(meta.title).toBe('T');
+    expect(meta.thumbnail_url).toBe('https://i.ytimg.com/vi/x/hq.jpg');
+    expect(meta.views).toBe(1200);
+    expect(meta.comment_count).toBeNull();
     expect(calls).toHaveLength(3);
   });
   it('never returns a partial fetch when a later page fails', async () => {

@@ -47,18 +47,27 @@ export async function getComments(input, max, key, fetcher = fetch) {
   const id = extractVideoId(input);
   if (!key) throw new YouTubeError('YouTube retrieval is not set up on this site. You can still paste comments.', 503);
   if (!Number.isInteger(max) || max < 1 || max > MAX) throw new YouTubeError(`Choose between 1 and ${MAX} comments.`);
-  const details = await youtubeGet('videos', { part: 'snippet', id }, key, fetcher);
+  const details = await youtubeGet('videos', { part: 'snippet,statistics', id }, key, fetcher);
   if (!details.items?.length) throw new YouTubeError('This video is unavailable or is not public.', 404);
   const snippet = details.items[0].snippet ?? {};
+  const stats = details.items[0].statistics ?? {};
+  const thumbs = snippet.thumbnails ?? {};
+  const count = (v) => (v == null || v === '' ? null : Number(v));
   const meta = {
     source: 'YouTube',
     video_id: id,
     title: snippet.title || 'Untitled video',
     channel: snippet.channelTitle || 'Unknown channel',
     published_at: snippet.publishedAt || '',
+    thumbnail_url: (thumbs.maxres || thumbs.high || thumbs.medium || thumbs.default || {}).url || '',
+    url: `https://www.youtube.com/watch?v=${id}`,
+    views: count(stats.viewCount),
+    likes: count(stats.likeCount),
+    comment_count: count(stats.commentCount),
     sampling: `Up to ${max} top-level comments, ordered by relevance; replies excluded.`,
   };
   const comments = [];
+  const likes = [];
   const seen = new Set();
   const tokens = new Set();
   let pageToken;
@@ -72,6 +81,7 @@ export async function getComments(input, max, key, fetcher = fetch) {
       const text = top.snippet?.textOriginal || top.snippet?.textDisplay;
       if (typeof text === 'string' && text.trim() && !seen.has(cid)) {
         comments.push(text.trim());
+        likes.push(Number(top.snippet?.likeCount ?? 0) || 0);
         seen.add(cid);
         if (comments.length >= max) break;
       }
@@ -81,7 +91,7 @@ export async function getComments(input, max, key, fetcher = fetch) {
     tokens.add(pageToken);
   }
   // A failed later page throws above, so a partial fetch is never presented as complete.
-  return { meta, comments };
+  return { meta, comments, likes };
 }
 
 export async function onRequestGet({ request, env, waitUntil }) {
