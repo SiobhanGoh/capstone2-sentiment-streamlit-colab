@@ -84,7 +84,21 @@ Live exploratory checks also found errors: the straightforward negative Malay se
 
 Screenshot: a functional positive example, not accuracy evidence. [Deployment file verification](verification/deployment_source.json) records the exact deployed Space revision and file checksums. [Feature checks](verification/app_feature_checks.json) separates public browser checks, automated checks and observed prediction limitations.
 
-## Run the app
+## Web app (runs in your browser)
+
+`web/` is the new front end: a React site where the model runs **inside the visitor's browser** through ONNX and transformers.js, so typed and uploaded text never leaves their device and there is no server to fall asleep. It covers single-text analysis with all three class scores, comment analysis from pasted text, YouTube or an uploaded CSV (up to 1,000 at a time), search and filter, CSV and PDF exports, and per-browser history. Setup and free Cloudflare Pages deployment are in [web/README.md](web/README.md).
+
+The browser model is a 16-bit ONNX conversion of the same pinned checkpoint, published at [`SiobhanGoh/malay-english-sentiment-onnx`](https://huggingface.co/SiobhanGoh/malay-english-sentiment-onnx). It was checked on the same frozen 981-input test partition before release ([record](verification/browser_model_evaluation.json)):
+
+| Model file | Size | Test accuracy | Macro-F1 | Same label as full precision |
+|---|---:|---:|---:|---:|
+| Full-precision ONNX | 712 MB | 76.04% | 0.7557 | 100% |
+| **16-bit ONNX (used by the web app)** | 356 MB | 76.04% | 0.7557 | 100% |
+| 8-bit ONNX (rejected) | 179 MB | 75.84% | 0.7490 | 89.8% |
+
+The full-precision export reproduces the PyTorch confusion matrix exactly. Running the web app's own code in headless Chrome over the same inputs gave identical labels to the Python evaluation (largest score difference 0.0042). The 8-bit file was not published because it changed about 1 in 10 labels. These checks show the conversion preserved the model; they are not new external validation, and the limitations above still apply.
+
+## Run the Streamlit app
 
 The app uses Python 3.12 with pinned dependencies. The Docker Space installs the CPU build of PyTorch. From the repository root:
 
@@ -113,6 +127,7 @@ tests/                    # Protocol, inference helpers, exports and app checks
 verification/             # Aggregate results; no raw social text
 colab_notebooks/           # Corrected workflow and historical source
 hf_space_streamlit/       # Verified deployed app source and pinned environment
+web/                      # In-browser React app, YouTube function and its tests
 assets/                   # Architecture and real app screenshot
 ```
 

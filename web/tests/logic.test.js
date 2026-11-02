@@ -21,6 +21,13 @@ describe('inference helpers', () => {
     expect(() => checkLabelOrder({ 0: 'negative', 1: 'neutral', 2: 'positive' })).not.toThrow();
     expect(() => checkLabelOrder({ 0: 'POSITIVE', 1: 'NEUTRAL', 2: 'NEGATIVE' })).toThrow();
   });
+  it('a verified release is pinned to an exact revision and checksum', () => {
+    if (release.status === 'verified') {
+      expect(release.browser_model.revision).toMatch(/^[a-f0-9]{40}$/);
+      expect(release.browser_model.onnx_sha256).toMatch(/^[a-f0-9]{64}$/);
+      expect(release.browser_model.onnx_file).toBe(release.browser_model.dtype === 'fp16' ? 'onnx/model_fp16.onnx' : 'onnx/model_quantized.onnx');
+    }
+  });
   it('release labels match the protocol', () => {
     expect(release.labels).toEqual(LABELS);
     expect(release.max_length).toBe(128);
