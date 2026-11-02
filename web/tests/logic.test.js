@@ -67,7 +67,9 @@ describe('exports', () => {
     expect(guessTextColumn(['id', 'body'], [{ id: '1', body: 'a long comment here' }])).toBe('body');
   });
   it('shows unsupported PDF characters as visible codes', () => {
-    expect(printable('ok 😀')).toBe('ok [U+1F600]');
+    expect(printable('ok 😀')).toBe('ok [emoji]');
+    expect(printable('wow 👍🏽🔥🔥 yes')).toBe('wow [emoji] yes');
+    expect(printable('𝄞')).toBe('[U+1D11E]');
     expect(printable('Cafe é')).toBe('Cafe é');
   });
 });

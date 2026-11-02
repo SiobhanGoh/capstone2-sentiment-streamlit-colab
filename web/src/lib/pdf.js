@@ -1,12 +1,30 @@
-// Comment report PDF built in the browser. Loaded only when someone exports.
+// Comment report PDF in the app's pastel theme, built in the browser.
+// Loaded only when someone exports.
 import { jsPDF } from 'jspdf';
 import regularUrl from '../assets/fonts/DejaVuSans.ttf?url';
 import boldUrl from '../assets/fonts/DejaVuSans-Bold.ttf?url';
+import displayUrl from '../assets/fonts/BricolageGrotesque-Bold.ttf?url';
 import glyphs from './pdf_glyphs.json';
 import release from '../model_release.json';
 import { LABELS } from './inference.js';
 import { SAMPLE_NOTE, SCORE_NOTE, pct, summarise, title } from './analysis.js';
 import { NOTES_DISCLAIMER, creatorNotes } from './insights.js';
+
+const C = {
+  ink: [43, 37, 64], soft: [90, 83, 115], faint: [138, 132, 160], mist: [244, 241, 251], white: [255, 255, 255],
+  ube: [117, 98, 180], ube100: [233, 227, 250], ube300: [191, 176, 236],
+};
+const TONE = {
+  NEGATIVE: { soft: [252, 228, 234], bar: [244, 175, 192], deep: [169, 53, 86] },
+  NEUTRAL: { soft: [251, 243, 214], bar: [242, 222, 151], deep: [138, 106, 18] },
+  POSITIVE: { soft: [221, 243, 229], bar: [168, 221, 189], deep: [47, 122, 84] },
+};
+const DOTS = [TONE.POSITIVE.bar, TONE.NEUTRAL.bar, TONE.NEGATIVE.bar];
+const W = 595.28;
+const H = 841.89;
+const M = 40;
+const CW = W - M * 2;
+const BOTTOM = H - 52;
 
 function supported(cp) {
   let lo = 0;
@@ -20,12 +38,24 @@ function supported(cp) {
   return false;
 }
 
-// Show characters the font cannot draw as visible codes instead of empty boxes.
+const EMOJI = /\p{Extended_Pictographic}/u;
+const JOINERS = new Set([0x200d, 0xfe0f, 0xfe0e]);
+
+// Characters the PDF font can't draw are shown as [emoji] or a Unicode code, never as empty boxes.
 export function printable(text) {
   let out = '';
+  let lastEmoji = false;
   for (const ch of String(text)) {
     const cp = ch.codePointAt(0);
-    out += ch === '\n' || ch === '\t' || supported(cp) ? ch : `[U+${cp.toString(16).toUpperCase().padStart(4, '0')}]`;
+    if (JOINERS.has(cp) || (cp >= 0x1f3fb && cp <= 0x1f3ff)) continue;
+    if (ch === '\n' || ch === '\t' || supported(cp)) { out += ch; lastEmoji = false; continue; }
+    if (EMOJI.test(ch)) {
+      if (!lastEmoji) out += '[emoji]';
+      lastEmoji = true;
+      continue;
+    }
+    out += `[U+${cp.toString(16).toUpperCase().padStart(4, '0')}]`;
+    lastEmoji = false;
   }
   return out;
 }
@@ -37,101 +67,293 @@ async function fontBase64(url) {
   return btoa(binary);
 }
 
+async function thumbnail(meta) {
+  if (!meta.video_id) return null;
+  try {
+    const res = await fetch(`/api/thumb?id=${encodeURIComponent(meta.video_id)}`);
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
+}
+
+const compact = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 });
+const likesText = (n) => `${n.toLocaleString()} ${n === 1 ? 'like' : 'likes'}`;
+const clip = (s, n) => (s.length > n ? `${s.slice(0, n - 1).trimEnd()}…` : s);
+
 export async function buildReport(rows, meta) {
   const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-  doc.addFileToVFS('DejaVuSans.ttf', await fontBase64(regularUrl));
+  const [reg, bold, disp, thumb] = await Promise.all([fontBase64(regularUrl), fontBase64(boldUrl), fontBase64(displayUrl), thumbnail(meta)]);
+  doc.addFileToVFS('DejaVuSans.ttf', reg);
   doc.addFont('DejaVuSans.ttf', 'Sans', 'normal');
-  doc.addFileToVFS('DejaVuSans-Bold.ttf', await fontBase64(boldUrl));
+  doc.addFileToVFS('DejaVuSans-Bold.ttf', bold);
   doc.addFont('DejaVuSans-Bold.ttf', 'Sans', 'bold');
-  doc.setProperties({ title: 'Sentiment analysis report', author: 'Siobhan Goh' });
-
-  const margin = 42;
-  const width = doc.internal.pageSize.getWidth() - margin * 2;
-  const bottom = doc.internal.pageSize.getHeight() - margin;
-  let y = margin;
-
-  const write = (text, { size = 9, bold = false, gap = 6, color = [43, 37, 64] } = {}) => {
-    doc.setFont('Sans', bold ? 'bold' : 'normal');
-    doc.setFontSize(size);
-    doc.setTextColor(...color);
-    const lineHeight = size * 1.45;
-    for (const line of doc.splitTextToSize(printable(text), width)) {
-      if (y + lineHeight > bottom) { doc.addPage(); y = margin; }
-      doc.text(line, margin, y + size);
-      y += lineHeight;
-    }
-    y += gap;
-  };
+  doc.addFileToVFS('Bricolage-Bold.ttf', disp);
+  doc.addFont('Bricolage-Bold.ttf', 'Display', 'bold');
+  doc.setProperties({ title: `Sentiment report: ${meta.title || 'comments'}`, author: 'Rojak Sentiment' });
 
   const s = summarise(rows);
-  const spec = release.browser_model;
-  write('Sentiment analysis report', { size: 18, bold: true, gap: 10 });
-  write(meta.title || 'Comment analysis', { size: 11, bold: true });
-  write(`Source: ${meta.source}${meta.channel ? `, ${meta.channel}` : ''}`);
-  if (meta.url) {
-    const facts = [meta.views != null && `${meta.views.toLocaleString()} views`, meta.likes != null && `${meta.likes.toLocaleString()} likes`,
-      meta.comment_count != null && `${meta.comment_count.toLocaleString()} comments`, meta.published_at && `published ${meta.published_at.slice(0, 10)}`].filter(Boolean);
-    write(`${meta.url}${facts.length ? ` | ${facts.join(', ')}` : ''}`);
-  }
-  write(meta.sampling || 'User-supplied comments; not a representative sample.');
-  write(`Analysed comments: ${s.total}. Excluded empty inputs: ${meta.excluded ?? 0}. Inputs truncated to 128 tokens: ${s.truncated}.`);
-  write(SCORE_NOTE);
-  if (rows.some((r) => printable(r.comment) !== String(r.comment))) {
-    write('Characters this PDF font cannot draw are shown as Unicode codes in brackets. The CSV download keeps the original text.');
-  }
-  if (meta.source === 'YouTube') write(SAMPLE_NOTE);
-
-  y += 4;
-  const cols = [margin, margin + 250, margin + 360];
-  doc.setFillColor(236, 231, 248);
-  doc.rect(margin, y, 470, 22, 'F');
-  doc.setFont('Sans', 'bold');
-  doc.setFontSize(9);
-  ['Predicted sentiment', 'Count', 'Share'].forEach((h, i) => doc.text(h, cols[i] + 8, y + 15));
-  y += 22;
-  doc.setFont('Sans', 'normal');
-  LABELS.forEach((l) => {
-    doc.setDrawColor(217, 217, 217);
-    doc.rect(margin, y, 470, 22);
-    [title(l), String(s.counts[l]), pct(s.shares[l])].forEach((v, i) => doc.text(v, cols[i] + 8, y + 15));
-    y += 22;
-  });
-  y += 14;
-  write(`Mean top-class model score: ${pct(s.meanScore)}. This is not accuracy or sentiment intensity.`);
-  write('Review individual comments before acting. Sarcasm, code-switching and new topics may produce errors. This classifier does not assess business risk or mental health.');
   const n = creatorNotes(rows);
-  write(meta.source === 'YouTube' ? 'Notes for the creator' : 'What to look at', { size: 12, bold: true, gap: 8 });
-  n.notes.forEach((t) => write(`• ${t}`, { gap: 4 }));
-  const quotes = (heading, list) => {
-    if (!list.length) return;
-    write(heading, { bold: true, gap: 2 });
-    list.forEach((r) => write(`#${r.no}${Number.isFinite(r.likes) ? ` (${r.likes} likes)` : ''}: ${r.comment}`, { size: 8.5, gap: 4, color: [74, 68, 96] }));
+  const isYouTube = meta.source === 'YouTube';
+  let y = M;
+
+  const fill = (c) => doc.setFillColor(...c);
+  const alpha = (a) => doc.setGState(new doc.GState({ opacity: a }));
+  const font = (f, size, color = C.ink) => {
+    doc.setFont(f === 'display' ? 'Display' : 'Sans', f === 'regular' ? 'normal' : 'bold');
+    doc.setFontSize(size);
+    doc.setTextColor(...color);
   };
-  quotes('Read these first', n.readFirst);
-  quotes('Viewer questions', n.questions.slice(0, 3));
-  quotes('What viewers enjoyed', n.highlights);
-  write(NOTES_DISCLAIMER, { size: 7.5, gap: 10 });
+  const lines = (text, width, f, size) => { font(f, size); return doc.splitTextToSize(printable(text), width); };
+
+  const background = () => {
+    fill(C.mist);
+    doc.rect(0, 0, W, H, 'F');
+    alpha(0.45);
+    fill(C.ube300); doc.circle(-30, -10, 170, 'F');
+    fill(TONE.POSITIVE.bar); doc.circle(W + 40, 330, 150, 'F');
+    fill(TONE.NEGATIVE.bar); doc.circle(W * 0.38, H + 60, 170, 'F');
+    alpha(1);
+  };
+  const card = (x, top, w, h, color = C.white, opacity = 0.82) => {
+    alpha(opacity); fill(color); doc.roundedRect(x, top, w, h, 14, 14, 'F'); alpha(1);
+  };
+  const newPage = () => { doc.addPage(); background(); y = M; };
+  const ensure = (h) => { if (y + h > BOTTOM) newPage(); };
+  const dots = (x, cy, r) => DOTS.forEach((c, i) => { fill(c); doc.circle(x + r + i * r * 1.55, cy, r, 'F'); });
+  const chip = (x, top, text, bg, color) => {
+    font('bold', 7.5, color);
+    const w = doc.getTextWidth(text) + 14;
+    fill(bg); doc.roundedRect(x, top, w, 15, 7.5, 7.5, 'F');
+    doc.text(text, x + 7, top + 10.3);
+    return w;
+  };
+  const bar = (x, top, w, h, share, color) => {
+    fill([226, 220, 242]); doc.roundedRect(x, top, w, h, h / 2, h / 2, 'F');
+    if (share > 0) { fill(color); doc.roundedRect(x, top, Math.max(w * share, h), h, h / 2, h / 2, 'F'); }
+  };
+
+  // ---------- Cover ----------
+  background();
+  dots(M, y + 6, 6);
+  font('display', 13); doc.text('Rojak Sentiment', M + 34, y + 10.5);
+  font('regular', 8.5, C.faint);
+  doc.text(`Generated ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`, W - M, y + 10, { align: 'right' });
+  y += 44;
+  font('display', 30); doc.text('Sentiment report', M, y + 24);
+  y += 40;
+  font('regular', 10.5, C.soft);
+  const intro = isYouTube ? 'What the comments on this video say, read by a Malay–English sentiment model.' : 'What these comments say, read by a Malay–English sentiment model.';
+  doc.text(intro, M, y + 10);
+  y += 28;
+
+  // Video or source card
+  if (isYouTube) {
+    const th = thumb ? 101 : 0;
+    const textX = M + 16 + (thumb ? 180 + 16 : 0);
+    const textW = CW - (textX - M) - 16;
+    const tl = lines(meta.title || 'Untitled video', textW, 'bold', 12.5).slice(0, 3);
+    const h = Math.max(th + 32, 24 + tl.length * 16 + 64);
+    card(M, y, CW, h);
+    if (thumb) {
+      fill(C.white); doc.roundedRect(M + 14, y + 14, 184, th + 4, 8, 8, 'F');
+      doc.addImage(thumb, 'JPEG', M + 16, y + 16, 180, th);
+    }
+    let ty = y + 26;
+    font('bold', 12.5); tl.forEach((l) => { doc.text(l, textX, ty); ty += 16; });
+    font('regular', 9, C.soft);
+    doc.text(printable(`${meta.channel || ''}${meta.published_at ? `, published ${meta.published_at.slice(0, 10)}` : ''}`), textX, ty + 2);
+    ty += 14;
+    let cx = textX;
+    [meta.views != null && `${compact.format(meta.views)} views`, meta.likes != null && `${compact.format(meta.likes)} likes`,
+      meta.comment_count != null && `${compact.format(meta.comment_count)} comments`].filter(Boolean)
+      .forEach((t) => { cx += chip(cx, ty, t, C.ube100, C.ube) + 6; });
+    ty += 28;
+    font('bold', 8.5, C.ube);
+    if (meta.url) doc.textWithLink('Open on YouTube', textX, ty, { url: meta.url });
+    y += h + 14;
+  } else {
+    const tl = lines(meta.title || 'Comment analysis', CW - 32, 'bold', 12.5).slice(0, 2);
+    const h = 30 + tl.length * 16 + 14;
+    card(M, y, CW, h);
+    let ty = y + 26;
+    font('bold', 12.5); tl.forEach((l) => { doc.text(l, M + 16, ty); ty += 16; });
+    font('regular', 9, C.soft); doc.text(printable(meta.source), M + 16, ty + 2);
+    y += h + 14;
+  }
+
+  // KPI tiles
+  const gap = 10;
+  const tileH = 78;
+  const wide = CW * 0.31;
+  const narrow = (CW - wide - gap * 3) / 3;
+  card(M, y, wide, tileH);
+  font('regular', 8.5, C.soft); doc.text(s.tied ? 'Joint most frequent' : 'Most frequent label', M + 14, y + 20);
+  font('display', s.dominant.length > 12 ? 15 : 22); doc.text(s.dominant, M + 14, y + 46);
+  font('regular', 8, C.faint); doc.text(`${s.total} analysed${meta.excluded ? `, ${meta.excluded} empty` : ''}`, M + 14, y + 64);
+  LABELS.forEach((l, i) => {
+    const x = M + wide + gap + i * (narrow + gap);
+    card(x, y, narrow, tileH, TONE[l].soft, 1);
+    font('bold', 8.5, TONE[l].deep); doc.text(title(l), x + 14, y + 20);
+    font('display', 24); doc.text(pct(s.shares[l], 0), x + 14, y + 49);
+    font('regular', 8, C.soft); doc.text(`${s.counts[l]} ${s.counts[l] === 1 ? 'comment' : 'comments'}`, x + 14, y + 65);
+  });
+  y += tileH + 12;
+
+  // Share bar and averages
+  const half = (CW - gap) / 2;
+  const boxH = 112;
+  card(M, y, half, boxH);
+  font('bold', 10); doc.text('Share of comments', M + 14, y + 22);
+  let bx = M + 14;
+  const bw = half - 28;
+  LABELS.forEach((l, i) => {
+    const w = bw * s.shares[l];
+    if (w <= 0) return;
+    fill(TONE[l].bar);
+    const first = bx === M + 14;
+    const last = LABELS.slice(i + 1).every((k) => s.shares[k] === 0);
+    doc.roundedRect(bx, y + 34, w, 14, first || last ? 7 : 0, first || last ? 7 : 0, 'F');
+    if (first && !last) doc.rect(bx + Math.min(7, w / 2), y + 34, w - Math.min(7, w / 2), 14, 'F');
+    if (last && !first) doc.rect(bx, y + 34, Math.max(w - 7, 0), 14, 'F');
+    if (!first && !last) doc.rect(bx, y + 34, w, 14, 'F');
+    bx += w;
+  });
+  let lx = M + 14;
+  LABELS.forEach((l) => {
+    fill(TONE[l].bar); doc.circle(lx + 4, y + 63, 4, 'F');
+    font('regular', 8.5, C.soft); doc.text(`${title(l)} ${pct(s.shares[l], 0)}`, lx + 12, y + 66);
+    lx += doc.getTextWidth(`${title(l)} ${pct(s.shares[l], 0)}`) + 26;
+  });
+  font('regular', 7, C.faint);
+  doc.text(doc.splitTextToSize(isYouTube ? SAMPLE_NOTE : 'A summary of the supplied comments only.', bw), M + 14, y + 84);
+
+  const ax = M + half + gap;
+  card(ax, y, half, boxH);
+  font('bold', 10); doc.text('Average score per class', ax + 14, y + 22);
+  LABELS.forEach((l, i) => {
+    const mean = rows.reduce((a, r) => a + r.scores[i], 0) / s.total;
+    const ry = y + 38 + i * 22;
+    font('regular', 8.5, C.soft); doc.text(title(l), ax + 14, ry + 7);
+    font('regular', 8.5, C.soft); doc.text(pct(mean), ax + half - 14, ry + 7, { align: 'right' });
+    bar(ax + 74, ry, half - 74 - 56, 8, mean, TONE[l].bar);
+  });
+  font('regular', 7, C.faint); doc.text(`Mean top-class score ${pct(s.meanScore)}. Not accuracy.`, ax + 14, y + 104);
+  y += boxH + 14;
+
+  // Creator notes
+  const noteLines = n.notes.map((t) => lines(t, CW - 46, 'regular', 9));
+  const colW = (CW - 28 - 16) / 3;
+  const groups = [
+    { name: 'Read these first', list: n.readFirst, tone: TONE.NEGATIVE.soft, color: TONE.NEGATIVE.deep, empty: 'No negative comments.' },
+    { name: 'Viewer questions', list: n.questions.slice(0, 3), tone: C.ube100, color: C.ube, empty: 'No questions spotted.' },
+    { name: 'What viewers enjoyed', list: n.highlights, tone: TONE.POSITIVE.soft, color: TONE.POSITIVE.deep, empty: 'No positive comments.' },
+  ].map((g) => ({ ...g, quotes: g.list.map((r) => { const all = lines(clip(r.comment, 220), colW - 18, 'regular', 8); const l = all.slice(0, 5); if (all.length > 5) l[4] = `${l[4].replace(/\s*\S*$/, '')}…`; return { r, l }; }) }));
+  const colH = (g) => 18 + (g.quotes.length ? g.quotes.reduce((a, q) => a + q.l.length * 10.5 + 26, 0) : 16);
+  const notesH = 56 + noteLines.reduce((a, l) => a + l.length * 12.5 + 5, 0);
+  ensure(notesH);
+  card(M, y, CW, notesH);
+  fill(TONE.NEUTRAL.bar); doc.circle(M + 21, y + 22, 6, 'F');
+  font('display', 15); doc.text(isYouTube ? 'Notes for the creator' : 'What to look at', M + 34, y + 27);
+  let ny = y + 48;
+  noteLines.forEach((l) => {
+    fill(C.ube300); doc.circle(M + 21, ny - 3, 2.2, 'F');
+    font('regular', 9, C.soft); l.forEach((line) => { doc.text(line, M + 30, ny); ny += 12.5; });
+    ny += 5;
+  });
+  y += notesH + 12;
+
+  const quotesH = 30 + Math.max(...groups.map(colH)) + 26;
+  ensure(quotesH);
+  card(M, y, CW, quotesH);
+  groups.forEach((g, i) => {
+    const gx = M + 14 + i * (colW + 8);
+    let gy = y + 24;
+    font('bold', 8.5, g.color); doc.text(g.name, gx, gy); gy += 10;
+    if (!g.quotes.length) { font('regular', 8, C.faint); doc.text(g.empty, gx, gy + 8); return; }
+    g.quotes.forEach(({ r, l }) => {
+      const qh = l.length * 10.5 + 20;
+      fill(g.tone); doc.roundedRect(gx, gy, colW, qh, 8, 8, 'F');
+      font('regular', 8, C.ink); l.forEach((line, k) => doc.text(line, gx + 9, gy + 13 + k * 10.5));
+      font('regular', 7, C.soft);
+      doc.text(`#${r.no}${Number.isFinite(r.likes) ? `   ${likesText(r.likes)}` : ''}`, gx + 9, gy + qh - 6);
+      gy += qh + 6;
+    });
+  });
+  font('regular', 6.8, C.faint);
+  doc.text(doc.splitTextToSize(NOTES_DISCLAIMER, CW - 28), M + 14, y + quotesH - 16);
+  y += quotesH + 16;
+
+  // Comments by label
   for (const label of LABELS) {
     const group = rows.filter((r) => r.sentiment === label);
-    write(`${title(label)} comments (${group.length})`, { size: 12, bold: true, gap: 8 });
-    if (!group.length) write('None in this set.');
-    group.forEach((r) => {
-      write(`#${r.no} | Model score ${pct(r.score)}${Number.isFinite(r.likes) ? ` | ${r.likes} likes` : ''}${r.truncated ? ' | truncated' : ''}`, { bold: true, gap: 2 });
-      write(r.comment, { size: 8.5, gap: 10, color: [74, 68, 96] });
-    });
+    const t = TONE[label];
+    const firstH = group.length ? Math.min(34 + lines(group[0].comment, CW - 40, 'regular', 9).length * 12.5, 160) : 24;
+    ensure(50 + firstH + 8);
+    fill(t.soft); doc.roundedRect(M, y, CW, 40, 12, 12, 'F');
+    font('display', 16, t.deep); doc.text(`${title(label)} comments`, M + 16, y + 26);
+    font('display', 16, t.deep); doc.text(pct(s.shares[label], 0), W - M - 16, y + 26, { align: 'right' });
+    font('regular', 8.5, C.soft); doc.text(`${group.length} of ${s.total}`, W - M - 60, y + 25, { align: 'right' });
+    y += 50;
+    if (!group.length) { font('regular', 9, C.faint); doc.text('None in this set.', M + 16, y + 6); y += 24; continue; }
+    for (const r of group) {
+      const body = lines(r.comment, CW - 44, 'regular', 9);
+      const ch = 34 + body.length * 12.5;
+      if (ch > BOTTOM - M) {
+        // Very long comments flow across pages without a card.
+        ensure(40);
+        font('bold', 8, t.deep); doc.text(`#${r.no}  ${pct(r.score)}`, M + 16, y + 10); y += 22;
+        font('regular', 9, C.ink);
+        for (const line of body) { ensure(13); doc.text(line, M + 16, y); y += 12.5; }
+        y += 10;
+        continue;
+      }
+      ensure(ch + 8);
+      card(M, y, CW, ch, C.white, 0.85);
+      fill(t.bar); doc.roundedRect(M + 7, y + 9, 4, ch - 18, 2, 2, 'F');
+      let cx = M + 20;
+      font('bold', 8, C.faint); doc.text(`#${r.no}`, cx, y + 17); cx += doc.getTextWidth(`#${r.no}`) + 8;
+      cx += chip(cx, y + 7, `${pct(r.score)} score`, t.soft, t.deep) + 5;
+      if (Number.isFinite(r.likes)) cx += chip(cx, y + 7, likesText(r.likes), C.ube100, C.ube) + 5;
+      if (r.truncated) chip(cx, y + 7, 'truncated', TONE.NEUTRAL.soft, TONE.NEUTRAL.deep);
+      font('regular', 9, C.ink);
+      body.forEach((line, k) => doc.text(line, M + 20, y + 38 + k * 12.5));
+      y += ch + 8;
+    }
+    y += 10;
   }
-  write('Model release', { size: 12, bold: true, gap: 8 });
-  write(`${spec.repo_id} | Revision ${spec.revision || 'unreleased'} | ${spec.dtype}`, { size: 7 });
-  write(`Converted from ${release.source_checkpoint.repo_id} (weights SHA-256 ${release.source_checkpoint.model_sha256}).`, { size: 7 });
-  write('Degree capstone 2025–2026. Corrected retrospective internal evaluation; external generalisation and calibration are not established.', { size: 7 });
 
+  // About this report
+  const spec = release.browser_model;
+  const about = [
+    SCORE_NOTE,
+    `Analysed comments: ${s.total}. Excluded empty inputs: ${meta.excluded ?? 0}. Inputs truncated to 128 tokens: ${s.truncated}.`,
+    meta.sampling || 'User-supplied comments; not a representative sample.',
+    'Review individual comments before acting. Sarcasm, slang, code-switching and new topics may produce errors. This classifier does not assess business risk or mental health.',
+    rows.some((r) => printable(r.comment) !== String(r.comment)) && 'Emoji and characters this PDF font cannot draw appear as [emoji] or a Unicode code. The CSV download keeps the original text.',
+    `Model: ${spec.repo_id} (${spec.dtype}), revision ${spec.revision || 'unreleased'}, converted from ${release.source_checkpoint.repo_id}. Corrected internal test accuracy ${pct(release.evaluation.original_accuracy, 2)} on ${release.evaluation.test_inputs} inputs; retrospective, not external validation.`,
+  ].filter(Boolean).map((t) => lines(t, CW - 32, 'regular', 8));
+  const aboutH = 40 + about.reduce((a, l) => a + l.length * 11 + 5, 0);
+  ensure(aboutH);
+  card(M, y, CW, aboutH, C.ube100, 0.7);
+  font('display', 12); doc.text('About this report', M + 16, y + 24);
+  let ay = y + 42;
+  about.forEach((l) => { font('regular', 8, C.soft); l.forEach((line) => { doc.text(line, M + 16, ay); ay += 11; }); ay += 5; });
+
+  // Footer on every page
   const pages = doc.getNumberOfPages();
   for (let p = 1; p <= pages; p += 1) {
     doc.setPage(p);
-    doc.setFont('Sans', 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(120, 112, 140);
-    doc.text(`Page ${p} of ${pages}`, doc.internal.pageSize.getWidth() - margin, doc.internal.pageSize.getHeight() - 22, { align: 'right' });
+    dots(M, H - 26, 3);
+    font('bold', 7.5, C.faint); doc.text('Rojak Sentiment', M + 18, H - 23.5);
+    font('regular', 7.5, C.faint); doc.text(`Page ${p} of ${pages}`, W - M, H - 23.5, { align: 'right' });
   }
   return doc.output('blob');
 }
