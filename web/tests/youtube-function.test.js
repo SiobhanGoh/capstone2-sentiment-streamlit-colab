@@ -15,7 +15,7 @@ function fakeYouTube(pages, { video = true } = {}) {
   };
   return { fetcher, calls };
 }
-const thread = (id, text, likeCount = 0) => ({ id, snippet: { topLevelComment: { id, snippet: { textOriginal: text, likeCount } } } });
+const thread = (id, text, likeCount = 0) => ({ id, snippet: { topLevelComment: { id, snippet: { textOriginal: text, likeCount, publishedAt: `2026-10-0${likeCount % 9 + 1}T00:00:00Z` } } } });
 
 describe('YouTube Pages Function', () => {
   it('pages through results, skips duplicates and blanks, and stops at the limit', async () => {
@@ -23,7 +23,8 @@ describe('YouTube Pages Function', () => {
       { items: [thread('a', 'one', 7), thread('b', '  '), thread('a', 'one again')], nextPageToken: 'p2' },
       { items: [thread('c', 'two', 3), thread('d', 'three')], nextPageToken: 'p3' },
     ]);
-    const { meta, comments, likes } = await getComments('dQw4w9WgXcQ', 2, 'KEY', fetcher);
+    const { meta, comments, likes, dates } = await getComments('dQw4w9WgXcQ', 2, 'KEY', fetcher);
+    expect(dates).toEqual(['2026-10-08T00:00:00Z', '2026-10-04T00:00:00Z']);
     expect(comments).toEqual(['one', 'two']);
     expect(likes).toEqual([7, 3]);
     expect(meta.title).toBe('T');

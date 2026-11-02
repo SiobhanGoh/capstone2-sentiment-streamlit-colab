@@ -68,6 +68,7 @@ export async function getComments(input, max, key, fetcher = fetch) {
   };
   const comments = [];
   const likes = [];
+  const dates = [];
   const seen = new Set();
   const tokens = new Set();
   let pageToken;
@@ -82,6 +83,7 @@ export async function getComments(input, max, key, fetcher = fetch) {
       if (typeof text === 'string' && text.trim() && !seen.has(cid)) {
         comments.push(text.trim());
         likes.push(Number(top.snippet?.likeCount ?? 0) || 0);
+        dates.push(top.snippet?.publishedAt || null);
         seen.add(cid);
         if (comments.length >= max) break;
       }
@@ -91,7 +93,7 @@ export async function getComments(input, max, key, fetcher = fetch) {
     tokens.add(pageToken);
   }
   // A failed later page throws above, so a partial fetch is never presented as complete.
-  return { meta, comments, likes };
+  return { meta, comments, likes, dates };
 }
 
 export async function onRequestGet({ request, env, waitUntil }) {
