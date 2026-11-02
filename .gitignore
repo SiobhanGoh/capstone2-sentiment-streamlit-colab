@@ -218,3 +218,4 @@ web/node_modules/
 web/dist/
 web/public/models/
 *.onnx
+web/public/ort/

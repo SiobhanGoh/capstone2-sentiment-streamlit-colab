@@ -3,8 +3,8 @@
   "browser_model": {
     "repo_id": "SiobhanGoh/malay-english-sentiment-onnx",
     "revision": "",
-    "dtype": "q8",
-    "onnx_file": "onnx/model_quantized.onnx",
+    "dtype": "fp16",
+    "onnx_file": "onnx/model_fp16.onnx",
     "onnx_sha256": ""
   },
   "source_checkpoint": {
@@ -15,7 +15,11 @@
   },
   "protocol": "sentiment-disjoint-v1",
   "max_length": 128,
-  "labels": ["NEGATIVE", "NEUTRAL", "POSITIVE"],
+  "labels": [
+    "NEGATIVE",
+    "NEUTRAL",
+    "POSITIVE"
+  ],
   "evaluation": {
     "test_inputs": 981,
     "original_accuracy": 0.7604485219164119,

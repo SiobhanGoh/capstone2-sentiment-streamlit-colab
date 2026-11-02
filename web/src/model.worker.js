@@ -14,6 +14,14 @@ function load() {
   if (loading) return loading;
   const spec = release.browser_model;
   const localPath = import.meta.env.VITE_LOCAL_MODEL_PATH;
+  // Evaluation builds only: serve onnxruntime's files from the same npm version instead of the CDN.
+  const wasmPath = import.meta.env.VITE_ORT_WASM_PATH;
+  if (wasmPath) {
+    env.backends.onnx.wasm.wasmPaths = {
+      mjs: `${wasmPath}ort-wasm-simd-threaded.asyncify.mjs`,
+      wasm: `${wasmPath}ort-wasm-simd-threaded.asyncify.wasm`,
+    };
+  }
   if (localPath) {
     env.allowRemoteModels = false;
     env.allowLocalModels = true;
