@@ -1,7 +1,7 @@
 <p align="center"><img src="assets/sentiment-hero.svg" width="100%" alt="Malay–English Sentiment Analysis — Transformer NLP" /></p>
 
 <p align="center"><strong>Multilingual text classification · Social-comment analytics · Explainability</strong></p>
-<p align="center"><a href="https://huggingface.co/spaces/SiobhanGoh/emotion-detection-malaybert-skeleton">Hugging Face demo</a> · <a href="#corrected-evaluation">Evaluation</a> · <a href="#reproduce-the-comparison">Reproduce</a> · <a href="#run-the-app">Run the app</a></p>
+<p align="center"><a href="https://capstone2-sentiment-streamlit-colab.pages.dev/">Live web app</a> · <a href="https://huggingface.co/spaces/SiobhanGoh/emotion-detection-malaybert-skeleton">Streamlit demo</a> · <a href="#corrected-evaluation">Evaluation</a> · <a href="#reproduce-the-comparison">Reproduce</a> · <a href="#run-the-app">Run the app</a></p>
 
 ## Overview
 
@@ -86,7 +86,7 @@ Screenshot: a functional positive example, not accuracy evidence. [Deployment fi
 
 ## Web app (runs in your browser)
 
-`web/` is the new front end: a React site where the model runs **inside the visitor's browser** through ONNX and transformers.js, so typed and uploaded text never leaves their device and there is no server to fall asleep. It covers single-text analysis with all three class scores, comment analysis from pasted text, YouTube or an uploaded CSV (up to 1,000 at a time), search and filter, CSV and PDF exports, and per-browser history. Setup and free Cloudflare Pages deployment are in [web/README.md](web/README.md).
+[`web/`](https://capstone2-sentiment-streamlit-colab.pages.dev/) is the new front end, live at **capstone2-sentiment-streamlit-colab.pages.dev**: a React site where the model runs **inside the visitor's browser** through ONNX and transformers.js, so typed and uploaded text never leaves their device and there is no server to fall asleep. It covers single-text analysis with all three class scores, comment analysis from pasted text, YouTube or an uploaded CSV (up to 1,000 at a time), search and filter, CSV and PDF exports, and per-browser history. Setup and free Cloudflare Pages deployment are in [web/README.md](web/README.md).
 
 The browser model is a 16-bit ONNX conversion of the same pinned checkpoint, published at [`SiobhanGoh/malay-english-sentiment-onnx`](https://huggingface.co/SiobhanGoh/malay-english-sentiment-onnx). It was checked on the same frozen 981-input test partition before release ([record](verification/browser_model_evaluation.json)):
 
