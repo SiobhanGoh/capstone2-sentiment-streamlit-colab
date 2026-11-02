@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { ArrowRightLeft } from 'lucide-react';
 import { useModel } from '../lib/useModel.js';
 import { LABELS } from '../lib/inference.js';
@@ -7,6 +8,7 @@ import { recurringWords } from '../lib/insights.js';
 import { analyseYouTube, isNearSplit, shareDiffs } from '../lib/pipeline.js';
 import { Card, Notice, Ripple, TONE } from '../components/ui.jsx';
 import { InfoTip } from '../components/extras.jsx';
+import { Count } from '../components/motion.jsx';
 import { ShareBar, VideoCard } from '../components/CommentResults.jsx';
 
 function Side({ name, a }) {
@@ -51,31 +53,42 @@ function Differences({ a, b }) {
   const diffs = shareDiffs(sa, sb);
   const small = Math.min(sa.total, sb.total) < 30;
   return (
-    <Card>
+    <section className="glass rounded-panel p-6 sm:p-8">
       <div className="flex items-center gap-1">
-        <h2 className="text-2xl font-semibold">What's different</h2>
+        <h2 className="text-h2 font-semibold">What's different</h2>
         <InfoTip label="Reading the differences">
           Each video's comments are a sample ordered by relevance, so small gaps can come from which comments were picked. Treat differences under about 10 points as noise, especially with fewer than 50 comments each.
         </InfoTip>
       </div>
-      <ul className="mt-4 space-y-3">
-        {diffs.map((d) => {
-          const same = Math.abs(d.points) < 5;
-          return (
-            <li key={d.label} className={`flex flex-wrap items-center gap-3 rounded-xl2 px-4 py-3 ${TONE[d.label].soft}`}>
-              <span className={`w-20 font-semibold ${TONE[d.label].text}`}>{title(d.label)}</span>
-              <span className="tabular-nums">A {pct(d.a, 0)}</span>
-              <span className="text-ink-faint">→</span>
-              <span className="tabular-nums">B {pct(d.b, 0)}</span>
-              <span className="ml-auto font-display text-lg font-bold tabular-nums">
-                {same ? 'About the same' : `B is ${Math.abs(d.points)} points ${d.points > 0 ? 'higher' : 'lower'}`}
-              </span>
-            </li>
-          );
-        })}
-      </ul>
-      {small && <p className="mt-3 text-sm text-ink-faint">At least one video has fewer than 30 analysed comments, so these differences are rough.</p>}
-    </Card>
+      <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-x-4 gap-y-5">
+        <p className="text-right font-display text-small font-bold text-ube-600 dark:text-ube-300">Video A</p>
+        <span />
+        <p className="font-display text-small font-bold text-ube-600 dark:text-ube-300">Video B</p>
+        {diffs.map((d, i) => (
+          <div key={d.label} className="contents">
+            <div className="flex items-center justify-end gap-3">
+              <span className="font-display text-h2 font-bold tabular-nums"><Count value={Math.round(d.a * 100)} suffix="%" /></span>
+              <div className="neu-inset flex h-5 w-full max-w-[16rem] justify-end overflow-hidden rounded-full">
+                <motion.div className="h-full rounded-full" style={{ background: TONE[d.label].hex }} initial={{ width: 0 }} animate={{ width: `${d.a * 100}%` }}
+                  transition={{ type: 'spring', stiffness: 90, damping: 18, delay: i * 0.08 }} />
+              </div>
+            </div>
+            <div className="w-24 text-center">
+              <p className={`text-small font-semibold ${TONE[d.label].text}`}>{title(d.label)}</p>
+              <p className="text-micro text-ink-faint">{Math.abs(d.points) < 5 ? 'about the same' : `B ${d.points > 0 ? '+' : '−'}${Math.abs(d.points)} pts`}</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="neu-inset flex h-5 w-full max-w-[16rem] overflow-hidden rounded-full">
+                <motion.div className="h-full rounded-full" style={{ background: TONE[d.label].hex }} initial={{ width: 0 }} animate={{ width: `${d.b * 100}%` }}
+                  transition={{ type: 'spring', stiffness: 90, damping: 18, delay: i * 0.08 + 0.04 }} />
+              </div>
+              <span className="font-display text-h2 font-bold tabular-nums"><Count value={Math.round(d.b * 100)} suffix="%" /></span>
+            </div>
+          </div>
+        ))}
+      </div>
+      {small && <p className="mt-5 text-small text-ink-faint">At least one video has fewer than 30 analysed comments, so these differences are rough.</p>}
+    </section>
   );
 }
 

@@ -45,3 +45,33 @@ export function bucketLabel(start, unit) {
   if (unit === 'month') return d.toLocaleDateString('en-GB', { month: 'short', year: '2-digit', timeZone: 'UTC' });
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 }
+
+export function bucketEnd(start, unit) {
+  if (unit === 'day') return start + DAY;
+  if (unit === 'week') return start + 7 * DAY;
+  const d = new Date(start);
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1);
+}
+
+export const PERIODS = [
+  { id: 'all', name: 'All time', days: null },
+  { id: '30', name: 'Last 30 days', days: 30 },
+  { id: '7', name: 'Last 7 days', days: 7 },
+];
+
+// Keep rows inside the chosen period (relative to `now`) and, if set, a brushed time range.
+export function filterRows(rows, { period = 'all', range = null, now = Date.now() } = {}) {
+  const days = PERIODS.find((p) => p.id === period)?.days;
+  return rows.filter((r) => {
+    if (!days && !range) return true;
+    const t = Date.parse(r.date ?? '');
+    if (Number.isNaN(t)) return false;
+    if (days && now - t > days * DAY) return false;
+    if (range && (t < range.start || t >= range.end)) return false;
+    return true;
+  });
+}
+
+export function periodCounts(rows, now = Date.now()) {
+  return Object.fromEntries(PERIODS.map((p) => [p.id, filterRows(rows, { period: p.id, now }).length]));
+}

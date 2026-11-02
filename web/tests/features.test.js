@@ -91,3 +91,21 @@ describe('model download timing', () => {
     expect(shouldAutoLoad({ connection: { type: 'wifi', effectiveType: '4g' } }, win(true, 390))).toBe(true);
   });
 });
+
+describe('period and brush filters', () => {
+  const now = Date.UTC(2026, 10, 3);
+  const rows = [5, 20, 40].map((d, i) => ({ no: i + 1, sentiment: 'NEUTRAL', scores: [0, 1, 0], date: new Date(now - d * 86400000).toISOString() }));
+  it('keeps comments inside the chosen period', async () => {
+    const { filterRows, periodCounts } = await import('../src/lib/timeline.js');
+    expect(filterRows(rows, { period: '7', now }).map((r) => r.no)).toEqual([1]);
+    expect(filterRows(rows, { period: '30', now }).map((r) => r.no)).toEqual([1, 2]);
+    expect(periodCounts(rows, now)).toEqual({ all: 3, 30: 2, 7: 1 });
+  });
+  it('narrows to a brushed range and drops undated rows only when filtering', async () => {
+    const { filterRows } = await import('../src/lib/timeline.js');
+    const range = { start: now - 25 * 86400000, end: now - 10 * 86400000 };
+    expect(filterRows(rows, { range, now }).map((r) => r.no)).toEqual([2]);
+    expect(filterRows([...rows, { no: 9 }], { now })).toHaveLength(4);
+    expect(filterRows([...rows, { no: 9 }], { period: '30', now })).toHaveLength(2);
+  });
+});

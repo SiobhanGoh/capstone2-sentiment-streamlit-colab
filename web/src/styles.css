@@ -78,6 +78,12 @@
 }
 @keyframes ripple { to { transform: scale(2.6); opacity: 0; } }
 
+@keyframes flash-ring {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(117, 98, 180, 0); }
+  20%, 60% { box-shadow: 0 0 0 4px rgba(117, 98, 180, 0.55); }
+}
+.flash-ring { animation: flash-ring 2s ease-out; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
 }

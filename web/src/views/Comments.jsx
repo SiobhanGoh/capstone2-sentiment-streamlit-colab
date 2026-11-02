@@ -88,11 +88,13 @@ export default function Comments() {
     }
   };
 
-  const exportPdf = async () => {
+  const exportPdf = async (rows = analysis.rows) => {
     setExporting(true);
     try {
       const { buildReport } = await import('../lib/pdf.js');
-      download('sentiment_report.pdf', await buildReport(analysis.rows, analysis.meta), 'application/pdf');
+      const filtered = rows.length !== analysis.rows.length;
+      const meta = filtered ? { ...analysis.meta, sampling: `${analysis.meta.sampling} Filtered to ${rows.length} of ${analysis.rows.length} comments.` } : analysis.meta;
+      download('sentiment_report.pdf', await buildReport(rows, meta), 'application/pdf');
     } catch {
       setMessage('The PDF could not be created. The CSV download still has every result.');
     } finally {

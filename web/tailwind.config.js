@@ -17,7 +17,19 @@ export default {
         display: ['"Bricolage Grotesque Variable"', 'system-ui', 'sans-serif'],
         sans: ['"Plus Jakarta Sans Variable"', 'system-ui', 'sans-serif'],
       },
-      borderRadius: { xl2: '1.25rem', xl3: '1.75rem' },
+      // Type scale: hero numbers, secondary numbers, headings, body, small, micro.
+      fontSize: {
+        hero: ['8.5rem', { lineHeight: '0.85', letterSpacing: '-0.04em' }],
+        num: ['3.5rem', { lineHeight: '1', letterSpacing: '-0.03em' }],
+        h1: ['2.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+        h2: ['1.5rem', { lineHeight: '1.25', letterSpacing: '-0.01em' }],
+        body: ['0.9375rem', { lineHeight: '1.6' }],
+        small: ['0.8125rem', { lineHeight: '1.45' }],
+        micro: ['0.6875rem', { lineHeight: '1.4' }],
+      },
+      // Corners: panels 28px, cards 20px, tiles inside cards 14px.
+      borderRadius: { xl2: '1.25rem', xl3: '1.75rem', panel: '1.75rem', card: '1.25rem', tile: '0.875rem' },
+      transitionDuration: { hover: '150ms', state: '240ms' },
     },
   },
   plugins: [],

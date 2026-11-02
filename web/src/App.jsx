@@ -4,9 +4,7 @@ import { Moon, Sun } from 'lucide-react';
 import Analyse from './views/Analyse.jsx';
 import Comments from './views/Comments.jsx';
 import Compare from './views/Compare.jsx';
-import Preview from './views/Preview.jsx';
 
-const PREVIEW = import.meta.env.VITE_PREVIEW === '1';
 import About from './views/About.jsx';
 import { loadHistory, saveHistory } from './lib/history.js';
 
@@ -20,7 +18,6 @@ const VIEWS = [
 function useRoute() {
   const read = () => {
     const p = window.location.hash.replace(/^#/, '') || '/';
-    if (PREVIEW && p === '/preview') return p;
     return VIEWS.some((v) => v.path === p) ? p : '/';
   };
   const [route, setRoute] = useState(read);
@@ -88,7 +85,6 @@ export default function App() {
             {route === '/' && <Analyse onPredicted={addPrediction} history={history} onClearHistory={clear} stored={stored} />}
             {route === '/comments' && <Comments />}
             {route === '/compare' && <Compare />}
-            {PREVIEW && route === '/preview' && <Preview />}
             {route === '/about' && <About />}
           </motion.main>
         </AnimatePresence>

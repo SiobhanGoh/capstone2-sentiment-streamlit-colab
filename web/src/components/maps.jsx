@@ -27,14 +27,16 @@ function regions() {
 }
 const pts = (poly) => poly.map((p) => p.join(',')).join(' ');
 
-export function SentimentTriangle({ rows, selected, onSelect, single = false }) {
+export function SentimentTriangle({ rows, selected, onSelect, onPick, focus, single = false }) {
   const reduce = useReducedMotion();
   const maxLikes = Math.max(1, ...rows.map((r) => r.likes ?? 0));
   const reg = regions();
   return (
     <svg viewBox="0 0 400 352" className="w-full" role="img"
       aria-label={single ? 'Where this text sits between negative, neutral and positive' : `${rows.length} comments placed between negative, neutral and positive by their scores`}>
-      {LABELS.map((l) => <polygon key={l} points={pts(reg[l])} fill={TONE[l].hex} opacity="0.13" />)}
+      {LABELS.map((l) => (
+        <motion.polygon key={l} points={pts(reg[l])} fill={TONE[l].hex} animate={{ opacity: focus ? (focus === l ? 0.24 : 0.05) : 0.13 }} transition={{ duration: 0.24 }} />
+      ))}
       <polygon points={pts([V.NEGATIVE, V.NEUTRAL, V.POSITIVE])} fill="none" stroke="currentColor" strokeOpacity="0.18" strokeWidth="1.5" strokeLinejoin="round" />
       {Object.values(reg).map((poly, i) => <polyline key={i} points={pts([poly[1], CENTRE])} stroke="currentColor" strokeOpacity="0.12" strokeDasharray="3 4" fill="none" />)}
       <circle cx={CENTRE[0]} cy={CENTRE[1]} r="34" fill="none" stroke="currentColor" strokeOpacity="0.25" strokeDasharray="2 4" />
@@ -48,18 +50,20 @@ export function SentimentTriangle({ rows, selected, onSelect, single = false }) 
         const [x, y] = toXY(r.scores);
         const radius = single ? 9 : 4 + Math.sqrt((r.likes ?? 0) / maxLikes) * 8;
         const active = selected?.no === r.no;
+        const dim = focus && focus !== r.sentiment;
         return (
           <g key={r.no ?? i}>
             {(single || active) && !reduce && (
               <motion.circle cx={x} cy={y} r={radius} fill="none" stroke={TONE[r.sentiment].hex} strokeWidth="2"
                 initial={{ r: radius, opacity: 0.8 }} animate={{ r: radius + 14, opacity: 0 }} transition={{ repeat: Infinity, duration: 1.6 }} />
             )}
-            <motion.circle cx={x} cy={y} fill={TONE[r.sentiment].hex} fillOpacity={active || single ? 1 : 0.7}
+            <motion.circle fill={TONE[r.sentiment].hex}
               stroke="white" strokeWidth={active ? 2.5 : 1}
-              initial={reduce ? false : { r: 0 }} animate={{ r: active ? radius + 2 : radius }}
-              transition={{ delay: reduce ? 0 : Math.min(i * 0.012, 0.8), type: 'spring', stiffness: 260, damping: 18 }}
+              initial={reduce ? false : { r: 0, cx: CENTRE[0], cy: CENTRE[1] }}
+              animate={{ r: active ? radius + 2 : radius, cx: x, cy: y, fillOpacity: dim ? 0.12 : active || single ? 1 : 0.72 }}
+              transition={{ delay: reduce ? 0 : Math.min(i * 0.01, 0.6), type: 'spring', stiffness: 170, damping: 20 }}
               className={onSelect ? 'cursor-pointer' : undefined}
-              onMouseEnter={() => onSelect?.(r)} onClick={() => onSelect?.(r)} />
+              onMouseEnter={() => onSelect?.(r)} onClick={() => { onSelect?.(r); onPick?.(r); }} />
           </g>
         );
       })}
@@ -67,12 +71,12 @@ export function SentimentTriangle({ rows, selected, onSelect, single = false }) 
   );
 }
 
-function SentimentMap({ rows }) {
+function SentimentMap({ rows, focus, onPick }) {
   const [selected, setSelected] = useState(null);
   const hasLikes = rows.some((r) => Number.isFinite(r.likes));
   return (
     <div className="grid gap-5 lg:grid-cols-[1.2fr_1fr] lg:items-center">
-      <div className="text-ink dark:text-ube-50"><SentimentTriangle rows={rows} selected={selected} onSelect={setSelected} /></div>
+      <div className="text-ink dark:text-ube-50"><SentimentTriangle rows={rows} selected={selected} onSelect={setSelected} focus={focus} /></div>
       <div>
         <p className="text-sm text-ink-soft dark:text-ube-100">
           Each dot is a comment, placed by its three scores. Dots near a corner are ones the model was sure about; dots near the middle are the ones worth checking.{hasLikes ? ' Bigger dots got more likes.' : ''}
@@ -87,6 +91,7 @@ function SentimentMap({ rows }) {
               </div>
               <p className="mt-2 line-clamp-6 whitespace-pre-wrap break-words">{selected.comment}</p>
               <p className="mt-2 text-xs tabular-nums text-ink-soft dark:text-ube-100">{LABELS.map((l, i) => `${title(l)} ${pct(selected.scores[i], 0)}`).join(', ')}</p>
+              {onPick && <button className="mt-3 text-small font-semibold text-ube-700 underline-offset-2 hover:underline dark:text-ube-100" onClick={() => onPick(selected)}>Find it in the list</button>}
             </motion.div>
           ) : (
             <motion.p key="hint" className="mt-4 rounded-xl2 border border-dashed border-ink-faint/40 p-4 text-sm text-ink-faint">
@@ -99,41 +104,78 @@ function SentimentMap({ rows }) {
   );
 }
 
-// ---------- Theme map: recurring words against the three labels ----------
-function ThemeMap({ rows, onTheme }) {
-  const themes = useMemo(() => themeMatrix(rows), [rows]);
-  if (!themes.length) return <p className="text-sm text-ink-faint">No word comes up in two or more comments yet. Try a video with more comments.</p>;
-  const max = Math.max(...themes.flatMap((t) => LABELS.map((l) => t[l])), 1);
+// ---------- Theme flow: recurring words streaming into the labels that used them ----------
+function ThemeFlow({ rows, onTheme, focus }) {
+  const reduce = useReducedMotion();
+  const themes = useMemo(() => themeMatrix(rows, { limit: 8 }), [rows]);
+  const [hot, setHot] = useState(null);
+  if (!themes.length) return <p className="text-small text-ink-faint">No word comes up in two or more comments yet. Try a video with more comments.</p>;
+  const rowH = 40;
+  const H = Math.max(themes.length * rowH + 24, 200);
+  const leftX = 150;
+  const rightX = 520;
+  const totals = Object.fromEntries(LABELS.map((l) => [l, themes.reduce((a, t) => a + t[l], 0)]));
+  const all = LABELS.reduce((a, l) => a + totals[l], 0) || 1;
+  // Right-hand label nodes, stacked with gaps, sized by how many theme mentions flow into them.
+  let cursor = 12;
+  const usable = H - 24 - 2 * 16;
+  const nodes = Object.fromEntries(LABELS.map((l) => {
+    const h = Math.max(18, (totals[l] / all) * usable);
+    const n = { y: cursor, h, used: 0 };
+    cursor += h + 16;
+    return [l, n];
+  }));
+  const maxFlow = Math.max(1, ...themes.flatMap((t) => LABELS.map((l) => t[l])));
+  const links = [];
+  themes.forEach((t, i) => {
+    const y0 = 12 + i * rowH + rowH / 2;
+    LABELS.forEach((l) => {
+      if (!t[l]) return;
+      const node = nodes[l];
+      const share = totals[l] ? t[l] / totals[l] : 0;
+      const y1 = node.y + node.used + (share * node.h) / 2;
+      node.used += share * node.h;
+      links.push({ key: `${t.word}-${l}`, word: t.word, l, n: t[l], d: `M${leftX + 8},${y0} C${(leftX + rightX) / 2},${y0} ${(leftX + rightX) / 2},${y1} ${rightX - 8},${y1}`, w: 2 + (t[l] / maxFlow) * 14 });
+    });
+  });
+  const lit = (link) => (hot ? link.word === hot || link.l === hot : focus ? link.l === focus : true);
   return (
     <div>
-      <p className="mb-4 text-sm text-ink-soft dark:text-ube-100">The words that come up most, and which label the comments using them got. Tap a word to see those comments.</p>
-      <div className="grid max-w-2xl grid-cols-[minmax(0,1fr)_repeat(3,minmax(56px,90px))] items-center gap-x-2 gap-y-1.5">
-        <span />
-        {LABELS.map((l) => <span key={l} className={`text-center text-xs font-semibold ${TONE[l].text}`}>{title(l)}</span>)}
-        {themes.map((t, i) => (
-          <motion.div key={t.word} className="contents" initial={false}>
-            <button onClick={() => onTheme(t.word)} className="truncate rounded-full px-3 py-1.5 text-left text-sm font-semibold hover:bg-ube-100 dark:hover:bg-night-raised">
-              {t.word} <span className="font-normal text-ink-faint">{t.total}</span>
-            </button>
-            {LABELS.map((l) => {
-              const n = t[l];
-              const size = n ? 14 + (n / max) * 30 : 0;
-              return (
-                <button key={l} onClick={() => onTheme(t.word)} aria-label={`${t.word}: ${n} ${title(l).toLowerCase()} comments`}
-                  className="grid h-12 place-items-center">
-                  {n > 0 ? (
-                    <motion.span className="grid place-items-center rounded-full text-[11px] font-bold text-ink"
-                      style={{ background: TONE[l].hex, width: size, height: size }}
-                      initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: i * 0.04, type: 'spring', stiffness: 220, damping: 16 }}>
-                      {n}
-                    </motion.span>
-                  ) : <span className="h-1.5 w-1.5 rounded-full bg-ink-faint/30" />}
-                </button>
-              );
-            })}
-          </motion.div>
+      <p className="mb-3 text-small text-ink-soft dark:text-ube-100">Words that come up in several comments, flowing into the label those comments got. Thicker streams mean more comments. Tap a word to see them.</p>
+      <svg viewBox={`0 0 640 ${H}`} className="w-full" role="img" aria-label="Flow from recurring words to the labels of the comments that use them">
+        {links.map((k, i) => (
+          <motion.path key={k.key} d={k.d} fill="none" stroke={TONE[k.l].hex} strokeLinecap="round" strokeWidth={k.w}
+            initial={reduce ? false : { pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: lit(k) ? 0.55 : 0.08 }}
+            transition={{ pathLength: { duration: 0.8, delay: i * 0.03, ease: 'easeOut' }, opacity: { duration: 0.24 } }} />
         ))}
-      </div>
+        {!reduce && links.filter(lit).map((k) => (
+          <motion.path key={`${k.key}-dash`} d={k.d} fill="none" stroke="white" strokeOpacity="0.7" strokeWidth="1.5" strokeLinecap="round"
+            strokeDasharray="2 14" initial={{ strokeDashoffset: 0 }} animate={{ strokeDashoffset: -64 }}
+            transition={{ repeat: Infinity, duration: 2.4, ease: 'linear' }} />
+        ))}
+        {themes.map((t, i) => {
+          const y0 = 12 + i * rowH + rowH / 2;
+          return (
+            <g key={t.word} className="cursor-pointer" onMouseEnter={() => setHot(t.word)} onMouseLeave={() => setHot(null)} onClick={() => onTheme(t.word)}>
+              <rect x="0" y={y0 - rowH / 2 + 3} width={leftX + 14} height={rowH - 6} rx="10" fill="currentColor" opacity={hot === t.word ? 0.08 : 0} />
+              <text x={leftX - 6} y={y0 + 5} textAnchor="end" className="fill-current text-[14px] font-semibold">
+                {t.word}<tspan dx="6" className="text-[11px] font-normal" opacity="0.5">{t.total}</tspan>
+              </text>
+              <circle cx={leftX + 6} cy={y0} r="5" fill="currentColor" opacity="0.5" />
+            </g>
+          );
+        })}
+        {LABELS.map((l) => {
+          const nd = nodes[l];
+          return (
+            <g key={l} className="cursor-default" onMouseEnter={() => setHot(l)} onMouseLeave={() => setHot(null)}>
+              <rect x={rightX - 8} y={nd.y} width="16" height={nd.h} rx="8" fill={TONE[l].hex} />
+              <text x={rightX + 16} y={nd.y + nd.h / 2 + 5} fill={TONE[l].hex} className="text-[14px] font-bold">{title(l)}</text>
+            </g>
+          );
+        })}
+      </svg>
     </div>
   );
 }
@@ -209,11 +251,11 @@ function PlacesMap({ rows }) {
 
 const TABS = [
   { id: 'sentiment', name: 'Sentiment map' },
-  { id: 'themes', name: 'Theme map' },
+  { id: 'themes', name: 'Theme flow' },
   { id: 'places', name: 'Places map' },
 ];
 
-export default function ExploreMaps({ rows, onTheme }) {
+export default function ExploreMaps({ rows, onTheme, onPick, focus }) {
   const [tab, setTab] = useState('sentiment');
   return (
     <Card>
@@ -222,10 +264,10 @@ export default function ExploreMaps({ rows, onTheme }) {
           Explore the comments
           <InfoTip label="About these maps">These maps only rearrange the labelled comments so patterns are easier to spot. Positions come from uncalibrated model scores, and word and place matches are simple text matches.</InfoTip>
         </h2>
-        <div role="tablist" aria-label="Map" className="neu-inset inline-flex flex-wrap gap-1 rounded-full p-1">
+        <div role="tablist" aria-label="Map" className="neu-inset inline-flex max-w-full gap-1 overflow-x-auto rounded-full p-1">
           {TABS.map((t) => (
             <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)}
-              className={`relative rounded-full px-4 py-2 text-sm font-semibold ${tab === t.id ? 'text-ink dark:text-ube-50' : 'text-ink-soft dark:text-ube-300'}`}>
+              className={`relative shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold ${tab === t.id ? 'text-ink dark:text-ube-50' : 'text-ink-soft dark:text-ube-300'}`}>
               {tab === t.id && <motion.span layoutId="map-pill" className="neu-raised absolute inset-0 rounded-full" transition={{ type: 'spring', stiffness: 300, damping: 28 }} />}
               <span className="relative">{t.name}</span>
             </button>
@@ -233,8 +275,8 @@ export default function ExploreMaps({ rows, onTheme }) {
         </div>
       </div>
       <div className="mt-5">
-        {tab === 'sentiment' && <SentimentMap rows={rows} />}
-        {tab === 'themes' && <ThemeMap rows={rows} onTheme={onTheme} />}
+        {tab === 'sentiment' && <SentimentMap rows={rows} focus={focus} onPick={onPick} />}
+        {tab === 'themes' && <ThemeFlow rows={rows} onTheme={onTheme} focus={focus} />}
         {tab === 'places' && <PlacesMap rows={rows} />}
       </div>
     </Card>

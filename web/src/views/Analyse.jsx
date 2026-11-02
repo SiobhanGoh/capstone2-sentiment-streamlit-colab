@@ -11,6 +11,7 @@ import { clearCorrections, correctionNote, correctionsCsv, useCorrections } from
 import { Badge, Card, Notice, Ripple, ScoreBars, TONE, Tilt } from '../components/ui.jsx';
 import { InfoTip, WordHighlights, WrongLabel } from '../components/extras.jsx';
 import ModelStatus from '../components/ModelStatus.jsx';
+import { Count } from '../components/motion.jsx';
 import { SentimentTriangle } from '../components/maps.jsx';
 
 const EXAMPLES = {
@@ -85,7 +86,7 @@ function ResultCard({ result, busy, text }) {
               <div className="mt-1 flex flex-wrap items-end gap-x-4 gap-y-2">
                 <p className={`font-display text-6xl font-bold sm:text-7xl ${tone.text}`}>{tone.word}</p>
                 <div className={`mb-2 inline-flex items-center gap-2 rounded-xl2 px-4 py-2 ${tone.soft}`}>
-                  <span className="font-display text-2xl font-semibold tabular-nums">{pct(result.score)}</span>
+                  <span className="font-display text-2xl font-semibold tabular-nums"><Count value={result.score * 100} decimals={1} suffix="%" /></span>
                   <span className="text-sm text-ink-soft dark:text-ube-100">score</span>
                   <InfoTip>{SCORE_NOTE}</InfoTip>
                 </div>
@@ -221,7 +222,7 @@ export default function Analyse({ onPredicted, history, onClearHistory, stored }
     <div className="space-y-5">
       <div className="grid gap-5 lg:grid-cols-[1.2fr_1fr]">
         <Card className="flex flex-col">
-          <h1 className="text-4xl font-bold leading-[1.05] sm:text-5xl">Read the mood of rojak text.</h1>
+          <h1 className="text-4xl font-bold leading-[1.05] sm:text-[3rem]">Read the mood of rojak text.</h1>
           <p className="mt-3 max-w-[60ch] text-ink-soft dark:text-ube-100">
             Malay, English or both in one sentence. A fine-tuned multilingual BERT runs right here in your browser, so what you type stays on your device.
           </p>
