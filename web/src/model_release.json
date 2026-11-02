@@ -1,0 +1,27 @@
+{
+  "status": "pending-verification",
+  "browser_model": {
+    "repo_id": "SiobhanGoh/malay-english-sentiment-onnx",
+    "revision": "",
+    "dtype": "q8",
+    "onnx_file": "onnx/model_quantized.onnx",
+    "onnx_sha256": ""
+  },
+  "source_checkpoint": {
+    "repo_id": "SiobhanGoh/CP2_Emotion_Model_New",
+    "revision": "9bc6645ce7a8e02761c59386ffd16969bed1bc55",
+    "subfolder": "corrected-2026-10",
+    "model_sha256": "771a19b8c14865f8d8d8c7adc7df95d859b08a866195f5b7bfe3ac44723ec61b"
+  },
+  "protocol": "sentiment-disjoint-v1",
+  "max_length": 128,
+  "labels": ["NEGATIVE", "NEUTRAL", "POSITIVE"],
+  "evaluation": {
+    "test_inputs": 981,
+    "original_accuracy": 0.7604485219164119,
+    "original_macro_f1": 0.7556863945342297,
+    "browser_accuracy": null,
+    "browser_macro_f1": null,
+    "label_agreement_with_original": null
+  }
+}

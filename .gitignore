@@ -211,3 +211,10 @@ runs/
 *.joblib
 *.safetensors
 .pytest_cache/
+
+# Web app
+!web/src/lib/
+web/node_modules/
+web/dist/
+web/public/models/
+*.onnx

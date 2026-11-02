@@ -1,0 +1,1642 @@
+[
+{
+"input": "Service dekat kedai ni BAGUS!!! #syok @kawan_baik https://t.co/abc",
+"expected": "service dekat kedai ni bagus!!! syok"
+},
+{
+"input": "Straße ΟΔΟΣ ﬁne Ｆｕｌｌｗｉｄｔｈ ½ ™ İstanbul",
+"expected": "strasse οδοσ fine fullwidth 1⁄2 tm i̇stanbul"
+},
+{
+"input": "  tab\there\u001cfilenext line　ideo ﻿bom ",
+"expected": "tab here file next line ideo ﻿bom"
+},
+{
+"input": "www.example.com/path?x=1 then @user.name and @ali123 ok",
+"expected": "then .name and ok"
+},
+{
+"input": "emoji 😍🔥 #Malaysia2026 ##double # alone",
+"expected": "emoji 😍🔥 malaysia2026 double alone"
+},
+{
+"input": "http:/broken and https://ok.my/x,y",
+"expected": "http:/broken and"
+},
+{
+"input": "",
+"expected": ""
+},
+{
+"input": "   ",
+"expected": ""
+},
+{
+"input": "@only @mentions",
+"expected": ""
+},
+{
+"input": "Tak sangka lah weh 🤣🤣 gila best",
+"expected": "tak sangka lah weh 🤣🤣 gila best"
+},
+{
+"input": ":ﬀABwww.#ςAhc Ⅻ①B  @xⅫA",
+"expected": ":ffab hc xii1b"
+},
+{
+"input": "@tAﬀAtc@x_\t①:www.@\n@x.#wς#@xBAh　www.Ⅻ ééς\n . ",
+"expected": "1: .wσ ééσ ."
+},
+{
+"input": "\nhttp://　ß😀",
+"expected": "http:// ss😀"
+},
+{
+"input": "B@①/ß:　①cB@x ßΣ　éB",
+"expected": "b@ 1/ss: 1cb ssσ éb"
+},
+{
+"input": "śBA\n",
+"expected": "śba"
+},
+{
+"input": "😀\tİΣbéΣ/@　Ah\t_ ﬀﬀ　 /😀ﬀ@xs_Ⅻ@xs①Σİt: .:",
+"expected": "😀 i̇σbéσ/@ ah _ ffff /😀ff ̇t: .:"
+},
+{
+"input": "ta　.p\ta:①www.ς _",
+"expected": "ta .p a:1 _"
+},
+{
+"input": "Aé@xﬀﬀﬀﬀ#́ﬀAwBh😀/@ßA#a:www.#ςbBhİ:pΣς́@@　é́",
+"expected": "aé ́ffawbh😀/ a: é́"
+},
+{
+"input": "\n :#ßṕ/http://bhhttp://ς:www.bhttp://\n phttp://ς/Σtwww.www.ßt",
+"expected": ":ssṕ/ p sst"
+},
+{
+"input": "w ﬀtwhttp://　ΣbbśpwΣ😀Σς t#t́wßh́áΣ @İẃ.Ⅻß ",
+"expected": "w fftwhttp:// σbbśpwσ😀σσ tt́wssh́áσ ̇ẃ.xiiss"
+},
+{
+"input": "éﬀ //_b:é:́Σ:@x@x_ba#http://_Ⅻwhb",
+"expected": "éff //_b:é:́σ:"
+},
+{
+"input": "h\t  pwww.①_AΣéhttp://①_",
+"expected": "h p _"
+},
+{
+"input": ":http://b😀.a:.:́@@xA http://http://@x́#@xA wsc#😀@xbB😀 ",
+"expected": ":http:// b😀.a:.:́@ wsc 😀 😀"
+},
+{
+"input": "ws😀www.́ http://p@xw😀_①@ﬀ😀 B ⅫBh\n@:ς:p_ét#ﬀ　/",
+"expected": "ws😀 b xiibh @:σ:p_étff /"
+},
+{
+"input": "/Ⅻﬀß①wΣ  ςbß@x",
+"expected": "/xii ffss1wσ σbss"
+},
+{
+"input": "😀bİßhttp://\tB@t# psc.s_Ⅻpﬀ:www.　  sA",
+"expected": "😀bi̇sshttp:// b psc.s_xiipff:www. sa"
+},
+{
+"input": "ⅫBsb p tBp@",
+"expected": "xiibsb p tbp@"
+},
+{
+"input": "aß@x①s_chttp:// @/pA.w\n\nhttp://h\t😀.sΣbpca",
+"expected": "ass :// @/pa.w 😀 .sσbpca"
+},
+{
+"input": "",
+"expected": ""
+},
+{
+"input": "w́ 😀#Ⅻ　www.ﬀ\nhtßw_ﬀΣA_aBpⅫ/A İ\t \tcé",
+"expected": "w ́ 😀xii htssw_ffσa_abpxii/a i̇ cé"
+},
+{
+"input": "/s😀apςß@x  c",
+"expected": "/s😀apσss c"
+},
+{
+"input": "hΣ.aßİ ́sw a p :ﬀ",
+"expected": "hσ.assi̇ ́s w a p :ff"
+},
+{
+"input": "cﬀb\n\nt http://:İ 　:\t:cⅫ_http://bt bc_ς#İ😀@xAbwww. ",
+"expected": "cffb t : :c xii _http:// bt bc_σi̇😀 ."
+},
+{
+"input": "paéBwww. http://B́pBp hté　İB́\tcwB:ßp\n_a",
+"expected": "paéb www. hté i̇b́ cwb:ssp _a"
+},
+{
+"input": "A　s#h　\thttp://\tééé@@xw\n ́b\téB😀sİhhB ",
+"expected": "a sh http:// ééé@ ́b éb 😀si̇hhb"
+},
+{
+"input": "http://pς_s@ςt",
+"expected": "s"
+},
+{
+"input": "　ﬀb/a　😀ﬀ\n:①Σİ @ßa ßﬀ@wa\tpςBﬀİBς",
+"expected": "ffb/a 😀ff :1σi̇ ssff pσbffi̇bσ"
+},
+{
+"input": "sAs#A\t: sⅫ wςⅫbﬀ@x@xh A①😀_\t　",
+"expected": "sasa : sxii wσxiibff a1😀_"
+},
+{
+"input": "@x_/",
+"expected": "/"
+},
+{
+"input": "①ß\t\nppﬀ \ń@xﬀ@//Bh　@xt😀ß😀Ⅻ_@xw  ",
+"expected": "1ss ppff ́ @//bh 😀ss😀xii_"
+},
+{
+"input": "ß@x   ςpwb①İ",
+"expected": "ss σpwb1i̇"
+},
+{
+"input": "http://hİsßA　sς_http://h s İﬀ😀Ⅻ\nb_cⅫ́",
+"expected": "sσ_ s i̇ff😀xii b_cxií"
+},
+{
+"input": "　aBﬀhttp://é😀 #t::http://#é @xca_tc\n_phttp://Ⅻ@#B\nhttp://wİpta",
+"expected": "abff t:: _p"
+},
+{
+"input": "",
+"expected": ""
+},
+{
+"input": "\nés  ́http:// @x b①\nAbw　① ptⅫςt　cß①ςﬀwa\t",
+"expected": "és ́http:// b1 abw 1 ptxiiσt css1σffwa"
+},
+{
+"input": "h　w\n",
+"expected": "h w"
+},
+{
+"input": "tétp\t#　.t　①A",
+"expected": "tétp .t 1a"
+},
+{
+"input": ":ﬀAhb:①AA.ﬀ😀 @ /ßw.http://éc\nİςß😀/#a s Σ①@@xh",
+"expected": ":ffahb:1aa.ff😀 @ /ssw. i̇σss😀/a s σ1@"
+},
+{
+"input": "Σ\nⅫ Áwςwww.😀w ς́b① ﬀcİcéBA",
+"expected": "σ xii áwσ σ́b1 ffci̇céba"
+},
+{
+"input": "wBßςsßcp s\naBbt#",
+"expected": "wbssσssscp s abbt"
+},
+{
+"input": "éİpⅫ　_　.a\n:   éς wﬀ/ ①Bć@xwww. /",
+"expected": "éi̇pxii _ .a : éσ wff/ 1bć . /"
+},
+{
+"input": "#Bp h#①　😀.t_①é www.@\t\tssςppw😀 ",
+"expected": "bp h1 😀.t_1é ssσppw😀"
+},
+{
+"input": "  :\tw Bﬀp ",
+"expected": ": w bffp"
+},
+{
+"input": "t#éc#át😀ςc\tt@AwwBς.😀pa#Σhcςß:ch",
+"expected": "técát😀σc t .😀paσhcσss:ch"
+},
+{
+"input": "cha ①ς.\nBhc　@x́B①",
+"expected": "cha 1σ. bhc ́b1"
+},
+{
+"input": "ﬀ@x:www. /",
+"expected": "ff :www. /"
+},
+{
+"input": "s①\t\n①A\nΣ①①bςwﬀﬀhaⅫ/Ⅻ@ ﬀςé",
+"expected": "s1 1a σ11bσwffffhaxii/xii@ ffσé"
+},
+{
+"input": "_aA@x:ﬀ ς/",
+"expected": "_aa :ff σ /"
+},
+{
+"input": "Σ\t/http:///B#İ　",
+"expected": "σ /"
+},
+{
+"input": "\n_ć Aİ /tﬀw",
+"expected": "_ć ai̇ /tffw"
+},
+{
+"input": ".hcﬀhttp:///İΣ@: wc@xc @İé@x\n①\n Ⅻİς😀😀",
+"expected": ".hcff wc ̇é 1 xiii̇σ😀 😀"
+},
+{
+"input": "ba　é 😀é.́ﬀ#",
+"expected": "ba é 😀é.́ff"
+},
+{
+"input": "_ΣⅫς",
+"expected": "_σxiiσ"
+},
+{
+"input": "😀cc",
+"expected": "😀 cc"
+},
+{
+"input": "_   Aİ_bB@w_　\t/tBΣp/ sé:p́hp  ςcw.ﬀ/",
+"expected": "_ a i̇_bb /tbσp/ sé:p ́hp σcw.ff/"
+},
+{
+"input": "s İ/p@http://Aς😀@xhttp://#pwww.ﬀςpİς:ςß 😀t.A\thttp://p\n act:\tⅫ①",
+"expected": "s i̇/p@ 😀t.a act: xii1"
+},
+{
+"input": "ςA_　tcbAaΣ\n#http://Σwww.t①\n_hς́/_a :😀#B:s",
+"expected": "σa_ tcbaaσ _hσ́/_a :😀b:s"
+},
+{
+"input": "paA@xΣ😀http://　 /acAwww.bﬀ. /A#a@xw:",
+"expected": "paa 😀http:// /aca /aa :"
+},
+{
+"input": "whttp://①.\nB\nÁwww.aİⅫé 😀.t#ptc@ß",
+"expected": "whttp:// 1. b á 😀.tptc"
+},
+{
+"input": "As@xⅫhttp://p\th a/p w/",
+"expected": "as h a/p w/"
+},
+{
+"input": "wİß İwww.́́http://abⅫt\nhﬀB/:c",
+"expected": "wi̇ss i̇ hffb/:c"
+},
+{
+"input": "@",
+"expected": "@"
+},
+{
+"input": "/Σ:bbc",
+"expected": "/σ:bbc"
+},
+{
+"input": "cBcBςwwww.B",
+"expected": "cbcbσw"
+},
+{
+"input": "# hh@cc \t́#_#h\t ßⅫpbΣp\tA",
+"expected": "hh ́_h ssxiipbσp a"
+},
+{
+"input": " ́\tb①bⅫhttp://#Σ́Awww.h \t/Ⅻahttp://w\t",
+"expected": "́ b1bxii /xiia"
+},
+{
+"input": "aΣ　",
+"expected": "aσ"
+},
+{
+"input": "　.　Σp",
+"expected": ". σ p"
+},
+{
+"input": "/\tht　/@ 　@x# Σ#ﬀﬀ Ⅻbςh\npⅫwww./İté_www.cΣ http://",
+"expected": "/ ht /@ σffff xiibσh pxiiwww. /i̇té_ http://"
+},
+{
+"input": "😀@x /é😀pt_",
+"expected": "😀 /é😀pt_"
+},
+{
+"input": "é ws\n::  http://Σ/  wp#/#w",
+"expected": "é ws :: wp/w"
+},
+{
+"input": "::\n\nⅫsw##shİécaﬀⅫt\téb:p",
+"expected": ":: xiiswshi̇écaffxiit éb:p"
+},
+{
+"input": "ﬀa Ⅻ①tt.@éⅫ p#① ﬀ/pⅫ́éb①http://. aİ　#cpwww.h/whttp://",
+"expected": "ffa xii1tt. p1 ff/pxiíéb1 ai̇ cp"
+},
+{
+"input": "#éwww.h́bςhttp://ß①éh.ﬀ@ΣApsİ",
+"expected": "é bσ ̇"
+},
+{
+"input": "AaB①①Σp#t\nﬀhttp://tﬀéh/_Bẃ@xt:Σ",
+"expected": "aab11σpt ff"
+},
+{
+"input": "①é\t@x_́ΣtsİpⅫ.́asΣ \n ́　Ⅻ ς:\nİA  _http://ΣaahB\tp",
+"expected": "1é ́σtsi̇pxii.́asσ ́ xii σ: i̇a _ p"
+},
+{
+"input": "#:t.😀Σ:hﬀwww./ @x\nw　hhttp:// 😀@@x@p①t_́　@xÁé:　 　/",
+"expected": ":t.😀σ:hff w hhttp:// 😀@ ́ : /"
+},
+{
+"input": "a/ é　\téςⅫ①B.ςbbcß#́　:ch①_ß#ςß́http://@xh",
+"expected": "a/ é éσxii1b.σbbcss ́ :ch1_ssσsś"
+},
+{
+"input": "ⅫßⅫp@xA\t\tΣ　ﬀßsΣh　",
+"expected": "xiissxiip σ ffss s σh"
+},
+{
+"input": "ßw \n_ c",
+"expected": "ssw _ c"
+},
+{
+"input": "@xﬀwww.Aﬀ\n#acẃAwww.İ: hcé.#.c①",
+"expected": "acẃa hcé..c1"
+},
+{
+"input": "aς_\n@xp",
+"expected": "aσ_"
+},
+{
+"input": ".①c bⅫA　http://c@①ﬀ😀Baİ:́",
+"expected": ".1c bxiia"
+},
+{
+"input": "@x# ́h:aⅫaa@ h@_́bs 😀.Aς: \t",
+"expected": "́h:axiiaa@ h ́bs 😀.aσ:"
+},
+{
+"input": "@x　épAcaAa İ\n\n/　A ς😀́/:@ς/①́İ😀sß\tsAßa:\nⅫ ",
+"expected": "épacaaa i̇ / a σ😀́/: /1́i̇😀sss sassa: xii"
+},
+{
+"input": "İİt😀\ta psⅫ/c\t::s@x　Σwww. www.@x　",
+"expected": "i̇i̇t😀 a psxii/c ::s σwww."
+},
+{
+"input": "wt\nAﬀéhpaİéwww. www.ΣBtﬀhttp://phttp:// ́",
+"expected": "wt afféhpai̇éwww. ́"
+},
+{
+"input": "wwhw .\tςΣﬀhttp://: c　ς#ςé : bΣshttp://b#ch　hpsⅫ#😀",
+"expected": "wwhw . σσff c σσé : bσs hpsxii😀"
+},
+{
+"input": "_pcßw.İ bAc@xςé　Bﬀ@ p t ﬀ.😀/ς t.cpΣA@x",
+"expected": "_pcssw.i̇ bac bff@ p t ff.😀/σ t.cpσa"
+},
+{
+"input": "A",
+"expected": "a"
+},
+{
+"input": "́A#: aw\n😀#́ ςpİ",
+"expected": "́a: aw 😀́ σpi̇"
+},
+{
+"input": "ς́İ/😀 :",
+"expected": "σ́i̇/😀 :"
+},
+{
+"input": "",
+"expected": ""
+},
+{
+"input": "wc/tBς_😀#İbB😀ß t́@ς:ßtA.😀@x:😀:",
+"expected": "wc/tbσ_😀i̇bb😀ss t́ :ssta.😀 :😀:"
+},
+{
+"input": "①① :bs\tß/p　# é́@:",
+"expected": "11 :bs ss/p é́@:"
+},
+{
+"input": "Ah@x́\t@pwςⅫp  #İ\t①/A\t:b😀ß_😀ahttp://\t.",
+"expected": "ah ́ i̇ 1/a :b😀 ss _😀ahttp:// ."
+},
+{
+"input": "Ⅻc①hs._.http://t.w  　s.h_w\nwa",
+"expected": "xiic1hs._. s.h_w wa"
+},
+{
+"input": "http://①Ahttp://",
+"expected": ""
+},
+{
+"input": "ß\t　 a①́_s .ςc/ςaΣhttp://😀http://B@",
+"expected": "ss a1́_s .σc/σaσ"
+},
+{
+"input": "  İA\t#　😀bhttp://www._b  t./#\np",
+"expected": "i̇a 😀 b t./ p"
+},
+{
+"input": "bb#wpbéhttp:// 😀#Σ#.cs@é　s@@@ﬀ_www.tt:éﬀ/bİ",
+"expected": "bbwpbéhttp:// 😀σ.cs s@@"
+},
+{
+"input": "http://cﬀAςßﬀ ßⅫ ﬀ@xA http://:Σ Ⅻaς#http://.B",
+"expected": "ssxii ff xiiaσ"
+},
+{
+"input": "Ⅻwbt_①ﬀécccsswww.c#p@http://",
+"expected": "xiiw bt_1ffécccss"
+},
+{
+"input": "",
+"expected": ""
+},
+{
+"input": " c\t@\nΣ/@As éwww.:😀@_\t①\ts  www.\t",
+"expected": "c @ σ/ s é _ 1 s www."
+},
+{
+"input": "tİw@xςé@x\ń́\nb ßtwwww.İﬀaΣ/  @x 　s",
+"expected": "ti̇w ́́ b sstw s"
+},
+{
+"input": "h\tAb/@xBΣ😀Ahttp://İ😀Σ#http://t:",
+"expected": "h ab/ 😀a"
+},
+{
+"input": "ßΣ_wshttp://#́s_①#a①@x@　ﬀ:①s@İ😀é\t",
+"expected": "ssσ_ws ff:1s ̇😀é"
+},
+{
+"input": "\tΣﬀhttp://@xİ a　İ😀\n.www.\n:Ⅻİt ß ",
+"expected": "σff a i̇😀 .www. :xiii̇t ss"
+},
+{
+"input": "  hⅫabAp　\nwww.\nwww.Ⅻhttp://http://ⅫİéΣcΣ😀aBhttp://t#①ςﬀ@x:w①　ﬀ",
+"expected": "hxiiabap www. ff :w1 ff"
+},
+{
+"input": "ßhttp:// /ς ςB\n.@\tß①/http://\thw①.A#Σ",
+"expected": "sshttp:// /σ σb .@ ss 1/http:// h w1.aσ"
+},
+{
+"input": "c①aa\n@xa\nﬀ#abw.　@xswww.:w①@:/http://#b#B/http://　éⅫ",
+"expected": "c1aa ffabw. . :w1@:/http:// bb/http:// éxii"
+},
+{
+"input": "a :",
+"expected": "a :"
+},
+{
+"input": "Σs/cs#BΣw😀İbAtﬀ",
+"expected": "σs/csbσw😀i̇batff"
+},
+{
+"input": "c😀A  tc/. aé\n①p　B İt①\nﬀ　b  ./Σİ.a\tﬀ@xς",
+"expected": "c😀a tc/. aé 1p b i̇t1 ff b ./σi̇.a ff"
+},
+{
+"input": "ßwww.İßﬀB@",
+"expected": "ss"
+},
+{
+"input": "Σ@x İwé\tΣ Ⅻcsbß: _ wswww._@x😀é /",
+"expected": "σ i̇wé σ xiicsbss: _ ws /"
+},
+{
+"input": "Σhﬀİh\ńht😀_p😀ςwww. ﬀh_@",
+"expected": "σhffi̇h ́ ht😀_p😀σwww. ff h_@"
+},
+{
+"input": "www.sİb:",
+"expected": ""
+},
+{
+"input": "aİ .t w#B@xς\nwB\n t\t",
+"expected": "ai̇ .t wb wb t"
+},
+{
+"input": "ﬀ\tΣﬀé_s.",
+"expected": "ff σffé_s."
+},
+{
+"input": "ς",
+"expected": "σ"
+},
+{
+"input": "①bé ﬀΣ#.\t@stcﬀc/Ⅻw\n:İc",
+"expected": "1bé ffσ. /xiiw :i̇c"
+},
+{
+"input": "\n.t　http://pⅫΣa@\tcA @c hΣ ①ﬀtshttp:// ΣⅫ😀ß😀Ah",
+"expected": ".t ca hσ 1fftshttp:// σxii😀ss 😀 ah"
+},
+{
+"input": "_　wc@xp.www./ www.p A/ΣΣ① w\n__　́ ",
+"expected": "_ wc . a/σσ1 w __ ́"
+},
+{
+"input": "a😀_Σ\n_: ß@@xⅫ/:",
+"expected": "a 😀_σ _: ss@ /:"
+},
+{
+"input": "éﬀh@\taς　hcAs\nw@\n😀@/ 😀éς\t/@xBcaé　 ßp#　Ⅻ　",
+"expected": "éffh@ aσ hcas w@ 😀@/ 😀éσ / ssp xii"
+},
+{
+"input": "www. aΣ \tp  _bb",
+"expected": "www. aσ p _bb"
+},
+{
+"input": ":\tς.http:///#\n İ.Σ tς_@xςp Ac#ﬀA",
+"expected": ": σ. i̇.σ tσ_ acffa"
+},
+{
+"input": "　Ⅻ　/\n :t/_😀ﬀ ",
+"expected": "xii / :t/_😀ff"
+},
+{
+"input": "😀́",
+"expected": "😀́"
+},
+{
+"input": "hςacⅫ:\tBA①",
+"expected": "hσac xii: ba 1"
+},
+{
+"input": "B😀a./İ\ta😀Σẃ www. http://éⅫwww.:ﬀ",
+"expected": "b😀a./i̇ a😀σẃ www."
+},
+{
+"input": " Aß\n①ς́_\nßhttp://bwt😀 :ς@x①ςhttp:// 😀ﬀp@t.w@x@tp#whttp://p",
+"expected": "ass 1σ́_ ss :σ :// 😀ffp .w w"
+},
+{
+"input": "t@xétwww.@ ①B😀_@x@#éﬀwww./ẃ _ςAﬀ A",
+"expected": "t 1b😀_ @ éff _σaff a"
+},
+{
+"input": "cahé\n@_Ⅻ w@Σ/ςßap@ ςhttp://Σ",
+"expected": "cahé w /σssap@ σ"
+},
+{
+"input": "cΣ#Σ@x @c pΣw😀b😀@b　@Bp.:@x\tİ:pwww.s😀",
+"expected": "cσσ pσw😀b😀 .: i̇:p"
+},
+{
+"input": "",
+"expected": ""
+},
+{
+"input": "ß",
+"expected": "ss"
+},
+{
+"input": "　́ccB.ﬀ́",
+"expected": "́ccb.ff́"
+},
+{
+"input": "😀ﬀthttp://Bςßhttp://h\n",
+"expected": "😀fft"
+},
+{
+"input": "ch/ςéßéİ",
+"expected": "ch/σésséi̇"
+},
+{
+"input": " aß́ßtb éc::sİsBpΣhttp://_c",
+"expected": "asśsstb éc::si̇sb pσ"
+},
+{
+"input": "#wⅫ#ς\t :B\nßς Σ@xﬀßAß ́ς  Σ:_haéﬀ😀ﬀ",
+"expected": "wxiiσ :b ssσ σ ́ σ σ:_haéff😀ff"
+},
+{
+"input": "\n/B:\n\np@xßBw .\nΣéΣⅫB　 .spwww.b/s bhAﬀ😀w\t",
+"expected": "/b: p . σéσxiib .sp bhaff😀w"
+},
+{
+"input": "#w A_A Bß_awswww.a bh  b　ﬀß.A①c ß　ﬀ",
+"expected": "w a_a bss_aws bh b ffss.a1c ss ff"
+},
+{
+"input": "éab  A①ß/ b:h:http:// ",
+"expected": "éab a1ss/ b:h:http://"
+},
+{
+"input": "ςⅫΣwww.@x:ßtṕc\n@xé@xsςhttp://http://s_p",
+"expected": "σxiiσ"
+},
+{
+"input": "",
+"expected": ""
+},
+{
+"input": "́#ς:tﬀ b_@Awww.h@x.pς:./http://bΣ 😀　hΣİéh b#",
+"expected": "́σ:tff b_ . h .pσ:./ 😀 hσi̇éh b"
+},
+{
+"input": "",
+"expected": ""
+},
+{
+"input": "ﬀΣAt",
+"expected": "ffσat"
+},
+{
+"input": "İ①İtbpbpⅫ tΣh Ⅻs\n　h/́s_\n\t ßa　 / 😀hAh",
+"expected": "i̇1i̇tbpbpxii tσh xiis h/́s_ ssa / 😀hah"
+},
+{
+"input": "c😀.Ⅻ_\nb@:a_\n:Σ#/éﬀ ①ßﬀ",
+"expected": "c😀.xii_ b@:a_ : σ/éff 1ssff"
+},
+{
+"input": "c wac_tⅫ#bA B@@　_http://Ⅻa",
+"expected": "c wac_ txiiba b@@ _"
+},
+{
+"input": "twww.:www.@http://Σ　BΣ",
+"expected": "t @ bσ"
+},
+{
+"input": "tBs.apsBcwA①",
+"expected": "tbs.apsbcw a1"
+},
+{
+"input": "ςsa céwww.\t@xß①sﬀⅫ www.①İ:İİ①:a pİ w@ cAﬀ",
+"expected": "σsa céwww. pi̇ w@ caff"
+},
+{
+"input": " 😀@x éá́ßwww.İ İΣBﬀhttp://s Bwww.tpṕΣhttp://́t:Bhttp://ςhttp://",
+"expected": "😀 éá́ ss i̇σbff b"
+},
+{
+"input": "http:///ς .:é.c İςⅫ",
+"expected": ".:é.c i̇σxii"
+},
+{
+"input": "①:pİ#ςΣ",
+"expected": "1:pi̇σσ"
+},
+{
+"input": "http://\n😀 sﬀ\t😀@😀́.http://:a_ς　http:// ςhttp://ßİpb@xwapA.\n",
+"expected": "http:// 😀 sff 😀@😀́. http:// σ"
+},
+{
+"input": "s p p😀 http://　 w_Ⅻ\tςc😀İςc\t①ⅫpΣ İ_wςBhßB",
+"expected": "s p p😀 http:// w_xii σc😀i̇σc 1xiipσ i̇_wσbhssb"
+},
+{
+"input": "😀İﬀhttp://①",
+"expected": "😀i̇ff"
+},
+{
+"input": "b#ééⅫ①́.B😀ﬀ　_atwﬀwww.c\t@xßİé@ tBa#",
+"expected": "bééxii1́.b😀ff _ atwff ̇é@ tba"
+},
+{
+"input": " héAwß́A@x①_①A: ßwhttp://a.www.shttp://p  İp\n@xﬀ",
+"expected": "héawsśa : ssw i̇p"
+},
+{
+"input": "①A\n\n İⅫwww.p\nw_Ahwww.ςé　:ςßwé@xA awww.B① c",
+"expected": "1a i̇xii w_ah :σsswé a c"
+},
+{
+"input": "t😀\twhéﬀ😀hhA.Ⅻ@A_B",
+"expected": "t😀 whéff😀hha.xii"
+},
+{
+"input": "　.a@x/　t\thwww./:hhttp://#é#w A①tp😀Ⅻ:A_c/😀\tt @x:\np",
+"expected": ".a / t h a1tp😀xii:a_c/😀 t : p"
+},
+{
+"input": "@xh:tﬀc İ:\ttwww. wé:.Ⅻßﬀ",
+"expected": ":tffc i̇: twww. wé:.xiissff"
+},
+{
+"input": "cΣ@hhttp://http://B",
+"expected": "cσ"
+},
+{
+"input": "　Σb　 w　s\nwww. w_́st\nc",
+"expected": "σb w s www. w_́st c"
+},
+{
+"input": "#aΣw:\nA.ßΣ😀́ ßς.@\nB@xé#@x@/ﬀéccc#①_①ΣB",
+"expected": "aσw: a.ssσ😀́ ssσ.@ b @/fféccc 1_1σb"
+},
+{
+"input": "/ς/ ßá\n:p## @:　swww.www.@ é ",
+"expected": "/σ/ ssá :p @: s é"
+},
+{
+"input": "www.cpςw\tﬀ@xh",
+"expected": "pσw ff"
+},
+{
+"input": " www. #a#A",
+"expected": "www. aa"
+},
+{
+"input": "ht /:pbⅫﬀhttp://@\t@ ht A Bß#ch.\nß é.",
+"expected": "ht /:pbxiiff @ ht a bssch. ss é."
+},
+{
+"input": "",
+"expected": ""
+},
+{
+"input": "①①c  :/:Σ_hwtßBác　",
+"expected": "11c : /:σ_hwtssbác"
+},
+{
+"input": "ßBBwAς① Σ/　　_p\nAé/Ⅻİ\nwww.@Bpt wé@x 　",
+"expected": "ssbbwaσ1 σ/ _p aé/xiii̇ wé"
+},
+{
+"input": "Aﬀﬀßİﬀ tßⅫ\na\n　b@́①①\né:ßwww.h Σﬀéc\tß s.😀",
+"expected": "affffssi̇ff tssxii a b@́11 é:ss σfféc ss s.😀"
+},
+{
+"input": "www. @hcİ.İsß:ς/tΣﬀ\n　 w/ﬀhttp://aa",
+"expected": "www. ̇.i̇sss:σ/tσff w/ff"
+},
+{
+"input": "# épΣ#@xİ_p",
+"expected": "épσ i̇_p"
+},
+{
+"input": "Bß😀s\tς\nİhttp://A　　ςbA@@xİ😀\n:éc ",
+"expected": "b ss😀s σ i̇ σba@ ̇😀 :éc"
+},
+{
+"input": "_as:wcﬀ.s \twww.b①@x① İ　ςs /　Awww.Σ_w",
+"expected": "_as:w cff.s i̇ σs / a"
+},
+{
+"input": "A/\nhttp:///\nA\nİς.s\ńw 😀ﬀ#pςﬀ İ́s@h😀①/ ",
+"expected": "a/ a i̇σ.s ́w 😀ffpσff i̇́s 😀 1/"
+},
+{
+"input": ":s",
+"expected": ":s"
+},
+{
+"input": "́@x①Bsﬀςﬀhttp://\t@p😀acwww.\nΣςp B@x#①@\n/.@ﬀﬀßﬀ",
+"expected": "́ :// 😀acwww. σσp b 1@ /."
+},
+{
+"input": "　ßΣ.:www.http://①\t_hßB①Ba Ⅻﬀhs_:t",
+"expected": "ssσ.: _hssb1b a xiiffhs_:t"
+},
+{
+"input": "@\tcİ\t_İsBsht\n",
+"expected": "@ ci̇ _i̇sb sht"
+},
+{
+"input": "ς ςbhttp://B",
+"expected": "σ σb"
+},
+{
+"input": " haé_😀s",
+"expected": "haé_😀s"
+},
+{
+"input": "A😀@xccwww.é@́t\tßßhttp://th@xh\twww.bt.bsⅫςBs @",
+"expected": "a😀 ssss sxiiσbs @"
+},
+{
+"input": "İ①tAςwww.ßpB́_Ⅻééwßw@ﬀ/\twBhttp://",
+"expected": "i̇ 1taσ wbhttp://"
+},
+{
+"input": "😀",
+"expected": "😀"
+},
+{
+"input": "wpw@x\tbbBΣh①a",
+"expected": "wpw bbbσh1a"
+},
+{
+"input": "www.p@xΣ/ Σ\n#c.Σ①bé#ß#:ς́　 ß ́_#http://pİhΣpbwshttp://Ⅻ",
+"expected": "σ c.σ1béss:σ́ ss ́_ i̇hσpbws"
+},
+{
+"input": "/Ⅻ__a@hwww.İba échwww.B ß@xé　ha",
+"expected": "/xii__a éch ss ha"
+},
+{
+"input": "hΣİ##_w😀é😀BÁ/ﬀ",
+"expected": "hσi̇_w😀é😀bá/ff"
+},
+{
+"input": "́́:@　İB taﬀtc #",
+"expected": "́́:@ i̇b tafftc"
+},
+{
+"input": "acéAﬀ tc@x①pc",
+"expected": "acéaff tc"
+},
+{
+"input": "éb́##.:http:///",
+"expected": "éb́.:"
+},
+{
+"input": " #İaBb@x @xwww.BAwww.\téﬀa@xhb.éh@hⅫ@ www.http://Σ#  #",
+"expected": "i̇abb éffa . éh @"
+},
+{
+"input": "ςs\n\n\t",
+"expected": "σs"
+},
+{
+"input": "　ßwa Bc@h",
+"expected": "sswa bc"
+},
+{
+"input": "İé①h bAb_ⅫA.\t😀p_p\nΣb İ#/😀/́ s a①www.",
+"expected": "i̇é1h bab_xiia. 😀p_p σb i̇/😀/́ s a1www."
+},
+{
+"input": "ß",
+"expected": "ss"
+},
+{
+"input": "www.Σßa ß www./#c Ⅻß",
+"expected": "ss xiiss"
+},
+{
+"input": "Bwww.@é/hhttp://Awww. ①http:// hh\tapⅫ@.😀/",
+"expected": "b 1http:// hh apxii@.😀/"
+},
+{
+"input": "ﬀ ßpb hp:BBﬀ\nBBBwww.a",
+"expected": "ff sspb hp:bbff bbb"
+},
+{
+"input": "ςB:@x",
+"expected": "σb:"
+},
+{
+"input": "　s😀.#p",
+"expected": "s😀.p"
+},
+{
+"input": "ﬀ①.😀#éß hbİt#hΣßsaw",
+"expected": "ff1.😀éss hbi̇thσsssaw"
+},
+{
+"input": " /\np",
+"expected": "/ p"
+},
+{
+"input": "c:́#Aİp tAB",
+"expected": "c:́ai̇p tab"
+},
+{
+"input": "as_Σςwww.._ςpςς/http://@ /\t",
+"expected": "as_σσ /"
+},
+{
+"input": "btwtİς ́paA#İς \tb́😀　@@é@x",
+"expected": "btwti̇σ ́paai̇σ b́😀 @"
+},
+{
+"input": " ﬀ@　́.tⅫ😀A@wBsς😀́ ß@xABt́hİ@AⅫhttp://",
+"expected": "ff@ ́.txii😀a 😀́ ss t́hi̇ ://"
+},
+{
+"input": " http:///",
+"expected": ""
+},
+{
+"input": " h# ́péé_B😀 #hsςB@́́p.ab́cwww.t　_",
+"expected": "h ́péé_b😀 hsσb@́́p. a b́c _"
+},
+{
+"input": ":İ cς.tbé 😀hc\t😀_w\n wBﬀb",
+"expected": ":i̇ cσ.tbé 😀hc 😀_w wbffb"
+},
+{
+"input": "aς́tB́ς　h",
+"expected": "aσ́tb́σ h"
+},
+{
+"input": "hẃw\nést c①.ß①bς/ a:pé́@x@xİ_p @x@s①:_http://_ A",
+"expected": "hẃw ést c1.ss1bσ/ a:pé́ ̇_p :_ a"
+},
+{
+"input": "tⅫ/ 😀①pt:s",
+"expected": "txii/ 😀1pt:s"
+},
+{
+"input": "#AⅫ#b\tB\t._①Bhttp://İ\n@😀 　http://ςhttp://@xwⅫ",
+"expected": "axiib b ._1b @😀"
+},
+{
+"input": "pİ.p",
+"expected": "pi̇.p"
+},
+{
+"input": "①ςhttp://pBÁh a😀́ß.é",
+"expected": "1σ a😀́ss.é"
+},
+{
+"input": "tⅫ hwww.①ﬀ_tςςİ　ς_ths@c",
+"expected": "txii h σ_ths"
+},
+{
+"input": "_ﬀ①B́éßwww.ΣΣⅫ .́b/ﬀς@\t@xh wς\np/Bécw",
+"expected": "_ff1b́éss .́b/ffσ@ wσ p/bécw"
+},
+{
+"input": "",
+"expected": ""
+},
+{
+"input": "www.①@xsbBa.  a.t.p bb@  w:́ßBhttp://Σ \t①́pßA p/",
+"expected": "a.t.p bb@ w:́ssb 1́pssa p/"
+},
+{
+"input": " BAp_ßß　:w@xA:Ⅻİ",
+"expected": "bap_ssss :w :xiii̇"
+},
+{
+"input": "bt\nB́#B:w😀ét ́Ⅻ_aw",
+"expected": "bt b́b:w😀ét ́xii_aw"
+},
+{
+"input": "h#é pⅫhttp://www.ßAbtbt\théw.h\np_/Atéß\nﬀ http://\nA ",
+"expected": "hé p xii héw.h p_/atéss ff http:// a"
+},
+{
+"input": "\tA  ",
+"expected": "a"
+},
+{
+"input": ". ébw @http://",
+"expected": ". ébw @ http://"
+},
+{
+"input": "́http://\nB#BİⅫ́Bpt😀 ́①ςwww.😀 A#",
+"expected": "́http:// bbi̇xiíbp t😀 ́1σ a"
+},
+{
+"input": " s_c@x_Béc\nBßⅫhttp:// :ﬀ#Ac\t_http://#B /www.①",
+"expected": "s_c bssxiihttp:// :ffac _ /"
+},
+{
+"input": " .İⅫßς@ é@x",
+"expected": ".i̇xiissσ@ é"
+},
+{
+"input": " pİ́t.\t",
+"expected": "pi̇́t."
+},
+{
+"input": "ﬀw_w　#ß bp́:  .ßw①AatΣapcc ",
+"expected": "ffw_w ss bp ́: .ssw1aatσapcc"
+},
+{
+"input": " sς\nςΣﬀİ\t@ta① ",
+"expected": "sσ σσffi̇"
+},
+{
+"input": "/:\n",
+"expected": "/:"
+},
+{
+"input": " İⅫ\n_ www.ßAΣ. _www.A",
+"expected": "i̇xii _ _"
+},
+{
+"input": "éß́éhßς B#@ bbtςBB　Awéﬀ\ńİ\ń Σ\nΣ#http://B",
+"expected": "ésśéhssσ b@ bbtσbb awéff ́i̇ ́ σ σ"
+},
+{
+"input": "😀①athhςwww.ς@céⅫb_Ⅻ .http://\tΣ#tAtςⅫ/İ",
+"expected": "😀1athhσ .http:// σtatσxii/i̇"
+},
+{
+"input": "B①w \nß.　www.a:İ@x/.b@x@ςAAhbhé:@xh::😀bⅫ_p",
+"expected": "b1w ss . www. a:i̇ /.b b h é: ::😀bxii_p"
+},
+{
+"input": "st①héA aß/ www.pthttp://.t.w@éhsⅫA　a😀 B@x①: é/",
+"expected": "st1h éa ass/ a a😀 b : é/"
+},
+{
+"input": "hwww.ß① wt/①ΣⅫ\n\n/h😀 :w @\t.①́😀　́śhttp://ẃ:/tB",
+"expected": "h wt/1σxii /h😀 :w @ .1́😀 ́ś : /tb"
+},
+{
+"input": "İBﬀ#ΣⅫßΣﬀ:é@xaćΣﬀⅫ\n/@x",
+"expected": "i̇bffσxiissσff:é ffxii /"
+},
+{
+"input": "",
+"expected": ""
+},
+{
+"input": "ςﬀ tß/@x@xﬀ",
+"expected": "σff tss/"
+},
+{
+"input": "\t@_b ́😀　sςhttp://",
+"expected": "́😀 sσhttp://"
+},
+{
+"input": "Σ",
+"expected": "σ"
+},
+{
+"input": "www. ́@ßpİpbςİBςwww.asß\t　/İbBwhA_:\nttAⅫp@",
+"expected": "www. ́ ̇pbσi̇bσ /i̇bbwha_: ttaxiip@"
+},
+{
+"input": ":@x@x :Ⅻ",
+"expected": ": :xii"
+},
+{
+"input": "c　İⅫ ._\nc A/",
+"expected": "c i̇xii ._ c a/"
+},
+{
+"input": "cb /@é/",
+"expected": "cb / /"
+},
+{
+"input": ".wΣwς@",
+"expected": ".wσwσ@"
+},
+{
+"input": " ﬀ①p😀t́b./.:ΣA😀http://c😀@xa😀😀bßﬀ:",
+"expected": "ff1p😀t́b./.:σa😀 :"
+},
+{
+"input": "@xhttp://:",
+"expected": ""
+},
+{
+"input": ".İ/aaς①wİ①ß́/ İwsha  @xpß/www.　s ",
+"expected": ".i̇/a aσ1wi̇1sś/ i̇wsha /www. s"
+},
+{
+"input": "c:Ⅻ ①\tⅫa _#İs@Ⅻ😀p 😀ς#c　\nhBpsςh",
+"expected": "c:xii 1 xiia _i̇s 😀p 😀σc hbpsσh"
+},
+{
+"input": "http://Ⅻsé ﬀ́@c:\tAwww._Σİ pc😀́b  ché́ \t",
+"expected": "ff́ : a p c😀́b ché́"
+},
+{
+"input": "._@.pß//t́tppAt/\nBİwww.",
+"expected": "._@. pss//t́tppat/ bi̇www."
+},
+{
+"input": "😀h#①́ Aİté́http://wp/http://@@x ﬀ/_́́　sς#@x　ß/ß#ςİ@_　",
+"expected": "😀h1́ ai̇té́ ff/_́́ sσ ss/ssσi̇"
+},
+{
+"input": "\tßİ@x. b hé@\téςς́wwww..ςww\n\t B①ah@xBh@ @",
+"expected": "ssi̇ . b hé@ éσσ́w b1ah @ @"
+},
+{
+"input": "#wasAⅫ s a①Σwww..aw.",
+"expected": "wasaxii s a 1σ"
+},
+{
+"input": "#h@s İﬀbBⅫ@s",
+"expected": "h i̇ffbbxii"
+},
+{
+"input": "ⅫςbbAⅫwww.İ/",
+"expected": "xiiσbbaxii"
+},
+{
+"input": "ς@x_Σςpwww.://::@@/\n#@x　①éwww.",
+"expected": "σ 1éwww."
+},
+{
+"input": "",
+"expected": ""
+},
+{
+"input": " Ⅻ_",
+"expected": "xii_"
+},
+{
+"input": "a Σ  ́İⅫß́ctA😀",
+"expected": "a σ ́i̇xiisścta😀"
+},
+{
+"input": "c.wBp ß ß Ⅻ\nB😀",
+"expected": "c.wbp ss ss xii b 😀"
+},
+{
+"input": ":.\nⅫ #Ⅻ/c　@/A\t",
+"expected": ":. xii xii/c @/a"
+},
+{
+"input": "cßA#http://wﬀ/thⅫpé  éatﬀ#w① www.\tςß sßt",
+"expected": "cssa ff/thxiipé éatffw1 www. σss ssst"
+},
+{
+"input": "ﬀ①",
+"expected": "ff1"
+},
+{
+"input": "B: BAwww.wp#İ　pw#　😀\tB́_:B́Ⅻ_b",
+"expected": "b: ba pw 😀 b́_:b́xii_b"
+},
+{
+"input": "cB@  AtsΣ/ς",
+"expected": "cb@ atsσ/σ"
+},
+{
+"input": "s/😀😀.a_ www.Ⅻ :p@@İ ta:cΣ \n @x",
+"expected": "s/😀😀.a_ :p@ ̇ ta:cσ"
+},
+{
+"input": "😀www.w\nhttp://h́ß_ςΣ@xts_b①Ⅻ.cwww.\ts@😀ςhttp://́ www.İwww.\t",
+"expected": "😀 _ b1xii.cwww. s@😀σ"
+},
+{
+"input": "ﬀcṕ h😀Σ\néς ςhtⅫpς",
+"expected": "ffcṕ h😀σ éσ σhtxiipσ"
+},
+{
+"input": "s",
+"expected": "s"
+},
+{
+"input": "Aßς①cⅫhttp://\ntßß́#.　#ςws　c_ß①😀\t①: :./ΣsA",
+"expected": "assσ1cxiihttp:// tsssś. σws c_ss1😀 1: :./σsa"
+},
+{
+"input": "ßc.AⅫⅫw:ς@@s😀",
+"expected": "ssc.axiixiiw:σ @ 😀"
+},
+{
+"input": "pbﬀİ.İaς@ ß_cwhbt\t#w t́ @",
+"expected": "pbffi̇.i̇aσ@ ss_cwhbt w t́ @"
+},
+{
+"input": " http://",
+"expected": "http://"
+},
+{
+"input": " é@ h😀\n①ςat@ßﬀ Ⅻ ß İchttp://@x\nś́éaAİét.́@xİ",
+"expected": "é@ h😀 1σat xii ss i̇c ś́éaai̇ét.́ ̇"
+},
+{
+"input": "#p😀 \néhaB ",
+"expected": "p😀 éhab"
+},
+{
+"input": ".ςaⅫ①",
+"expected": ".σaxii1"
+},
+{
+"input": "é\tΣhttp://ς/#http://　@ς\twww.htİΣß@xs\t ς@ςwww. _ß@ß",
+"expected": "é σ http:// σ . _ss"
+},
+{
+"input": "①bςtﬀa/wwww.😀",
+"expected": "1bσtffa/w"
+},
+{
+"input": "ﬀpt.é/ςAbİt ﬀc　www.́wwww..B..",
+"expected": "ffpt.é/σabi̇t ffc"
+},
+{
+"input": "_/ \t@xwww._́@_s\n\nw",
+"expected": "_/ w"
+},
+{
+"input": "t😀 _ς　😀@x/A# c:sB.http://bbt😀 éwww. .w ßb_ß",
+"expected": "t😀 _σ 😀 /a c :sb. éwww. .w ssb_ss"
+},
+{
+"input": "BBb@A/\ts\n h😀s@xaA\tt\n @x́:",
+"expected": "bbb / s h😀s t ́:"
+},
+{
+"input": "www.éİéwtss _\nﬀct#h😀ςéΣ　",
+"expected": "_ ffcth😀σé σ"
+},
+{
+"input": "Σ",
+"expected": "σ"
+},
+{
+"input": "h/Σ　ﬀ/http://:Ⅻ.́hw Σ#psΣ@́\tİh",
+"expected": "h/σ ff/ hw σpsσ@́ i̇h"
+},
+{
+"input": "Ⅻa\np_@x@x_/\t#ⅫéⅫⅫw#:①.",
+"expected": "xiia p_ / xiiéxiixiiw:1."
+},
+{
+"input": ": tⅫİs:#.w/́www.w😀　#bw😀c#www.Ⅻh\nt.Σς#",
+"expected": ": txiii̇s:.w/́ bw😀c t.σσ"
+},
+{
+"input": "B/\n:p@x#AAw h pp p　.pa\nétς ①@ta",
+"expected": "b/ :p aaw h pp p .pa étσ 1"
+},
+{
+"input": "ß#😀　bth",
+"expected": "ss😀 bth"
+},
+{
+"input": "c İ①www.ﬀt\n①B😀Ⅻhttp://́s.①①hA@x",
+"expected": "c i̇1 1b 😀xii"
+},
+{
+"input": "é @x@ ςⅫaap　/",
+"expected": "é @ σxiiaap /"
+},
+{
+"input": "́_\nⅫh:ﬀa\tbİ😀",
+"expected": "́_ xiih:ffa bi̇😀"
+},
+{
+"input": "http://tßB_A \tc\t\nwww./@ B\nbς.",
+"expected": "c b bσ."
+},
+{
+"input": "ﬀ①@@http://é\n　😀İ#Ⅻtİw ́İﬀhttp://@xs@c😀pw:😀İsς:http:///Ⅻ:s",
+"expected": "ff 1@@ 😀i̇xiiti̇w ́i̇ff"
+},
+{
+"input": "@@xb① c😀\n😀B##ﬀ\n",
+"expected": "@ c😀 😀bff"
+},
+{
+"input": "İ",
+"expected": "i̇"
+},
+{
+"input": "_́ bb:t  @xwhttp://B_\t①😀p  A#",
+"expected": "_́ bb: t 1😀p a"
+},
+{
+"input": "①\nA@#ⅫBhs　\t.Ⅻb\té \n@xs #http://　ßtς@ \t\n",
+"expected": "1 a@xiibhs .xiib é http:// sstσ@"
+},
+{
+"input": " ①s Ⅻéph_@x_@xa p.ςpwﬀé.",
+"expected": "1 s xiiéph_ p.σpwffé."
+},
+{
+"input": "\n#.́http://①",
+"expected": ".́"
+},
+{
+"input": "wﬀ",
+"expected": "wff"
+},
+{
+"input": "Ⅻwς@x\tﬀﬀﬀwİ:ß@xéc  B@x.ςsé",
+"expected": "xiiwσ ffff ffwi̇: ss b .σsé"
+},
+{
+"input": "ß\nς.www../ :http://h́ß#http://::@xtß\t\n shﬀaⅫtİ",
+"expected": "ss σ. : shffaxiiti̇"
+},
+{
+"input": "a😀İa#tﬀp b#é①  😀\thAςc@b　@x:ﬀ:",
+"expected": "a😀i̇atffp bé1 😀 haσc :ff:"
+},
+{
+"input": "ésΣﬀ/w ßⅫw\t Aς#cßppsⅫhttp://😀😀éé @.@ _",
+"expected": "ésσff/w ssxiiw a σ cssppsxii @.@ _"
+},
+{
+"input": "_h　ßwß😀́c.A.😀",
+"expected": "_h sswss😀́c.a.😀"
+},
+{
+"input": "B😀bb",
+"expected": "b😀bb"
+},
+{
+"input": "① ①t_A① ß\n　①ﬀAa cⅫwtßab#AⅫ　　",
+"expected": "1 1t_a1 ss 1ffa a cxiiwtssabaxii"
+},
+{
+"input": "#İ aİp①B　www.http://İ#　#ﬀ#　Ⅻb@́",
+"expected": "i̇ ai̇p1b ff xii b@́"
+},
+{
+"input": "c①sá Σéİ#\tAß\nwww. ﬀbⅫ",
+"expected": "c1sá σéi̇ ass www. ffbxii"
+},
+{
+"input": "@x:́\nwww.c\ta: A b/p İthttp:// :# 😀http://İΣ:😀",
+"expected": ":́ a: a b/p i̇thttp:// : 😀"
+},
+{
+"input": "@x\tςbhttp://s　A@/a",
+"expected": "σb a@/a"
+},
+{
+"input": "@xB ßB:İ_\nwww.c@é:　@h:\ntaAp#",
+"expected": "ssb:i̇_ : : taap"
+},
+{
+"input": "😀http:// _. ﬀ:😀sp",
+"expected": "😀http:// _. ff:😀sp"
+},
+{
+"input": "www.._ς: b@w\na\n #\téwww./😀# Σﬀ./hBa ﬀ _ éA①😀@",
+"expected": "b a é σff./hba ff _ éa1😀@"
+},
+{
+"input": "ﬀ",
+"expected": "ff"
+},
+{
+"input": "w ⅫΣéwww.ς_İB\t①\t\t@hⅫ 😀\tw",
+"expected": "w xiiσé 1 😀 w"
+},
+{
+"input": "́\nİ @😀B😀Ⅻp　pﬀ#t/Ⅻwáİßİ@@x ﬀ:\n①_\t 😀é\t́",
+"expected": "́ i̇ @😀b😀xiip pfft / xiiwái̇ssi̇@ ff: 1 _ 😀é ́"
+},
+{
+"input": "_.pb①bswww.　ςhⅫbé①w  t\nİw①ςéⅫςİ#tB\nhttp://@😀①Σ①",
+"expected": "_.p b1bswww. σhxiibé1w t i̇w1σéxiiσi̇tb"
+},
+{
+"input": "/ www.Ⅻßpİ 　😀c　hA/AΣ\n h 　\n😀www.①www.BcB.h İ:http://\nς",
+"expected": "/ 😀c ha/aσ h 😀 i̇:http:// σ"
+},
+{
+"input": ":@x Ⅻ",
+"expected": ": xii"
+},
+{
+"input": "@c 　 cﬀsς😀ts.é",
+"expected": "cffsσ😀ts.é"
+},
+{
+"input": "/éΣ_ﬀ@xBw\nςs",
+"expected": "/éσ_ff σs"
+},
+{
+"input": " #@xßİt aa😀Ⅻς\n　tt\nhΣ@x́Σİ abwww.İ 　hⅫ@xh",
+"expected": "̇t aa😀xiiσ tt hσ ́σi̇ ab hxii"
+},
+{
+"input": "ćh ́ap\t_😀h\twww.　.w\nﬀßb#\tΣw:.①\t@ς:",
+"expected": "ćh ́ap _😀h www. .w ffssb σw:.1 :"
+},
+{
+"input": "\np①sé",
+"expected": "p 1sé"
+},
+{
+"input": "@xßpatßt wⅫpßb\n\tas",
+"expected": "wxiipssb a s"
+},
+{
+"input": "hς@ςß@.",
+"expected": "hσ @ ."
+},
+{
+"input": "p 😀　\nςhttp://http://cß①p@x.́　ß_ p#   cwhttp://",
+"expected": "p 😀 σ ss_ p cwhttp://"
+},
+{
+"input": "_www.　Σ　ςAwtⅫhttp://́wcß",
+"expected": "_www. σ σawtxii"
+},
+{
+"input": " s",
+"expected": "s"
+},
+{
+"input": "@　:http://.#http://:İ_\nhß́ ́ßﬀhΣb",
+"expected": "@ : hsś ́ssffhσb"
+},
+{
+"input": "　wwwww.@ét#ß:#w@x ς ①#www.c\nİé́sß\nwww.bw",
+"expected": "wwwww. ss:w σ 1 i̇é́sss"
+},
+{
+"input": ". hΣⅫwB http://c_bhttp://　😀psb①shttp://cs_éhh :bs",
+"expected": ". hσxiiwb 😀psb1s :bs"
+},
+{
+"input": "　①ςaⅫ①A",
+"expected": "1σaxii1a"
+},
+{
+"input": "　cﬀ_　　",
+"expected": "cff_"
+},
+{
+"input": ":ﬀ_①ss  @",
+"expected": ": ff_ 1ss @"
+},
+{
+"input": "ς#www..http://h_b ßt t@A①.c ́́h①\nh:@x",
+"expected": "σ www. . sst t .c ́́h1 h:"
+},
+{
+"input": "é́/cΣ@xhß@h😀#@ßhttp://http://@x:Asa　①A_ßⅫ①BⅫ @xhttp://ςhttp://ﬀ:Ⅻ",
+"expected": "é́/cσ 😀 1a_ssxii1bxii"
+},
+{
+"input": "ς\n 😀b @ﬀ　😀.@ςc a",
+"expected": "σ 😀b 😀. a"
+},
+{
+"input": "A\té A  😀p",
+"expected": "a é a 😀p"
+},
+{
+"input": "😀İ@t.ς@Σé:AⅫhB😀́_#a①① @t😀ßh  ",
+"expected": "😀i̇ .σ :axiihb😀́_a11 😀ssh"
+},
+{
+"input": ".http://ßB b@p①.ßc😀@ @xh/\nwww.:sps😀:",
+"expected": ". b . ssc😀@ / sps😀:"
+},
+{
+"input": "p😀h/w😀_hß.ﬀ\nﬀ́ﬀ:ςA",
+"expected": "p😀h/w😀_hss.ff ff́ff:σa"
+},
+{
+"input": "p.http://ßhİs__ςéhttp://h_.ßwww.paⅫ.Bp h#",
+"expected": "p. h"
+},
+{
+"input": "@x　  \tsΣA@cb/phttp:// Ⅻw ",
+"expected": "sσa /phttp:// xiiw"
+},
+{
+"input": "www.ßéc\np@ﬀΣ@x\n#w \tss tc İΣ.Ⅻßs /http://",
+"expected": "p w ss tc i̇σ.xiisss /http://"
+},
+{
+"input": ".@@x.b ς́_@x①é/cς ",
+"expected": ".@ .b σ ́_ /cσ"
+},
+{
+"input": " ",
+"expected": ""
+},
+{
+"input": "bA._\n\t#/",
+"expected": "ba._ /"
+},
+{
+"input": ":www.\t ._😀/😀ﬀ._\nİ_@x @x ﬀς http://ßé#",
+"expected": ":www. ._😀/😀ff._ i̇_ ffσ"
+},
+{
+"input": "@x@p#:ß ①bwww.##.①p A:s@ςΣß:éécß\n # A",
+"expected": ":ss 1b a:s :éécss a"
+},
+{
+"input": "http://ﬀΣ@x@xς😀s_B\n wⅫcchttp://\t@xwww..①",
+"expected": "wxiicchttp://"
+},
+{
+"input": "www. _ #_😀a Ata :İwww.:/http://ﬀ́sat \n@x　cςⅫ_😀_http://",
+"expected": "www. _ _😀a ata :i̇ cσxii_😀_http://"
+},
+{
+"input": "a　@x@x:aß́ﬀςb　c@́B ﬀ tp",
+"expected": "a :asśffσb c@́b ff tp"
+},
+{
+"input": " 😀www.@x😀\nhttp://www.Σ　hⅫB①@Σ_www.Ⅻh t tßbﬀ",
+"expected": "😀 hxiib1@ σ_ t tssbff"
+},
+{
+"input": "\tAahttp://①\n@xİ\n/́éé\tﬀc#",
+"expected": "aa ̇ /́éé ffc"
+},
+{
+"input": " .b　.tsς@ßaΣΣİ@ßßß\n:.bBéwww. t",
+"expected": ". b .tsσ ̇ :.bbéwww. t"
+},
+{
+"input": "aςh①www.p",
+"expected": "aσh1"
+},
+{
+"input": "pwww.bBwww.p@xςB@xİpbΣ①b\tpbςA",
+"expected": "p pbσa"
+},
+{
+"input": "A @xhttp://é#ßBwww.pΣ#:Bé😀 .www.shttp://ß́p①@xw bwww.www.A:😀ß.①",
+"expected": "a . b"
+},
+{
+"input": "\tⅫwa www.__p😀.abς bAⅫp  #😀hBt",
+"expected": "xiiwa baxiip 😀hbt"
+},
+{
+"input": "tt#😀@ ",
+"expected": "tt😀@"
+},
+{
+"input": " ́/ﬀ́/ İ😀.www.##😀@x　#B ς_ ①́́İ_",
+"expected": "́/ff́/ i̇😀. b σ_ 1́́i̇_"
+},
+{
+"input": "Ⅻ　.é\t@x#@x/ßςt  😀ﬀ　Ⅻwww.:htΣßBB\n@́.ééaﬀBchttp://Ⅻ",
+"expected": "xii .é /ssσt 😀ff xii @́.ééaffbc"
+},
+{
+"input": "bhttp://_wΣ① hΣwwww.p",
+"expected": "b hσw"
+},
+{
+"input": "a  Ac\na#bİhttp://",
+"expected": "a ac abi̇http://"
+},
+{
+"input": "😀Σb😀:c/é swww.éb\tßΣbBB😀ahttp://①@́ ",
+"expected": "😀σb😀:c/é s ssσbbb😀a"
+},
+{
+"input": "saİ www.http:// ",
+"expected": "sai̇"
+},
+{
+"input": "t@ ahttp://①/http://a .tt. ßﬀAΣⅫ_　w\n",
+"expected": "t@ a .tt. ssffaσxii_ w"
+},
+{
+"input": "awß①h😀t\ncßİt①İB ##\nwww.@　A chc_http://t①ﬀ ",
+"expected": "awss1h😀t cssi̇t1i̇b a chc_"
+},
+{
+"input": "Σ:ßé.😀péA\nhwww.t́\n@x",
+"expected": "σ:ssé.😀p éa h"
+},
+{
+"input": "awww._B@t_b/　/awww.pςİh́ap  _",
+"expected": "a /a _"
+},
+{
+"input": "pς  :b\n　at ́éh́_@é@x@a .www.",
+"expected": "pσ :b at ́éh́_@ é .www."
+},
+{
+"input": "İhttp://Bbw\nB@/😀Σ@",
+"expected": "i̇ b@/😀σ@"
+},
+{
+"input": "İswpﬀ@①tpİ①#",
+"expected": "i̇swpff ̇1"
+},
+{
+"input": "http://./_s::http://h　www./h .:ﬀB́Σ  tBhttp://bb",
+"expected": ".:ffb́σ tb"
+},
+{
+"input": " #ς ①http://",
+"expected": "σ 1http://"
+},
+{
+"input": "ςﬀⅫ@xwww./www.c\nhh/ﬀ😀tⅫ́tB　Ⅻ",
+"expected": "σffxii hh/ff😀txiítb xii"
+},
+{
+"input": "s\nⅫp　c😀　Σb́/www.\n\n#　́BB/😀😀Σ́",
+"expected": "s xiip c😀 σ b́/www. ́bb/😀😀σ́"
+},
+{
+"input": "shttp://ßİ_éb@x ς\t:Σ  ①　a:_hςtﬀßİ_😀http://c ß",
+"expected": "s σ :σ 1 a:_hσtffssi̇_😀 ss"
+},
+{
+"input": ":www.",
+"expected": ":www."
+},
+{
+"input": "B\nς①　\tİςwshttp://tt　s.　@x@h́B①pB@#Σ　t́ ́ςp",
+"expected": "b σ1 i̇ σws s. ́b1 pb@σ t́ ́σp"
+},
+{
+"input": "　_A/w　:t́",
+"expected": "_a/w :t́"
+},
+{
+"input": "éa#ﬀp \t#\tAp/ _é",
+"expected": "éaffp ap/ _ é"
+}
+]
