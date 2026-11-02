@@ -43,3 +43,5 @@ jobs:
           git add verification/browser_model_release.json
           git commit -m "Record published browser model revision"
           git push
+      - name: Delete the temporary transfer branch
+        run: git push origin --delete model-transfer || true
