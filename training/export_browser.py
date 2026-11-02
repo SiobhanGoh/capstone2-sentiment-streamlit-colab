@@ -68,12 +68,22 @@ def export_fp32(model, tokenizer, path):
 
 
 def make_variants(fp32_path, onnx_dir):
-    import onnx
-    from onnxconverter_common import float16
+    """Write the 8-bit file, and a 16-bit file when it converts cleanly. Returns notes."""
     from onnxruntime.quantization import QuantType, quantize_dynamic
     quantize_dynamic(str(fp32_path), str(onnx_dir / "model_quantized.onnx"), weight_type=QuantType.QInt8)
-    half = float16.convert_float_to_float16(onnx.load(str(fp32_path)), keep_io_types=True)
-    onnx.save(half, str(onnx_dir / "model_fp16.onnx"))
+    notes = {}
+    try:
+        import onnxruntime as ort
+        from onnxruntime.transformers.optimizer import optimize_model
+        optimised = optimize_model(str(fp32_path), model_type="bert", num_heads=12, hidden_size=768,
+                                   opt_level=0, use_gpu=False)
+        optimised.convert_float_to_float16(keep_io_types=True)
+        optimised.save_model_to_file(str(onnx_dir / "model_fp16.onnx"))
+        ort.InferenceSession(str(onnx_dir / "model_fp16.onnx"), providers=["CPUExecutionProvider"])
+    except Exception as error:  # 16-bit is optional; never block the 8-bit release on it.
+        (onnx_dir / "model_fp16.onnx").unlink(missing_ok=True)
+        notes["model_fp16.onnx"] = f"not produced: {type(error).__name__}: {str(error)[:300]}"
+    return notes
 
 
 def compare(model, tokenizer, onnx_dir):
@@ -86,6 +96,8 @@ def compare(model, tokenizer, onnx_dir):
         reference = model(**{k: torch.from_numpy(v) for k, v in inputs.items()}).logits.numpy()
     report = {}
     for name in ["model.onnx", "model_quantized.onnx", "model_fp16.onnx"]:
+        if not (onnx_dir / name).exists():
+            continue
         session = ort.InferenceSession(str(onnx_dir / name), providers=["CPUExecutionProvider"])
         wanted = {i.name for i in session.get_inputs()}
         logits = session.run(["logits"], {k: v.astype("int64") for k, v in inputs.items() if k in wanted})[0]
@@ -117,12 +129,13 @@ def main():
     if [str(model.config.id2label[i]).upper() for i in range(3)] != LABELS:
         raise SystemExit("Label order does not match the evaluation protocol.")
     export_fp32(model, tokenizer, onnx_dir / "model.onnx")
-    make_variants(onnx_dir / "model.onnx", onnx_dir)
+    notes = make_variants(onnx_dir / "model.onnx", onnx_dir)
     manifest = {
         "source": {k: spec[k] for k in ["repo_id", "revision", "subfolder", "model_sha256"]},
         "files": {str(p.relative_to(out)): {"sha256": sha256(p), "bytes": p.stat().st_size}
                   for p in sorted(out.rglob("*")) if p.is_file()},
         "public_sentence_check": compare(model, tokenizer, onnx_dir),
+        "notes": notes,
     }
     (out / "export_manifest.json").write_text(json.dumps(manifest, indent=2))
     print(json.dumps(manifest["public_sentence_check"], indent=2))
