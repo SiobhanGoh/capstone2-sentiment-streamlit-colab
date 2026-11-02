@@ -27,3 +27,26 @@ jobs:
           path: browser-model
           retention-days: 7
           compression-level: 0
+
+  # Temporary hand-off for offline evaluation: the files are split below GitHub's 100 MB
+  # file limit and pushed to a short-lived branch, which is deleted after checksums are verified.
+  transfer:
+    needs: export
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: browser-model
+          path: browser-model
+      - name: Push split files to the model-transfer branch
+        run: |
+          cd browser-model
+          for f in $(find . -name '*.onnx'); do split -b 95m -d -a 2 "$f" "$f.part"; rm "$f"; done
+          git init -q -b model-transfer
+          git config user.name "SiobhanGoh"
+          git config user.email "siobhangoh17@gmail.com"
+          git add -A
+          git commit -q -m "Temporary browser model transfer (${GITHUB_SHA::7})"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" model-transfer
