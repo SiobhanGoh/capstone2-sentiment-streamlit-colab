@@ -1,0 +1,104 @@
+{
+  "protocol": "sentiment-disjoint-v1",
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "source_sha256": "3ff66de7b91cb1b2fd06ac5dd136f495859114808d19b1688c66a21ba1d74d77",
+  "test_inputs": 981,
+  "labels": [
+    "NEGATIVE",
+    "NEUTRAL",
+    "POSITIVE"
+  ],
+  "source_checkpoint": {
+    "repo_id": "SiobhanGoh/CP2_Emotion_Model_New",
+    "revision": "9bc6645ce7a8e02761c59386ffd16969bed1bc55",
+    "subfolder": "corrected-2026-10",
+    "model_sha256": "771a19b8c14865f8d8d8c7adc7df95d859b08a866195f5b7bfe3ac44723ec61b"
+  },
+  "variants": {
+    "model.onnx": {
+      "sha256": "efd2840cb01aa11c3249ed0933fe85bbf1dcf505755cb5492fbe6fc56471bc1d",
+      "bytes": 711633395,
+      "accuracy": 0.7604485219164119,
+      "macro_f1": 0.7556863945342297,
+      "confusion_matrix": [
+        [
+          325,
+          23,
+          52
+        ],
+        [
+          38,
+          182,
+          35
+        ],
+        [
+          54,
+          33,
+          239
+        ]
+      ],
+      "label_agreement_with_full_precision": 1.0
+    },
+    "model_quantized.onnx": {
+      "sha256": "8a1396573035102a86d617e694ae0e149bb8a6d67db87edd6199730b717105b7",
+      "bytes": 178613007,
+      "accuracy": 0.7584097859327217,
+      "macro_f1": 0.7490282458256899,
+      "confusion_matrix": [
+        [
+          350,
+          28,
+          22
+        ],
+        [
+          40,
+          194,
+          21
+        ],
+        [
+          75,
+          51,
+          200
+        ]
+      ],
+      "label_agreement_with_full_precision": 0.8980632008154944
+    },
+    "model_fp16.onnx": {
+      "sha256": "0a2598021419127f9bff25f2e998eb25a89965cbd76ffda341442a8ecf2bd149",
+      "bytes": 355751278,
+      "accuracy": 0.7604485219164119,
+      "macro_f1": 0.7556863945342297,
+      "confusion_matrix": [
+        [
+          325,
+          23,
+          52
+        ],
+        [
+          38,
+          182,
+          35
+        ],
+        [
+          54,
+          33,
+          239
+        ]
+      ],
+      "label_agreement_with_full_precision": 1.0
+    }
+  },
+  "note": "Retrospective internal evaluation on the same frozen test partition as the corrected comparison; it checks that conversion preserved behaviour, not external validity.",
+  "export_run_id": 41487726725,
+  "published_variant": "model_fp16.onnx",
+  "browser_pipeline_check": {
+    "variant": "model_fp16.onnx",
+    "test_inputs": 981,
+    "browser_accuracy": 0.7604485219164119,
+    "browser_macro_f1": 0.7556863945342297,
+    "label_agreement_with_python_onnx": 1.0,
+    "max_abs_score_diff_vs_python_onnx": 0.004210622960221011,
+    "how": "The web app's own worker (JS cleaning, transformers.js tokenizer, onnxruntime-web WASM) in headless Chrome; scripts/browser_eval.py."
+  },
+  "selection": "16-bit chosen: identical labels to the full-precision export on every test input at half the size. The 8-bit file changed about 1 in 10 labels, so it was not published."
+}

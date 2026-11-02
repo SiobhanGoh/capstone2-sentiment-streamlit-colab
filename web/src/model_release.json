@@ -5,7 +5,7 @@
     "revision": "",
     "dtype": "fp16",
     "onnx_file": "onnx/model_fp16.onnx",
-    "onnx_sha256": ""
+    "onnx_sha256": "0a2598021419127f9bff25f2e998eb25a89965cbd76ffda341442a8ecf2bd149"
   },
   "source_checkpoint": {
     "repo_id": "SiobhanGoh/CP2_Emotion_Model_New",
@@ -24,8 +24,8 @@
     "test_inputs": 981,
     "original_accuracy": 0.7604485219164119,
     "original_macro_f1": 0.7556863945342297,
-    "browser_accuracy": null,
-    "browser_macro_f1": null,
-    "label_agreement_with_original": null
+    "browser_accuracy": 0.7604485219164119,
+    "browser_macro_f1": 0.7556863945342297,
+    "label_agreement_with_original": 1.0
   }
 }

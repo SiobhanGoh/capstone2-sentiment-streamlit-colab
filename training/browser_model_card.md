@@ -19,7 +19,13 @@ Three-class sentiment polarity (negative, neutral, positive) for Malay, English 
 
 Scored on the same frozen 981-input test partition as the capstone's corrected comparison. The split fingerprint and source file checksum were verified before scoring.
 
-{{EVALUATION_TABLE}}
+| File | Size | Test accuracy | Macro-F1 | Same label as full precision |
+|---|---:|---:|---:|---:|
+| Full precision (not published) | 712 MB | 76.04% | 0.7557 | 100.0% |
+| **16-bit (this repo)** | 356 MB | 76.04% | 0.7557 | 100.0% |
+| 8-bit (not published) | 179 MB | 75.84% | 0.7490 | 89.8% |
+
+The full-precision export reproduces the original PyTorch result exactly (same confusion matrix). Run in a browser through transformers.js, the 16-bit file gave the same label as the Python evaluation on all 981 inputs (largest score difference 0.0042).
 
 These are retrospective internal results on the existing corpus, not new external validation. Softmax scores are uncalibrated. Expect errors on sarcasm, slang, heavy code-switching and topics unlike the training data.
 
@@ -29,7 +35,7 @@ These are retrospective internal results on the existing corpus, not new externa
 import { AutoModelForSequenceClassification, AutoTokenizer } from '@huggingface/transformers';
 const id = 'SiobhanGoh/malay-english-sentiment-onnx';
 const tokenizer = await AutoTokenizer.from_pretrained(id, { revision: '<pinned commit>' });
-const model = await AutoModelForSequenceClassification.from_pretrained(id, { revision: '<pinned commit>', dtype: '{{DTYPE}}' });
+const model = await AutoModelForSequenceClassification.from_pretrained(id, { revision: '<pinned commit>', dtype: 'fp16' });
 ```
 
 Apply the project's text cleaning first (Unicode NFKC, case-folding, link and @mention removal, `#` removal, whitespace collapse). Source, training protocol and the web app: https://github.com/SiobhanGoh/capstone2-sentiment-streamlit-colab
