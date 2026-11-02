@@ -1,4 +1,4 @@
-import { useModel, MOCK } from '../lib/useModel.js';
+import { useModel, MOCK, MODEL_MB } from '../lib/useModel.js';
 
 function mb(bytes) {
   return `${(bytes / 1e6).toFixed(0)} MB`;
@@ -21,6 +21,14 @@ export default function ModelStatus() {
       <p className="flex flex-wrap items-center gap-2 text-xs text-jambu-700 dark:text-jambu-300">
         {m.error}
         <button className="underline underline-offset-2" onClick={m.retry}>Try again</button>
+      </p>
+    );
+  }
+  if (m.status === 'idle' && m.waiting) {
+    return (
+      <p className="max-w-xs text-xs text-ink-soft dark:text-ube-300">
+        The model ({MODEL_MB} MB) downloads once, when you first analyse. Wi-Fi is best.{' '}
+        <button className="font-semibold underline underline-offset-2" onClick={m.retry}>Download now</button>
       </p>
     );
   }

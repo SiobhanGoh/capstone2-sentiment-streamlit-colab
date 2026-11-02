@@ -4,10 +4,13 @@ The live front end for the Malay–English sentiment model. It is a static React
 
 ## What it does
 
-- **Analyse:** one piece of Malay, English or code-switched text, with the label, all three class scores and what the model actually reads after cleaning.
-- **Comments:** paste up to 1,000 comments, pull up to 100 from a YouTube video, or upload a CSV and pick the text column. Summary, search, filter and sort, plus CSV and PDF downloads.
-- **History:** single-text predictions kept in this browser only, with a CSV download.
+- **Analyse:** one piece of Malay, English or code-switched text. Shows the label, all three class scores, where the text sits on the sentiment triangle, and an optional "Why this label?" view that shades the words whose removal changes the score most. Recent texts are kept in this browser.
+- **Comments:** paste up to 1,000 comments, pull up to 100 from a YouTube video, or upload a CSV. Shows the video card, the share of each label, how many comments are worth checking by hand, creator notes (most-liked negative comments, viewer questions, recurring words), three explorable maps (sentiment triangle, theme map, places map of Malaysian states), when comments were posted, and every comment in three columns with search and sort. Exports as a themed PDF report, a CSV or a short copyable summary.
+- **Compare:** two YouTube videos side by side, with the difference in each label's share.
+- **Wrong label?:** on any result, record the label you think is right. Corrections stay in this browser and download as CSV, ready to become a hand-checked test set for the next model.
 - **About:** the model card, evaluation numbers and limits.
+
+On phones and mobile data the 356 MB model waits until the first analysis instead of downloading as soon as the page opens.
 
 ## Run locally
 

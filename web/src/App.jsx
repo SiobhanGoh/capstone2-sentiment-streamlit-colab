@@ -3,14 +3,14 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Moon, Sun } from 'lucide-react';
 import Analyse from './views/Analyse.jsx';
 import Comments from './views/Comments.jsx';
-import History from './views/History.jsx';
+import Compare from './views/Compare.jsx';
 import About from './views/About.jsx';
 import { loadHistory, saveHistory } from './lib/history.js';
 
 const VIEWS = [
   { path: '/', name: 'Analyse' },
   { path: '/comments', name: 'Comments' },
-  { path: '/history', name: 'History' },
+  { path: '/compare', name: 'Compare' },
   { path: '/about', name: 'About' },
 ];
 
@@ -72,7 +72,7 @@ export default function App() {
               <a key={v.path} href={`#${v.path}`} aria-current={route === v.path ? 'page' : undefined}
                 className={`relative whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold ${route === v.path ? 'text-white' : 'text-ink-soft hover:text-ink dark:text-ube-100'}`}>
                 {route === v.path && <motion.span layoutId="nav-pill" className="absolute inset-0 rounded-full bg-ube-600" transition={{ type: 'spring', stiffness: 320, damping: 30 }} />}
-                <span className="relative">{v.name}{v.path === '/history' && history.length ? ` ${history.length}` : ''}</span>
+                <span className="relative">{v.name}</span>
               </a>
             ))}
           </nav>
@@ -81,9 +81,9 @@ export default function App() {
         <AnimatePresence mode="wait">
           <motion.main key={route} initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
             exit={reduce ? undefined : { opacity: 0 }} transition={{ duration: 0.18 }}>
-            {route === '/' && <Analyse onPredicted={addPrediction} />}
+            {route === '/' && <Analyse onPredicted={addPrediction} history={history} onClearHistory={clear} stored={stored} />}
             {route === '/comments' && <Comments />}
-            {route === '/history' && <History items={history} onClear={clear} stored={stored} />}
+            {route === '/compare' && <Compare />}
             {route === '/about' && <About />}
           </motion.main>
         </AnimatePresence>

@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Upload } from 'lucide-react';
 import { useModel } from '../lib/useModel.js';
-import { MAX_COMMENTS, buildRows, splitPasted, usableComments } from '../lib/analysis.js';
+import { MAX_COMMENTS, splitPasted } from '../lib/analysis.js';
+import { analyseComments, analyseYouTube } from '../lib/pipeline.js';
 import { download, guessTextColumn, parseCsvFile } from '../lib/csv.js';
-import { fetchComments } from '../lib/youtube.js';
 import { Card, Notice, Ripple } from '../components/ui.jsx';
 import CommentResults from '../components/CommentResults.jsx';
 
@@ -63,18 +63,15 @@ export default function Comments() {
     setBusy(true);
     setProgress(null);
     try {
+      if (source === 'youtube') {
+        setAnalysis(await analyseYouTube(video, limit, model.predict, setProgress));
+        return;
+      }
       let comments;
       let meta;
-      let likes = null;
       if (source === 'paste') {
         comments = splitPasted(pasted);
         meta = { source: 'Pasted comments', title: 'Pasted comment analysis', sampling: 'User-supplied comments; not a representative sample.' };
-      } else if (source === 'youtube') {
-        setProgress({ label: 'Fetching comments from YouTube' });
-        const data = await fetchComments(video, limit);
-        comments = data.comments;
-        likes = Array.isArray(data.likes) ? data.likes : null;
-        meta = data.meta;
       } else {
         if (!file) throw new Error('Choose a CSV file first.');
         comments = file.data.map((r) => String(r[column] ?? ''));
@@ -82,12 +79,7 @@ export default function Comments() {
       }
       if (!comments.length) throw new Error('No comments were found. Try another source or add one comment per line.');
       if (comments.length > MAX_COMMENTS) throw new Error(`Please use up to ${MAX_COMMENTS.toLocaleString()} comments at a time.`);
-      const { valid, excluded } = usableComments(comments);
-      if (!valid.length) throw new Error('None of these comments has text left after links and mentions are removed.');
-      setProgress({ label: 'Analysing', done: 0, total: valid.length });
-      const results = await model.predict(valid.map((v) => v.comment), (done, total) => setProgress({ label: 'Analysing', done, total }));
-      const rows = buildRows(valid, results).map((r) => (likes ? { ...r, likes: likes[r.no - 1] ?? 0 } : r));
-      setAnalysis({ rows, meta: { ...meta, excluded, analysed_at: new Date().toISOString() } });
+      setAnalysis(await analyseComments(comments, meta, model.predict, setProgress));
     } catch (e) {
       setMessage(e.message || 'This analysis could not be completed. Try fewer or shorter comments.');
     } finally {

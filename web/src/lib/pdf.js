@@ -7,8 +7,9 @@ import displayUrl from '../assets/fonts/BricolageGrotesque-Bold.ttf?url';
 import glyphs from './pdf_glyphs.json';
 import release from '../model_release.json';
 import { LABELS } from './inference.js';
-import { SAMPLE_NOTE, SCORE_NOTE, pct, summarise, title } from './analysis.js';
+import { SCORE_NOTE, pct, summarise, title } from './analysis.js';
 import { NOTES_DISCLAIMER, creatorNotes } from './insights.js';
+import { isNearSplit } from './pipeline.js';
 
 const C = {
   ink: [43, 37, 64], soft: [90, 83, 115], faint: [138, 132, 160], mist: [244, 241, 251], white: [255, 255, 255],
@@ -135,10 +136,6 @@ export async function buildReport(rows, meta) {
     doc.text(text, x + 7, top + 10.3);
     return w;
   };
-  const bar = (x, top, w, h, share, color) => {
-    fill([226, 220, 242]); doc.roundedRect(x, top, w, h, h / 2, h / 2, 'F');
-    if (share > 0) { fill(color); doc.roundedRect(x, top, Math.max(w * share, h), h, h / 2, h / 2, 'F'); }
-  };
 
   // ---------- Cover ----------
   background();
@@ -195,9 +192,12 @@ export async function buildReport(rows, meta) {
   const wide = CW * 0.31;
   const narrow = (CW - wide - gap * 3) / 3;
   card(M, y, wide, tileH);
-  font('regular', 8.5, C.soft); doc.text(s.tied ? 'Joint most frequent' : 'Most frequent label', M + 14, y + 20);
-  font('display', s.dominant.length > 12 ? 15 : 22); doc.text(s.dominant, M + 14, y + 46);
-  font('regular', 8, C.faint); doc.text(`${s.total} analysed${meta.excluded ? `, ${meta.excluded} empty` : ''}`, M + 14, y + 64);
+  const unsure = rows.filter((r) => isNearSplit(r)).length;
+  font('regular', 8.5, C.soft); doc.text('Worth checking by hand', M + 14, y + 20);
+  font('display', 22); doc.text(String(unsure), M + 14, y + 46);
+  const uw = doc.getTextWidth(String(unsure));
+  font('regular', 10, C.soft); doc.text(`of ${s.total}`, M + 20 + uw, y + 46);
+  font('regular', 7.5, C.faint); doc.text('Top two scores within 20 points', M + 14, y + 64);
   LABELS.forEach((l, i) => {
     const x = M + wide + gap + i * (narrow + gap);
     card(x, y, narrow, tileH, TONE[l].soft, 1);
@@ -207,45 +207,32 @@ export async function buildReport(rows, meta) {
   });
   y += tileH + 12;
 
-  // Share bar and averages
-  const half = (CW - gap) / 2;
-  const boxH = 112;
-  card(M, y, half, boxH);
+  // Share bar
+  const boxH = 86;
+  card(M, y, CW, boxH);
   font('bold', 10); doc.text('Share of comments', M + 14, y + 22);
   let bx = M + 14;
-  const bw = half - 28;
+  const bw = CW - 28;
   LABELS.forEach((l, i) => {
     const w = bw * s.shares[l];
     if (w <= 0) return;
     fill(TONE[l].bar);
     const first = bx === M + 14;
     const last = LABELS.slice(i + 1).every((k) => s.shares[k] === 0);
-    doc.roundedRect(bx, y + 34, w, 14, first || last ? 7 : 0, first || last ? 7 : 0, 'F');
-    if (first && !last) doc.rect(bx + Math.min(7, w / 2), y + 34, w - Math.min(7, w / 2), 14, 'F');
-    if (last && !first) doc.rect(bx, y + 34, Math.max(w - 7, 0), 14, 'F');
-    if (!first && !last) doc.rect(bx, y + 34, w, 14, 'F');
+    doc.roundedRect(bx, y + 32, w, 14, first || last ? 7 : 0, first || last ? 7 : 0, 'F');
+    if (first && !last) doc.rect(bx + Math.min(7, w / 2), y + 32, w - Math.min(7, w / 2), 14, 'F');
+    if (last && !first) doc.rect(bx, y + 32, Math.max(w - 7, 0), 14, 'F');
+    if (!first && !last) doc.rect(bx, y + 32, w, 14, 'F');
     bx += w;
   });
   let lx = M + 14;
   LABELS.forEach((l) => {
-    fill(TONE[l].bar); doc.circle(lx + 4, y + 63, 4, 'F');
-    font('regular', 8.5, C.soft); doc.text(`${title(l)} ${pct(s.shares[l], 0)}`, lx + 12, y + 66);
+    fill(TONE[l].bar); doc.circle(lx + 4, y + 61, 4, 'F');
+    font('regular', 8.5, C.soft); doc.text(`${title(l)} ${pct(s.shares[l], 0)}`, lx + 12, y + 64);
     lx += doc.getTextWidth(`${title(l)} ${pct(s.shares[l], 0)}`) + 26;
   });
   font('regular', 7, C.faint);
-  doc.text(doc.splitTextToSize(isYouTube ? SAMPLE_NOTE : 'A summary of the supplied comments only.', bw), M + 14, y + 84);
-
-  const ax = M + half + gap;
-  card(ax, y, half, boxH);
-  font('bold', 10); doc.text('Average score per class', ax + 14, y + 22);
-  LABELS.forEach((l, i) => {
-    const mean = rows.reduce((a, r) => a + r.scores[i], 0) / s.total;
-    const ry = y + 38 + i * 22;
-    font('regular', 8.5, C.soft); doc.text(title(l), ax + 14, ry + 7);
-    font('regular', 8.5, C.soft); doc.text(pct(mean), ax + half - 14, ry + 7, { align: 'right' });
-    bar(ax + 74, ry, half - 74 - 56, 8, mean, TONE[l].bar);
-  });
-  font('regular', 7, C.faint); doc.text(`Mean top-class score ${pct(s.meanScore)}. Not accuracy.`, ax + 14, y + 104);
+  doc.text(isYouTube ? 'Top-level comments ordered by relevance; not a representative audience sample.' : 'A summary of the supplied comments only.', M + 14, y + 78);
   y += boxH + 14;
 
   // Creator notes

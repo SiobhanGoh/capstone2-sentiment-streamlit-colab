@@ -75,3 +75,18 @@ export function creatorNotes(rows) {
 }
 
 export const NOTES_DISCLAIMER = 'These notes only point to comments worth reading. They come from the labels, likes and repeated words, not from a validated measure of audience mood or business risk.';
+
+// Recurring words across all labels: how many comments of each label mention each word.
+export function themeMatrix(rows, { min = 2, limit = 10 } = {}) {
+  const counts = new Map();
+  for (const r of rows) {
+    for (const w of new Set(words(r.comment))) {
+      const c = counts.get(w) ?? { word: w, total: 0, NEGATIVE: 0, NEUTRAL: 0, POSITIVE: 0 };
+      c.total += 1;
+      c[r.sentiment] += 1;
+      counts.set(w, c);
+    }
+  }
+  return [...counts.values()].filter((c) => c.total >= min)
+    .sort((a, b) => b.total - a.total || a.word.localeCompare(b.word)).slice(0, limit);
+}

@@ -2,13 +2,24 @@ import { createContext, createElement, useCallback, useContext, useEffect, useMe
 import { mockPredict } from './mock.js';
 
 export const MOCK = import.meta.env.VITE_MOCK_MODEL === '1';
+export const MODEL_MB = 356;
+
+// Start the one-time download straight away only when it is unlikely to cost mobile data.
+export function shouldAutoLoad(nav = typeof navigator !== 'undefined' ? navigator : {}, win = typeof window !== 'undefined' ? window : null) {
+  const c = nav.connection;
+  if (c?.saveData) return false;
+  if (c?.type === 'cellular') return false;
+  if (['slow-2g', '2g', '3g'].includes(c?.effectiveType)) return false;
+  if (!c?.type && win?.matchMedia?.('(pointer: coarse)').matches && win.innerWidth < 900) return false;
+  return true;
+}
 const ModelContext = createContext(null);
 
 export function ModelProvider({ children }) {
   const worker = useRef(null);
   const pending = useRef(new Map());
   const nextId = useRef(1);
-  const [state, setState] = useState({ status: MOCK ? 'ready' : 'idle', loaded: 0, total: 0, error: '' });
+  const [state, setState] = useState({ status: MOCK ? 'ready' : 'idle', loaded: 0, total: 0, error: '', waiting: !MOCK && !shouldAutoLoad() });
 
   const ensureWorker = useCallback(() => {
     if (MOCK || worker.current) return worker.current;
@@ -33,12 +44,13 @@ export function ModelProvider({ children }) {
 
   const load = useCallback(() => {
     if (MOCK) return;
-    setState((s) => (s.status === 'ready' ? s : { ...s, status: 'loading', error: '' }));
+    setState((s) => (s.status === 'ready' ? s : { ...s, status: 'loading', error: '', waiting: false }));
     ensureWorker().postMessage({ type: 'load' });
   }, [ensureWorker]);
 
-  // Start downloading in the background shortly after the page settles.
+  // On desktop or Wi-Fi, start downloading shortly after the page settles; on mobile data, wait to be asked.
   useEffect(() => {
+    if (MOCK || !shouldAutoLoad()) return undefined;
     const t = setTimeout(load, 600);
     return () => clearTimeout(t);
   }, [load]);
@@ -46,6 +58,7 @@ export function ModelProvider({ children }) {
   const predict = useCallback((texts, onBatch) => {
     if (MOCK) return mockPredict(texts, onBatch);
     const id = nextId.current++;
+    setState((s) => (s.status === 'idle' ? { ...s, status: 'loading', waiting: false } : s));
     return new Promise((resolve, reject) => {
       pending.current.set(id, { resolve, reject, onBatch });
       ensureWorker().postMessage({ type: 'predict', id, texts });

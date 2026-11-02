@@ -87,11 +87,12 @@ export function WordHighlights({ impacts, label }) {
       {impacts.map((w, i) => {
         const strength = Math.min(Math.abs(w.delta) / max, 1);
         const supports = w.delta > 0;
+        const against = !supports && strength >= 0.15;
         const alpha = Math.round((0.12 + strength * 0.7) * 255).toString(16).padStart(2, '0');
         return (
           <span key={`${w.word}-${i}`} title={`${supports ? 'Supports' : 'Pulls against'} ${title(label)}: ${(w.delta * 100).toFixed(1)} points`}
-            className={`mx-0.5 rounded-md px-1 py-0.5 ${supports ? '' : 'underline decoration-dotted underline-offset-4'}`}
-            style={{ background: strength < 0.05 ? 'transparent' : supports ? `${hex}${alpha}` : `#8A84A0${Math.round(strength * 0x40).toString(16).padStart(2, '0')}` }}>
+            className={`mx-0.5 rounded-md px-1 py-0.5 ${against ? 'underline decoration-dotted decoration-2 underline-offset-4' : ''}`}
+            style={{ background: supports && strength >= 0.05 ? `${hex}${alpha}` : 'transparent' }}>
             {w.word}
           </span>
         );
