@@ -1,0 +1,146 @@
+{
+  "protocol": "sentiment-disjoint-v1",
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "runs": {
+    "xlmr-large-s1": {
+      "family": "xlmr-large",
+      "validation_macro_f1": 0.6949757440667014
+    },
+    "xlmr-large-s2": {
+      "family": "xlmr-large",
+      "validation_macro_f1": 0.6819295795325203
+    },
+    "xlmr-large-s3": {
+      "family": "xlmr-large",
+      "validation_macro_f1": 0.6966278765379216
+    },
+    "xlmr-large-s4": {
+      "family": "xlmr-large",
+      "validation_macro_f1": 0.6789289669035758
+    },
+    "xlmr-large-s5": {
+      "family": "xlmr-large",
+      "validation_macro_f1": 0.6918288372772222
+    },
+    "xlmr-large2-s1": {
+      "family": "xlmr-large2",
+      "validation_macro_f1": 0.7731081578346358
+    },
+    "xlmr-large2-s2": {
+      "family": "xlmr-large2",
+      "validation_macro_f1": 0.7591032369381588
+    },
+    "xlmr-large2-s3": {
+      "family": "xlmr-large2",
+      "validation_macro_f1": 0.7649633088304388
+    },
+    "mbert-silver-s1": {
+      "family": "mbert-silver",
+      "validation_macro_f1": 0.7453803707302157
+    },
+    "mbert-silver-s2": {
+      "family": "mbert-silver",
+      "validation_macro_f1": 0.7479423868312757
+    },
+    "xlmr-large-silver-s1": {
+      "family": "xlmr-large-silver",
+      "validation_macro_f1": 0.7369825239101829
+    },
+    "xlmr-large-silver-s2": {
+      "family": "xlmr-large-silver",
+      "validation_macro_f1": 0.7394598019475453
+    },
+    "xlmr-large-silver-s3": {
+      "family": "xlmr-large-silver",
+      "validation_macro_f1": 0.7351466379027336
+    }
+  },
+  "validation_cv_macro_f1": {
+    "app": 0.7421822513956052,
+    "app+tfidf": 0.7479842698929579,
+    "mbert-silver-best": 0.7479423868312757,
+    "mbert-silver-best+tfidf": 0.7493050150252207,
+    "mbert-silver-mean": 0.7562214335824035,
+    "mbert-silver-mean+tfidf": 0.7519574930605278,
+    "xlmr-large-best": 0.6966278765379216,
+    "xlmr-large-best+tfidf": 0.693641967135943,
+    "xlmr-large-mean": 0.6955413175324088,
+    "xlmr-large-mean+tfidf": 0.7014137094467495,
+    "xlmr-large-silver-best": 0.7394598019475453,
+    "xlmr-large-silver-best+tfidf": 0.7401401344952637,
+    "xlmr-large-silver-mean": 0.7423545916671889,
+    "xlmr-large-silver-mean+tfidf": 0.7513489037170009,
+    "xlmr-large2-best": 0.7731081578346358,
+    "xlmr-large2-best+tfidf": 0.7837311485475267,
+    "xlmr-large2-mean": 0.7810179571165556,
+    "xlmr-large2-mean+tfidf": 0.784333166704173,
+    "all-mean": 0.7810222138861054,
+    "all-mean+tfidf": 0.7806482162111511,
+    "app+mbert-silver": 0.7584975485261799,
+    "app+mbert-silver+tfidf": 0.7584815872188876,
+    "app+xlmr-large": 0.7501493581703654,
+    "app+xlmr-large+tfidf": 0.7432228666309921,
+    "app+xlmr-large-silver": 0.7596566664048797,
+    "app+xlmr-large-silver+tfidf": 0.7738605013736262,
+    "app+xlmr-large2": 0.7796740529988698,
+    "app+xlmr-large2+tfidf": 0.7812456476035244
+  },
+  "selected": "xlmr-large2-mean+tfidf",
+  "selected_members": [
+    "xlmr-large2-s1",
+    "xlmr-large2-s2",
+    "xlmr-large2-s3"
+  ],
+  "test": {
+    "selected": {
+      "accuracy": 0.7900101936799184,
+      "macro_f1": 0.7845602384052225
+    },
+    "current_app": {
+      "accuracy": 0.7737003058103975,
+      "macro_f1": 0.7667621578426006
+    },
+    "comparison": {
+      "only_reference_right": 62,
+      "only_candidate_right": 78,
+      "p_value": 0.2047319763305937,
+      "accuracy_diff_95ci": [
+        -0.007135575942915473,
+        0.03975535168195721
+      ],
+      "macro_f1_diff_95ci": [
+        -0.007039318940352748,
+        0.04288274688181543
+      ]
+    }
+  },
+  "selected_params": {
+    "temperature": 0.8628989324425245,
+    "weight": 0.75,
+    "offsets": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "note": "Retrospective internal evaluation on the existing corpus. Run epochs and best seeds were chosen on the same validation split, so validation scores are slightly optimistic for every candidate.",
+  "also_compared_with_original_mbert": {
+    "original_test_accuracy": 0.7604485219164119,
+    "only_original_right": 65,
+    "only_selected_right": 94,
+    "p_value": 0.026070187610561638,
+    "accuracy_diff_95ci": [
+      0.004077471967380286,
+      0.05504587155963303
+    ],
+    "macro_f1_diff_95ci": [
+      0.002639865975342373,
+      0.055149887261325865
+    ]
+  },
+  "schedules_tried": {
+    "large": "lr 1e-5, effective batch 32, 5 epochs: undertrained (best validation macro-F1 0.697), kept in the record",
+    "large2": "lr 2e-5, batch 16, 8 epochs: added after 'large', fixed before any further result"
+  },
+  "test_looks": "This experiment's test split had been scored before (original mBERT, candidates, post-hoc blend). Each choice was made on validation, but repeated looks at one test split make small gains less certain than a single p-value suggests."
+}
