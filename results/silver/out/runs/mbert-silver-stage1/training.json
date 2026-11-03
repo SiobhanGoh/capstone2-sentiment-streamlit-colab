@@ -1,0 +1,95 @@
+{
+  "base_model": "google-bert/bert-base-multilingual-cased",
+  "base_revision": "3f076fdb1ab68d5b2880cb87a0886f315b8146f8",
+  "init_from": null,
+  "train_data": "extra tweets (silver)",
+  "train_rows": 150276,
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "epochs": 1,
+  "batch_size": 16,
+  "accumulation": 2,
+  "learning_rate": 2e-05,
+  "max_length": 128,
+  "seed": 1,
+  "device": "cuda",
+  "selection": "validation macro-F1 only",
+  "status": "complete",
+  "selected_epoch": 1,
+  "selected_validation": {
+    "accuracy": 0.5494393476044852,
+    "macro_f1": 0.5231697605874411
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.7145677165686608,
+      "validation": {
+        "accuracy": 0.5494393476044852,
+        "macro_f1": 0.5231697605874411,
+        "confusion_matrix": [
+          [
+            299,
+            70,
+            30
+          ],
+          [
+            101,
+            118,
+            37
+          ],
+          [
+            97,
+            107,
+            122
+          ]
+        ],
+        "classification_report": {
+          "NEGATIVE": {
+            "precision": 0.6016096579476862,
+            "recall": 0.7493734335839599,
+            "f1-score": 0.6674107142857143,
+            "support": 399.0
+          },
+          "NEUTRAL": {
+            "precision": 0.4,
+            "recall": 0.4609375,
+            "f1-score": 0.4283121597096189,
+            "support": 256.0
+          },
+          "POSITIVE": {
+            "precision": 0.6455026455026455,
+            "recall": 0.37423312883435583,
+            "f1-score": 0.47378640776699027,
+            "support": 326.0
+          },
+          "accuracy": 0.5494393476044852,
+          "macro avg": {
+            "precision": 0.549037434483444,
+            "recall": 0.5281813541394386,
+            "f1-score": 0.5231697605874411,
+            "support": 981.0
+          },
+          "weighted avg": {
+            "precision": 0.5635842160601318,
+            "recall": 0.5494393476044852,
+            "f1-score": 0.5406719233615711,
+            "support": 981.0
+          }
+        }
+      },
+      "seconds": 1105.11
+    }
+  ],
+  "spec": {
+    "name": "mbert-silver-stage1",
+    "family": "stage1",
+    "base": "google-bert/bert-base-multilingual-cased",
+    "revision": null,
+    "learning_rate": 2e-05,
+    "epochs": 1,
+    "seed": 1,
+    "data": "silver",
+    "batch_size": 16,
+    "accumulation": 2
+  }
+}

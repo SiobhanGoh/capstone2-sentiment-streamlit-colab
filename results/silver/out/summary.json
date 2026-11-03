@@ -1,0 +1,77 @@
+{
+  "experiment": "silver",
+  "protocol": "sentiment-disjoint-v1",
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "transfer_text_sha256": "0a2efe32571bb8269d0e9b78c20e15c27c301b55405c0eff6be771ff714bd268",
+  "runs": {
+    "xlmr-large-silver-stage1": {
+      "family": "stage1",
+      "validation": {
+        "accuracy": 0.46075433231396534,
+        "macro_f1": 0.44268183674812894
+      },
+      "selected_epoch": 1,
+      "hours": 0.953
+    },
+    "xlmr-large-silver-s1": {
+      "family": "xlmr-large-silver",
+      "validation": {
+        "accuracy": 0.7410805300713558,
+        "macro_f1": 0.7369825239101829
+      },
+      "selected_epoch": 4,
+      "hours": 0.239
+    },
+    "xlmr-large-silver-s2": {
+      "family": "xlmr-large-silver",
+      "validation": {
+        "accuracy": 0.7420998980632009,
+        "macro_f1": 0.7394598019475453
+      },
+      "selected_epoch": 4,
+      "hours": 0.242
+    },
+    "xlmr-large-silver-s3": {
+      "family": "xlmr-large-silver",
+      "validation": {
+        "accuracy": 0.7400611620795107,
+        "macro_f1": 0.7351466379027336
+      },
+      "selected_epoch": 4,
+      "hours": 0.239
+    },
+    "mbert-silver-stage1": {
+      "family": "stage1",
+      "validation": {
+        "accuracy": 0.5494393476044852,
+        "macro_f1": 0.5231697605874411
+      },
+      "selected_epoch": 1,
+      "hours": 0.359
+    },
+    "mbert-silver-s1": {
+      "family": "mbert-silver",
+      "validation": {
+        "accuracy": 0.7471967380224261,
+        "macro_f1": 0.7453803707302157
+      },
+      "selected_epoch": 4,
+      "hours": 0.092
+    },
+    "mbert-silver-s2": {
+      "family": "mbert-silver",
+      "validation": {
+        "accuracy": 0.7492354740061162,
+        "macro_f1": 0.7479423868312757
+      },
+      "selected_epoch": 4,
+      "hours": 0.092
+    }
+  },
+  "skipped": [],
+  "kept_models": {
+    "xlmr-large-silver": "xlmr-large-silver-s2",
+    "mbert-silver": "mbert-silver-s2"
+  },
+  "hours": 2.22
+}

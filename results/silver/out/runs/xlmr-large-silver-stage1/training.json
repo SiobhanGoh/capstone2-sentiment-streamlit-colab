@@ -1,0 +1,95 @@
+{
+  "base_model": "FacebookAI/xlm-roberta-large",
+  "base_revision": "c23d21b0620b635a76227c604d44e43a9f0ee389",
+  "init_from": null,
+  "train_data": "extra tweets (silver)",
+  "train_rows": 150276,
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "epochs": 1,
+  "batch_size": 16,
+  "accumulation": 2,
+  "learning_rate": 1e-05,
+  "max_length": 128,
+  "seed": 1,
+  "device": "cuda",
+  "selection": "validation macro-F1 only",
+  "status": "complete",
+  "selected_epoch": 1,
+  "selected_validation": {
+    "accuracy": 0.46075433231396534,
+    "macro_f1": 0.44268183674812894
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.5796098533078249,
+      "validation": {
+        "accuracy": 0.46075433231396534,
+        "macro_f1": 0.44268183674812894,
+        "confusion_matrix": [
+          [
+            244,
+            116,
+            39
+          ],
+          [
+            117,
+            105,
+            34
+          ],
+          [
+            97,
+            126,
+            103
+          ]
+        ],
+        "classification_report": {
+          "NEGATIVE": {
+            "precision": 0.5327510917030568,
+            "recall": 0.6115288220551378,
+            "f1-score": 0.5694282380396732,
+            "support": 399.0
+          },
+          "NEUTRAL": {
+            "precision": 0.3025936599423631,
+            "recall": 0.41015625,
+            "f1-score": 0.3482587064676617,
+            "support": 256.0
+          },
+          "POSITIVE": {
+            "precision": 0.5852272727272727,
+            "recall": 0.3159509202453988,
+            "f1-score": 0.4103585657370518,
+            "support": 326.0
+          },
+          "accuracy": 0.46075433231396534,
+          "macro avg": {
+            "precision": 0.4735240081242309,
+            "recall": 0.44587866410017885,
+            "f1-score": 0.44268183674812894,
+            "support": 981.0
+          },
+          "weighted avg": {
+            "precision": 0.4901281890355306,
+            "recall": 0.46075433231396534,
+            "f1-score": 0.4588511603097145,
+            "support": 981.0
+          }
+        }
+      },
+      "seconds": 2939.91
+    }
+  ],
+  "spec": {
+    "name": "xlmr-large-silver-stage1",
+    "family": "stage1",
+    "base": "FacebookAI/xlm-roberta-large",
+    "revision": "c23d21b0620b635a76227c604d44e43a9f0ee389",
+    "learning_rate": 1e-05,
+    "epochs": 1,
+    "seed": 1,
+    "data": "silver",
+    "batch_size": 16,
+    "accumulation": 2
+  }
+}

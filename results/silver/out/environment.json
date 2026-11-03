@@ -1,0 +1,7 @@
+{
+  "commit": "695f0f0ac0b2ffd86a8227ddc5d0d521f2dd6bcd",
+  "experiment": "silver",
+  "torch": "2.11.0+cu130",
+  "transformers": "4.57.6",
+  "gpu": "Tesla T4"
+}
