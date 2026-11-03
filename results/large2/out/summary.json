@@ -1,0 +1,40 @@
+{
+  "experiment": "large2",
+  "protocol": "sentiment-disjoint-v1",
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "transfer_text_sha256": "0a2efe32571bb8269d0e9b78c20e15c27c301b55405c0eff6be771ff714bd268",
+  "runs": {
+    "xlmr-large2-s1": {
+      "family": "xlmr-large2",
+      "validation": {
+        "accuracy": 0.7757390417940877,
+        "macro_f1": 0.7731081578346358
+      },
+      "selected_epoch": 8,
+      "hours": 0.43
+    },
+    "xlmr-large2-s2": {
+      "family": "xlmr-large2",
+      "validation": {
+        "accuracy": 0.762487257900102,
+        "macro_f1": 0.7591032369381588
+      },
+      "selected_epoch": 5,
+      "hours": 0.415
+    },
+    "xlmr-large2-s3": {
+      "family": "xlmr-large2",
+      "validation": {
+        "accuracy": 0.7675840978593272,
+        "macro_f1": 0.7649633088304388
+      },
+      "selected_epoch": 8,
+      "hours": 0.416
+    }
+  },
+  "skipped": [],
+  "kept_models": {
+    "xlmr-large2": "xlmr-large2-s1"
+  },
+  "hours": 1.266
+}
