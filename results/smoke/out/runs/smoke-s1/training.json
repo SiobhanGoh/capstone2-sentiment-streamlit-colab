@@ -1,0 +1,94 @@
+{
+  "base_model": "/tmp/rojak/runs/smoke-stage1/model",
+  "base_revision": null,
+  "init_from": "/tmp/rojak/runs/smoke-stage1/model",
+  "train_data": "train split (smoke subset)",
+  "train_rows": 300,
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "epochs": 1,
+  "batch_size": 16,
+  "accumulation": 1,
+  "learning_rate": 2e-05,
+  "max_length": 128,
+  "seed": 1,
+  "device": "cuda",
+  "selection": "validation macro-F1 only",
+  "status": "complete",
+  "selected_epoch": 1,
+  "selected_validation": {
+    "accuracy": 0.4413863404689093,
+    "macro_f1": 0.359355535117256
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.0731961444804543,
+      "validation": {
+        "accuracy": 0.4413863404689093,
+        "macro_f1": 0.359355535117256,
+        "confusion_matrix": [
+          [
+            186,
+            211,
+            2
+          ],
+          [
+            12,
+            244,
+            0
+          ],
+          [
+            84,
+            239,
+            3
+          ]
+        ],
+        "classification_report": {
+          "NEGATIVE": {
+            "precision": 0.6595744680851063,
+            "recall": 0.46616541353383456,
+            "f1-score": 0.5462555066079295,
+            "support": 399.0
+          },
+          "NEUTRAL": {
+            "precision": 0.3515850144092219,
+            "recall": 0.953125,
+            "f1-score": 0.5136842105263157,
+            "support": 256.0
+          },
+          "POSITIVE": {
+            "precision": 0.6,
+            "recall": 0.009202453987730062,
+            "f1-score": 0.01812688821752266,
+            "support": 326.0
+          },
+          "accuracy": 0.4413863404689093,
+          "macro avg": {
+            "precision": 0.5370531608314427,
+            "recall": 0.47616428917385484,
+            "f1-score": 0.359355535117256,
+            "support": 981.0
+          },
+          "weighted avg": {
+            "precision": 0.5594046650914559,
+            "recall": 0.4413863404689093,
+            "f1-score": 0.3622512442305944,
+            "support": 981.0
+          }
+        }
+      },
+      "seconds": 3.72
+    }
+  ],
+  "spec": {
+    "name": "smoke-s1",
+    "family": "smoke",
+    "init": "smoke-stage1",
+    "learning_rate": 2e-05,
+    "epochs": 1,
+    "seed": 1,
+    "batch_size": 16,
+    "accumulation": 1,
+    "limit": 300
+  }
+}

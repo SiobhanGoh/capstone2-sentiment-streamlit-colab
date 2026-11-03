@@ -1,0 +1,55 @@
+[{"stream_name":"stderr","time":24.524623881,"data":"ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.\n"}
+,{"stream_name":"stderr","time":24.524663823,"data":"gradio-client 2.7.2 requires huggingface-hub\u003c3.0,\u003e=1.16.0, but you have huggingface-hub 0.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":24.524668486,"data":"gradio 6.30.0 requires huggingface-hub\u003c3.0,\u003e=1.16.0, but you have huggingface-hub 0.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":24.524671196,"data":"gradio 6.30.0 requires pillow\u003c13.0,\u003e=8.0, but you have pillow 13.0.0 which is incompatible.\n"}
+,{"stream_name":"stderr","time":24.524673739,"data":"diffusers 0.42.0 requires huggingface-hub\u003c3.0,\u003e=1.32.0, but you have huggingface-hub 0.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":76.371334504,"data":"WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n"}
+,{"stream_name":"stderr","time":76.371370884,"data":"I0000 00:00:1793727142.262698      38 cudart_stub.cc:31] Could not find cuda drivers on your machine, GPU will not be used.\n"}
+,{"stream_name":"stderr","time":83.870758254,"data":"Some weights of BertForSequenceClassification were not initialized from the model checkpoint at google-bert/bert-base-multilingual-cased and are newly initialized: ['classifier.bias', 'classifier.weight']\n"}
+,{"stream_name":"stderr","time":83.870837462,"data":"You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.\n"}
+,{"stream_name":"stdout","time":84.319564207,"data":"{\"training_device\": \"cuda\", \"train_rows\": 300, \"epochs\": 1}\n"}
+,{"stream_name":"stdout","time":93.130398805,"data":"{\"epoch\": 1, \"train_loss\": 1.125218441611842, \"validation\": {\"accuracy\": 0.40672782874617736, \"macro_f1\": 0.20022301030374676, \"confusion_matrix\": [[396, 1, 2], [251, 3, 2], [325, 1, 0]], \"classification_report\": {\"NEGATIVE\": {\"precision\": 0.4074074074074074, \"recall\": 0.9924812030075187, \"f1-score\": 0.5776805251641138, \"support\": 399.0}, \"NEUTRAL\": {\"precision\": 0.6, \"recall\": 0.01171875, \"f1-score\": 0.022988505747126436, \"support\": 256.0}, \"POSITIVE\": {\"precision\": 0.0, \"recall\": 0.0, \"f1-score\": 0.0, \"support\": 326.0}, \"accuracy\": 0.40672782874617736, \"macro avg\": {\"precision\": 0.3358024691358024, \"recall\": 0.3347333176691729, \"f1-score\": 0.20022301030374676, \"support\": 981.0}, \"weighted avg\": {\"precision\": 0.32227885377732474, \"recall\": 0.40672782874617736, \"f1-score\": 0.240957784925327, \"support\": 981.0}}}, \"seconds\": 7.87}\n"}
+,{"stream_name":"stderr","time":93.271147471,"data":"The tokenizer you are loading from '/tmp/rojak/runs/smoke-stage1/model' with an incorrect regex pattern: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503/discussions/84#69121093e8b480e709447d5e. This will lead to incorrect tokenization. You should set the `fix_mistral_regex=True` flag when loading this tokenizer to fix this issue.\n"}
+,{"stream_name":"stderr","time":100.527196949,"data":"The tokenizer you are loading from '/tmp/rojak/runs/smoke-stage1/model' with an incorrect regex pattern: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503/discussions/84#69121093e8b480e709447d5e. This will lead to incorrect tokenization. You should set the `fix_mistral_regex=True` flag when loading this tokenizer to fix this issue.\n"}
+,{"stream_name":"stdout","time":100.774930987,"data":"{\"training_device\": \"cuda\", \"train_rows\": 300, \"epochs\": 1}\n"}
+,{"stream_name":"stdout","time":105.235784794,"data":"{\"epoch\": 1, \"train_loss\": 1.0731961444804543, \"validation\": {\"accuracy\": 0.4413863404689093, \"macro_f1\": 0.359355535117256, \"confusion_matrix\": [[186, 211, 2], [12, 244, 0], [84, 239, 3]], \"classification_report\": {\"NEGATIVE\": {\"precision\": 0.6595744680851063, \"recall\": 0.46616541353383456, \"f1-score\": 0.5462555066079295, \"support\": 399.0}, \"NEUTRAL\": {\"precision\": 0.3515850144092219, \"recall\": 0.953125, \"f1-score\": 0.5136842105263157, \"support\": 256.0}, \"POSITIVE\": {\"precision\": 0.6, \"recall\": 0.009202453987730062, \"f1-score\": 0.01812688821752266, \"support\": 326.0}, \"accuracy\": 0.4413863404689093, \"macro avg\": {\"precision\": 0.5370531608314427, \"recall\": 0.47616428917385484, \"f1-score\": 0.359355535117256, \"support\": 981.0}, \"weighted avg\": {\"precision\": 0.5594046650914559, \"recall\": 0.4413863404689093, \"f1-score\": 0.3622512442305944, \"support\": 981.0}}}, \"seconds\": 3.72}\n"}
+,{"stream_name":"stderr","time":105.383655562,"data":"The tokenizer you are loading from '/tmp/rojak/runs/smoke-s1/model' with an incorrect regex pattern: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503/discussions/84#69121093e8b480e709447d5e. This will lead to incorrect tokenization. You should set the `fix_mistral_regex=True` flag when loading this tokenizer to fix this issue.\n"}
+,{"stream_name":"stderr","time":112.925562818,"data":"The tokenizer you are loading from '/tmp/rojak/runs/smoke-s1/model' with an incorrect regex pattern: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503/discussions/84#69121093e8b480e709447d5e. This will lead to incorrect tokenization. You should set the `fix_mistral_regex=True` flag when loading this tokenizer to fix this issue.\n"}
+,{"stream_name":"stdout","time":113.02540171,"data":"{\n"}
+,{"stream_name":"stdout","time":113.025428843,"data":" \"experiment\": \"smoke\",\n"}
+,{"stream_name":"stdout","time":113.025434649,"data":" \"protocol\": \"sentiment-disjoint-v1\",\n"}
+,{"stream_name":"stdout","time":113.025439295,"data":" \"split_sha256\": \"692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929\",\n"}
+,{"stream_name":"stdout","time":113.0254455,"data":" \"transfer_text_sha256\": \"0a2efe32571bb8269d0e9b78c20e15c27c301b55405c0eff6be771ff714bd268\",\n"}
+,{"stream_name":"stdout","time":113.025454533,"data":" \"runs\": {\n"}
+,{"stream_name":"stdout","time":113.025457722,"data":"  \"smoke-stage1\": {\n"}
+,{"stream_name":"stdout","time":113.02546069,"data":"   \"family\": \"stage1\",\n"}
+,{"stream_name":"stdout","time":113.025481441,"data":"   \"validation\": {\n"}
+,{"stream_name":"stdout","time":113.02548448,"data":"    \"accuracy\": 0.40672782874617736,\n"}
+,{"stream_name":"stdout","time":113.025488466,"data":"    \"macro_f1\": 0.20022301030374676\n"}
+,{"stream_name":"stdout","time":113.025532128,"data":"   },\n"}
+,{"stream_name":"stdout","time":113.025537696,"data":"   \"selected_epoch\": 1,\n"}
+,{"stream_name":"stdout","time":113.025542247,"data":"   \"hours\": 0.013\n"}
+,{"stream_name":"stdout","time":113.025546908,"data":"  },\n"}
+,{"stream_name":"stdout","time":113.025551119,"data":"  \"smoke-s1\": {\n"}
+,{"stream_name":"stdout","time":113.025555457,"data":"   \"family\": \"smoke\",\n"}
+,{"stream_name":"stdout","time":113.025560074,"data":"   \"validation\": {\n"}
+,{"stream_name":"stdout","time":113.0255776,"data":"    \"accuracy\": 0.4413863404689093,\n"}
+,{"stream_name":"stdout","time":113.025580886,"data":"    \"macro_f1\": 0.359355535117256\n"}
+,{"stream_name":"stdout","time":113.025584358,"data":"   },\n"}
+,{"stream_name":"stdout","time":113.025587235,"data":"   \"selected_epoch\": 1,\n"}
+,{"stream_name":"stdout","time":113.02559017,"data":"   \"hours\": 0.003\n"}
+,{"stream_name":"stdout","time":113.025593095,"data":"  }\n"}
+,{"stream_name":"stdout","time":113.025595886,"data":" },\n"}
+,{"stream_name":"stdout","time":113.025599281,"data":" \"skipped\": [],\n"}
+,{"stream_name":"stdout","time":113.025631135,"data":" \"kept_models\": {\n"}
+,{"stream_name":"stdout","time":113.025635756,"data":"  \"smoke\": \"smoke-s1\"\n"}
+,{"stream_name":"stdout","time":113.025639486,"data":" },\n"}
+,{"stream_name":"stdout","time":113.025642753,"data":" \"hours\": 0.021\n"}
+,{"stream_name":"stdout","time":113.025646484,"data":"}\n"}
+,{"stream_name":"stderr","time":123.960132116,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":123.960159312,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":124.199327965,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":124.199368089,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":125.814036673,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":126.313553598,"data":"[NbConvertApp] Writing 313960 bytes to __results__.html\n"}
+]

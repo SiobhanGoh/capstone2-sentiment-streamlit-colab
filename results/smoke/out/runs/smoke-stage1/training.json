@@ -1,0 +1,96 @@
+{
+  "base_model": "google-bert/bert-base-multilingual-cased",
+  "base_revision": "3f076fdb1ab68d5b2880cb87a0886f315b8146f8",
+  "init_from": null,
+  "train_data": "extra tweets (silver)",
+  "train_rows": 300,
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "epochs": 1,
+  "batch_size": 16,
+  "accumulation": 1,
+  "learning_rate": 2e-05,
+  "max_length": 128,
+  "seed": 1,
+  "device": "cuda",
+  "selection": "validation macro-F1 only",
+  "status": "complete",
+  "selected_epoch": 1,
+  "selected_validation": {
+    "accuracy": 0.40672782874617736,
+    "macro_f1": 0.20022301030374676
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.125218441611842,
+      "validation": {
+        "accuracy": 0.40672782874617736,
+        "macro_f1": 0.20022301030374676,
+        "confusion_matrix": [
+          [
+            396,
+            1,
+            2
+          ],
+          [
+            251,
+            3,
+            2
+          ],
+          [
+            325,
+            1,
+            0
+          ]
+        ],
+        "classification_report": {
+          "NEGATIVE": {
+            "precision": 0.4074074074074074,
+            "recall": 0.9924812030075187,
+            "f1-score": 0.5776805251641138,
+            "support": 399.0
+          },
+          "NEUTRAL": {
+            "precision": 0.6,
+            "recall": 0.01171875,
+            "f1-score": 0.022988505747126436,
+            "support": 256.0
+          },
+          "POSITIVE": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1-score": 0.0,
+            "support": 326.0
+          },
+          "accuracy": 0.40672782874617736,
+          "macro avg": {
+            "precision": 0.3358024691358024,
+            "recall": 0.3347333176691729,
+            "f1-score": 0.20022301030374676,
+            "support": 981.0
+          },
+          "weighted avg": {
+            "precision": 0.32227885377732474,
+            "recall": 0.40672782874617736,
+            "f1-score": 0.240957784925327,
+            "support": 981.0
+          }
+        }
+      },
+      "seconds": 7.87
+    }
+  ],
+  "spec": {
+    "name": "smoke-stage1",
+    "family": "stage1",
+    "base": "google-bert/bert-base-multilingual-cased",
+    "revision": null,
+    "learning_rate": 2e-05,
+    "epochs": 1,
+    "seed": 1,
+    "data": "silver",
+    "batch_size": 16,
+    "accumulation": 1,
+    "limit": 300
+  }
+}

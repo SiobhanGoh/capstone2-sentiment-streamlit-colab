@@ -1,0 +1,31 @@
+{
+  "experiment": "smoke",
+  "protocol": "sentiment-disjoint-v1",
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "transfer_text_sha256": "0a2efe32571bb8269d0e9b78c20e15c27c301b55405c0eff6be771ff714bd268",
+  "runs": {
+    "smoke-stage1": {
+      "family": "stage1",
+      "validation": {
+        "accuracy": 0.40672782874617736,
+        "macro_f1": 0.20022301030374676
+      },
+      "selected_epoch": 1,
+      "hours": 0.013
+    },
+    "smoke-s1": {
+      "family": "smoke",
+      "validation": {
+        "accuracy": 0.4413863404689093,
+        "macro_f1": 0.359355535117256
+      },
+      "selected_epoch": 1,
+      "hours": 0.003
+    }
+  },
+  "skipped": [],
+  "kept_models": {
+    "smoke": "smoke-s1"
+  },
+  "hours": 0.021
+}
