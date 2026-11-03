@@ -1,0 +1,95 @@
+name: Kaggle training
+# Launches a training experiment on Kaggle's free GPU, or collects a finished one.
+# Needs repository secrets KAGGLE_USERNAME and KAGGLE_API_TOKEN (or legacy KAGGLE_KEY), and the
+# corpus uploaded on Kaggle as the private dataset <username>/rojak-sentiment-private.
+# Collect pushes only numbers (metrics and logits) to the kaggle-results branch: no corpus text,
+# no extra tweets and no model weights; the kept models stay in the private Kaggle output.
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: launch, status or collect
+        required: true
+        default: status
+        type: choice
+        options: [launch, status, collect]
+      experiment:
+        description: Experiment in training/kaggle_job.py
+        required: true
+        default: smoke
+        type: choice
+        options: [smoke, large, silver]
+permissions:
+  contents: write
+concurrency:
+  group: kaggle-${{ inputs.experiment }}
+jobs:
+  kaggle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+      KERNEL: ${{ secrets.KAGGLE_USERNAME }}/rojak-sentiment-${{ inputs.experiment }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Kaggle credentials
+        env:
+          TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+          KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          test -n "$KAGGLE_USERNAME" || { echo "::error::Add the KAGGLE_USERNAME repository secret."; exit 1; }
+          if [ -n "$TOKEN" ]; then echo "KAGGLE_API_TOKEN=$TOKEN" >> "$GITHUB_ENV";
+          elif [ -n "$KEY" ]; then echo "KAGGLE_KEY=$KEY" >> "$GITHUB_ENV";
+          else echo "::error::Add the KAGGLE_API_TOKEN (or legacy KAGGLE_KEY) repository secret."; exit 1; fi
+          python -m pip install -q --upgrade kaggle
+          kaggle --version
+      - name: Launch
+        if: inputs.action == 'launch'
+        run: |
+          mkdir kernel
+          python training/kaggle_entry.py "${{ inputs.experiment }}" "$GITHUB_SHA" kernel/kaggle_entry.py
+          cat > kernel/kernel-metadata.json <<EOF
+          {"id": "$KERNEL", "title": "rojak-sentiment-${{ inputs.experiment }}", "code_file": "kaggle_entry.py",
+           "language": "python", "kernel_type": "script", "is_private": true, "enable_gpu": true,
+           "enable_internet": true, "dataset_sources": ["$KAGGLE_USERNAME/rojak-sentiment-private"],
+           "competition_sources": [], "kernel_sources": [], "model_sources": []}
+          EOF
+          kaggle kernels push -p kernel
+      - name: Status
+        id: status
+        if: inputs.action != 'launch'
+        run: |
+          s=$(kaggle kernels status "$KERNEL" 2>&1) || true
+          echo "$s"
+          state=$(echo "$s" | grep -oiE 'complete|error|running|queued|cancel[a-z]*' | head -1 | tr 'A-Z' 'a-z')
+          echo "state=$state" >> "$GITHUB_OUTPUT"
+          echo "### Kaggle $KERNEL: ${state:-unknown}" >> "$GITHUB_STEP_SUMMARY"
+      - name: Collect numbers
+        if: inputs.action == 'collect' && (steps.status.outputs.state == 'complete' || steps.status.outputs.state == 'error')
+        run: |
+          mkdir -p fetched
+          kaggle kernels output "$KERNEL" -p fetched --force || true
+          url="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          if git ls-remote --exit-code --heads "$url" kaggle-results >/dev/null; then
+            git clone -q --depth 1 -b kaggle-results "$url" publish
+          else
+            git init -q -b kaggle-results publish && git -C publish remote add origin "$url"
+          fi
+          dest="results/${{ inputs.experiment }}"
+          rm -rf "publish/$dest" && mkdir -p "publish/$dest"
+          cd fetched
+          # Numbers only: JSON records and logits arrays. Weights and any text files are left out.
+          find . \( -name '*.json' -o -name 'logits.npz' \) -not -path './out/models/*' | while read f; do
+            mkdir -p "../publish/$dest/$(dirname "$f")"; cp "$f" "../publish/$dest/$f"; done
+          # The run log, for diagnosing failures; it contains progress lines, never corpus text.
+          for f in *.log; do [ -f "$f" ] && tail -n 300 "$f" > "../publish/$dest/run.log.txt"; done
+          cd ../publish
+          git config user.name "SiobhanGoh"
+          git config user.email "siobhangoh17@gmail.com"
+          git add -A
+          git commit -q -m "Kaggle ${{ inputs.experiment }} results (${{ steps.status.outputs.state }}, code ${GITHUB_SHA::7})" || echo "nothing new"
+          git push -q origin kaggle-results
+          echo "Pushed results/${{ inputs.experiment }} to kaggle-results" >> "$GITHUB_STEP_SUMMARY"

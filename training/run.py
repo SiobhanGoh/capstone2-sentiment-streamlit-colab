@@ -62,15 +62,20 @@ def token_batches(frame, tokenizer, batch_size, torch, device, shuffle=False):
         yield {k: v.to(device) for k, v in inputs.items()}, torch.tensor(batch.label_id.to_numpy(), dtype=torch.long, device=device)
 
 
-def predict_bert(model, tokenizer, frame, torch, device, batch_size=8):
+def predict_logits(model, tokenizer, frame, torch, device, batch_size=8):
+    """Raw class logits as a float32 array, in the frame's row order."""
     model.eval()
-    predictions = []
+    out = []
     with torch.inference_mode():
         for inputs, _ in token_batches(frame, tokenizer, batch_size, torch, device):
             with torch.autocast(device_type="cuda", dtype=torch.float16) if device == "cuda" else nullcontext():
                 logits = model(**inputs).logits
-            predictions.extend(logits.argmax(-1).cpu().tolist())
-    return predictions
+            out.append(logits.float().cpu().numpy())
+    return np.concatenate(out) if out else np.zeros((0, 3), dtype=np.float32)
+
+
+def predict_bert(model, tokenizer, frame, torch, device, batch_size=8):
+    return predict_logits(model, tokenizer, frame, torch, device, batch_size).argmax(1).tolist()
 
 
 DEFAULT_BASE = "google-bert/bert-base-multilingual-cased"
@@ -87,16 +92,26 @@ def check_pretrained_weights(loading):
 
 
 def train_bert(data_dir, output_dir, *, epochs=4, batch_size=4, accumulation=4, revision=None,
-               base=DEFAULT_BASE, learning_rate=2e-5):
+               base=DEFAULT_BASE, learning_rate=2e-5, seed=42, train_frame=None, init_from=None,
+               train_name="train split", eval_batch_size=8):
+    """Fine-tune and keep the epoch with the best validation macro-F1.
+
+    train_frame replaces the gold train split (for example extra tweets for a first stage); the
+    validation split is always the frozen one. init_from continues from a local checkpoint.
+    """
     import torch
     from transformers import AutoModelForSequenceClassification, AutoTokenizer, get_linear_schedule_with_warmup
     torch.set_num_threads(4)
-    random.seed(42)
-    np.random.seed(42)
-    torch.manual_seed(42)
-    if torch.cuda.is_available(): torch.cuda.manual_seed_all(42)
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available(): torch.cuda.manual_seed_all(seed)
     frame, manifest = load_prepared(data_dir)
     train, val = frame[frame.split == "train"], frame[frame.split == "validation"]
+    if train_frame is not None:
+        train = train_frame[["text", "label_id"]].reset_index(drop=True)
+    if init_from is not None:
+        base, revision = str(init_from), None
     output = Path(output_dir)
     if min(epochs, batch_size, accumulation) < 1:
         raise ValueError("Epochs, batch size and accumulation must be positive.")
@@ -104,11 +119,12 @@ def train_bert(data_dir, output_dir, *, epochs=4, batch_size=4, accumulation=4, 
         raise FileExistsError("Training output already contains artifacts; choose a new directory.")
     output.mkdir(parents=True, exist_ok=True)
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    tokenizer = AutoTokenizer.from_pretrained(base, revision=revision)
+    local = init_from is not None
+    tokenizer = AutoTokenizer.from_pretrained(base, revision=revision, local_files_only=local)
     # A new 3-class head is initialised; some community checkpoints publish only pytorch_model.bin.
     model, loading = AutoModelForSequenceClassification.from_pretrained(
         base, revision=revision, num_labels=3, id2label=dict(enumerate(LABELS)), label2id=LABEL_TO_ID,
-        output_loading_info=True,
+        output_loading_info=True, local_files_only=local,
     )
     check_pretrained_weights(loading)
     model.to(device)
@@ -122,10 +138,12 @@ def train_bert(data_dir, output_dir, *, epochs=4, batch_size=4, accumulation=4, 
     scheduler = get_linear_schedule_with_warmup(optimizer, int(.1*steps), steps)
     scaler = torch.amp.GradScaler("cuda", enabled=device == "cuda")
     best, history = -1, []
-    config = {"base_model": base, "base_revision": model.config._commit_hash,
+    config = {"base_model": base, "base_revision": None if local else model.config._commit_hash,
+              "init_from": None if init_from is None else str(init_from), "train_data": train_name,
+              "train_rows": len(train),
               "split_sha256": manifest["split_sha256"], "epochs": epochs, "batch_size": batch_size,
               "accumulation": accumulation, "learning_rate": learning_rate, "max_length": 128,
-              "seed": 42, "device": device, "selection": "validation macro-F1 only"}
+              "seed": seed, "device": device, "selection": "validation macro-F1 only"}
     write_json(output/"training.json", {**config, "status": "running", "history": history})
     print(json.dumps({"training_device": device, "train_rows": len(train), "epochs": epochs}), flush=True)
     for epoch in range(1, epochs+1):
@@ -152,7 +170,7 @@ def train_bert(data_dir, output_dir, *, epochs=4, batch_size=4, accumulation=4, 
             if step % 100 == 0:
                 print(json.dumps({"epoch": epoch, "batch": step, "batches": n_batches,
                                   "elapsed_seconds": round(time.time()-start)}), flush=True)
-        metrics = scores(val.label_id, predict_bert(model, tokenizer, val, torch, device))
+        metrics = scores(val.label_id, predict_bert(model, tokenizer, val, torch, device, eval_batch_size))
         record = {"epoch": epoch, "train_loss": total_loss/n_batches, "validation": metrics,
                   "seconds": round(time.time()-start, 2)}
         history.append(record)
