@@ -112,7 +112,10 @@ def train_bert(data_dir, output_dir, *, epochs=4, batch_size=4, accumulation=4, 
     )
     check_pretrained_weights(loading)
     model.to(device)
-    model.gradient_checkpointing_enable()
+    # Non-reentrant checkpointing: DeBERTa-v2 reuses one relative-position tensor across layers,
+    # and the reentrant mode frees it after the first layer's backward pass ("backward through the
+    # graph a second time"). The non-reentrant mode works for every architecture here.
+    model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=.01)
     n_batches = math.ceil(len(train)/batch_size)
     steps = math.ceil(n_batches/accumulation) * epochs
