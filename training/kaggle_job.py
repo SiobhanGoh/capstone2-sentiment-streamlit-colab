@@ -2,6 +2,7 @@
 
 Experiments (fixed before any run):
   large   XLM-RoBERTa-large fine-tuned on the gold train split, five seeds.
+  large2  The same model with a longer schedule (8 epochs, batch 16, learning rate 2e-5), three seeds.
   silver  First stage on ~160k ChatGPT-labelled Malaysian tweets (training/extra_data.py), then
           fine-tuned on the gold train split: XLM-RoBERTa-large (three seeds) and mBERT (two seeds;
           the browser model's own architecture, so a winner could ship without distillation).
@@ -44,6 +45,12 @@ EXPERIMENTS = {
     "large": [
         {"name": f"xlmr-large-s{s}", "family": "xlmr-large", **XLMR, "learning_rate": 1e-5, "epochs": 5, "seed": s, **BATCH}
         for s in range(1, 6)
+    ],
+    # Added after "large" stopped improving only because its schedule ended (validation macro-F1 still
+    # rising at the last epoch; 715 updates against mBERT's ~1,150). Fixed before any further result.
+    "large2": [
+        {"name": f"xlmr-large2-s{s}", "family": "xlmr-large2", **XLMR, "learning_rate": 2e-5, "epochs": 8, "seed": s,
+         "batch_size": 16, "accumulation": 1} for s in range(1, 4)
     ],
     "silver": [
         {"name": "xlmr-large-silver-stage1", "family": "stage1", **XLMR, "learning_rate": 1e-5, "epochs": 1, "seed": 1,
