@@ -73,7 +73,21 @@ def predict_bert(model, tokenizer, frame, torch, device, batch_size=8):
     return predictions
 
 
-def train_bert(data_dir, output_dir, *, epochs=4, batch_size=4, accumulation=4, revision=None):
+DEFAULT_BASE = "google-bert/bert-base-multilingual-cased"
+HEAD_PREFIXES = ("classifier.", "pooler.", "score.", "pre_classifier.")
+
+
+def check_pretrained_weights(loading):
+    """Refuse to fine-tune if the encoder itself did not load, which would silently start from random weights."""
+    # Only the new classification head (and a pooler some checkpoints omit) may start untrained.
+    missing = [k for k in loading.get("missing_keys", []) if not (k.startswith(HEAD_PREFIXES) or ".pooler." in k)]
+    if missing:
+        raise ValueError(f"{len(missing)} encoder weights did not load (for example {missing[0]}); "
+                         "this checkpoint does not match the sequence-classification architecture.")
+
+
+def train_bert(data_dir, output_dir, *, epochs=4, batch_size=4, accumulation=4, revision=None,
+               base=DEFAULT_BASE, learning_rate=2e-5):
     import torch
     from transformers import AutoModelForSequenceClassification, AutoTokenizer, get_linear_schedule_with_warmup
     torch.set_num_threads(4)
@@ -90,14 +104,16 @@ def train_bert(data_dir, output_dir, *, epochs=4, batch_size=4, accumulation=4, 
         raise FileExistsError("Training output already contains artifacts; choose a new directory.")
     output.mkdir(parents=True, exist_ok=True)
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    base = "google-bert/bert-base-multilingual-cased"
     tokenizer = AutoTokenizer.from_pretrained(base, revision=revision)
-    model = AutoModelForSequenceClassification.from_pretrained(
+    # A new 3-class head is initialised; some community checkpoints publish only pytorch_model.bin.
+    model, loading = AutoModelForSequenceClassification.from_pretrained(
         base, revision=revision, num_labels=3, id2label=dict(enumerate(LABELS)), label2id=LABEL_TO_ID,
-        use_safetensors=True,
-    ).to(device)
+        output_loading_info=True,
+    )
+    check_pretrained_weights(loading)
+    model.to(device)
     model.gradient_checkpointing_enable()
-    optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5, weight_decay=.01)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=.01)
     n_batches = math.ceil(len(train)/batch_size)
     steps = math.ceil(n_batches/accumulation) * epochs
     scheduler = get_linear_schedule_with_warmup(optimizer, int(.1*steps), steps)
@@ -105,7 +121,7 @@ def train_bert(data_dir, output_dir, *, epochs=4, batch_size=4, accumulation=4, 
     best, history = -1, []
     config = {"base_model": base, "base_revision": model.config._commit_hash,
               "split_sha256": manifest["split_sha256"], "epochs": epochs, "batch_size": batch_size,
-              "accumulation": accumulation, "learning_rate": 2e-5, "max_length": 128,
+              "accumulation": accumulation, "learning_rate": learning_rate, "max_length": 128,
               "seed": 42, "device": device, "selection": "validation macro-F1 only"}
     write_json(output/"training.json", {**config, "status": "running", "history": history})
     print(json.dumps({"training_device": device, "train_rows": len(train), "epochs": epochs}), flush=True)
@@ -141,10 +157,13 @@ def train_bert(data_dir, output_dir, *, epochs=4, batch_size=4, accumulation=4, 
             best = metrics['macro_f1']
             selected_epoch = epoch
             model.save_pretrained(output/"model", safe_serialization=True)
+            best_val = metrics
             tokenizer.save_pretrained(output/"model")
         write_json(output/"training.json", {**config, "status": "running", "selected_epoch": selected_epoch, "history": history})
         print(json.dumps(record), flush=True)
-    write_json(output/"training.json", {**config, "status": "complete", "selected_epoch": selected_epoch, "history": history})
+    write_json(output/"training.json", {**config, "status": "complete", "selected_epoch": selected_epoch,
+                                        "selected_validation": {"accuracy": best_val["accuracy"], "macro_f1": best_val["macro_f1"]},
+                                        "history": history})
 
 
 def evaluate(data_dir, baseline_dir, bert_dir, output_path):
