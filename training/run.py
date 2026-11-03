@@ -53,13 +53,40 @@ def train_baseline(data_dir, output_dir):
     print(json.dumps({"baseline_selected_C": selected_c, "validation_macro_f1": best_score}), flush=True)
 
 
-def token_batches(frame, tokenizer, batch_size, torch, device, shuffle=False):
+def token_batches(frame, tokenizer, batch_size, torch, device, shuffle=False, with_index=False):
     indices = np.random.permutation(len(frame)) if shuffle else np.arange(len(frame))
     for start in range(0, len(indices), batch_size):
-        batch = frame.iloc[indices[start:start+batch_size]]
+        idx = indices[start:start+batch_size]
+        batch = frame.iloc[idx]
         inputs = tokenizer(batch.text.tolist(), padding=True, truncation=True, max_length=128,
                            return_tensors="pt")
-        yield {k: v.to(device) for k, v in inputs.items()}, torch.tensor(batch.label_id.to_numpy(), dtype=torch.long, device=device)
+        labels = torch.tensor(batch.label_id.to_numpy(), dtype=torch.long, device=device)
+        if with_index:
+            yield {k: v.to(device) for k, v in inputs.items()}, labels, idx
+        else:
+            yield {k: v.to(device) for k, v in inputs.items()}, labels
+
+
+def soften(probs, temperature):
+    """Teacher probabilities at a distillation temperature: p ** (1/T), renormalised."""
+    z = np.log(np.clip(np.asarray(probs, dtype=np.float64), 1e-12, 1)) / temperature
+    z -= z.max(1, keepdims=True)
+    e = np.exp(z)
+    return (e / e.sum(1, keepdims=True)).astype(np.float32)
+
+
+def distillation_loss(logits, labels, teacher, alpha, temperature, torch):
+    """Per batch: (1 - alpha) * T^2 * KL(teacher_T || student_T) + alpha * CE on rows with a gold label.
+
+    labels of -1 mark rows with no gold label (teacher only). teacher is already softened to T.
+    """
+    F = torch.nn.functional
+    logits = logits.float()
+    log_student = F.log_softmax(logits / temperature, -1)
+    kd = (teacher * (teacher.clamp_min(1e-12).log() - log_student)).sum(-1) * temperature ** 2
+    has_label = (labels >= 0).float()
+    ce = F.cross_entropy(logits, labels.clamp_min(0), reduction="none") * has_label
+    return ((1 - alpha) * kd + alpha * ce).mean()
 
 
 def predict_logits(model, tokenizer, frame, torch, device, batch_size=8):
@@ -93,11 +120,14 @@ def check_pretrained_weights(loading):
 
 def train_bert(data_dir, output_dir, *, epochs=4, batch_size=4, accumulation=4, revision=None,
                base=DEFAULT_BASE, learning_rate=2e-5, seed=42, train_frame=None, init_from=None,
-               train_name="train split", eval_batch_size=8):
+               train_name="train split", eval_batch_size=8, subfolder=None, soft_targets=None,
+               kd_alpha=0.5, kd_temperature=2.0):
     """Fine-tune and keep the epoch with the best validation macro-F1.
 
     train_frame replaces the gold train split (for example extra tweets for a first stage); the
     validation split is always the frozen one. init_from continues from a local checkpoint.
+    soft_targets (teacher probabilities aligned with train_frame) switches to distillation; rows
+    with label_id -1 then learn from the teacher alone.
     """
     import torch
     from transformers import AutoModelForSequenceClassification, AutoTokenizer, get_linear_schedule_with_warmup
@@ -120,11 +150,12 @@ def train_bert(data_dir, output_dir, *, epochs=4, batch_size=4, accumulation=4, 
     output.mkdir(parents=True, exist_ok=True)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     local = init_from is not None
-    tokenizer = AutoTokenizer.from_pretrained(base, revision=revision, local_files_only=local)
+    sub = {} if subfolder is None else {"subfolder": subfolder}
+    tokenizer = AutoTokenizer.from_pretrained(base, revision=revision, local_files_only=local, **sub)
     # A new 3-class head is initialised; some community checkpoints publish only pytorch_model.bin.
     model, loading = AutoModelForSequenceClassification.from_pretrained(
         base, revision=revision, num_labels=3, id2label=dict(enumerate(LABELS)), label2id=LABEL_TO_ID,
-        output_loading_info=True, local_files_only=local,
+        output_loading_info=True, local_files_only=local, **sub,
     )
     check_pretrained_weights(loading)
     model.to(device)
@@ -137,13 +168,19 @@ def train_bert(data_dir, output_dir, *, epochs=4, batch_size=4, accumulation=4, 
     steps = math.ceil(n_batches/accumulation) * epochs
     scheduler = get_linear_schedule_with_warmup(optimizer, int(.1*steps), steps)
     scaler = torch.amp.GradScaler("cuda", enabled=device == "cuda")
+    if soft_targets is not None:
+        if len(soft_targets) != len(train):
+            raise ValueError("Soft targets must align with the training rows.")
+        teacher_all = soften(soft_targets, kd_temperature)
     best, history = -1, []
     config = {"base_model": base, "base_revision": None if local else model.config._commit_hash,
               "init_from": None if init_from is None else str(init_from), "train_data": train_name,
               "train_rows": len(train),
               "split_sha256": manifest["split_sha256"], "epochs": epochs, "batch_size": batch_size,
               "accumulation": accumulation, "learning_rate": learning_rate, "max_length": 128,
-              "seed": seed, "device": device, "selection": "validation macro-F1 only"}
+              "seed": seed, "device": device, "selection": "validation macro-F1 only", "subfolder": subfolder,
+              "distillation": None if soft_targets is None else {"alpha": kd_alpha, "temperature": kd_temperature,
+                                                                 "rows_without_gold_label": int((train.label_id < 0).sum())}}
     write_json(output/"training.json", {**config, "status": "running", "history": history})
     print(json.dumps({"training_device": device, "train_rows": len(train), "epochs": epochs}), flush=True)
     for epoch in range(1, epochs+1):
@@ -151,12 +188,17 @@ def train_bert(data_dir, output_dir, *, epochs=4, batch_size=4, accumulation=4, 
         optimizer.zero_grad(set_to_none=True)
         start = time.time()
         total_loss = 0.0
-        for step, (inputs, labels) in enumerate(token_batches(train, tokenizer, batch_size, torch, device, shuffle=True), 1):
+        for step, (inputs, labels, idx) in enumerate(token_batches(train, tokenizer, batch_size, torch, device,
+                                                                     shuffle=True, with_index=True), 1):
             # Correct normalization for a final incomplete accumulation group.
             group_start = ((step-1)//accumulation)*accumulation
             group_size = min(accumulation, n_batches-group_start)
             with torch.autocast(device_type="cuda", dtype=torch.float16) if device == "cuda" else nullcontext():
-                loss = model(**inputs, labels=labels).loss
+                if soft_targets is None:
+                    loss = model(**inputs, labels=labels).loss
+                else:
+                    teacher = torch.as_tensor(teacher_all[idx], device=device)
+                    loss = distillation_loss(model(**inputs).logits, labels, teacher, kd_alpha, kd_temperature, torch)
             total_loss += float(loss.detach())
             scaler.scale(loss/group_size).backward()
             if step % accumulation == 0 or step == n_batches:

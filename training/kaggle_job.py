@@ -5,6 +5,11 @@ Experiments (fixed before any run):
   silver  First stage on ~160k ChatGPT-labelled Malaysian tweets (training/extra_data.py), then
           fine-tuned on the gold train split: XLM-RoBERTa-large (three seeds) and mBERT (two seeds;
           the browser model's own architecture, so a winner could ship without distillation).
+  distill The browser model's architecture (mBERT) taught by the teacher chosen on validation
+          (training/distill_teacher.json, written by training/kaggle_select.py): soft labels on the
+          gold train split and the extra tweets, plus the gold labels. Students start from the
+          published checkpoint or from plain mBERT. Reads the teacher's logits from the earlier
+          Kaggle runs' outputs, attached as inputs.
   smoke   A two-minute check of the whole pipeline with tiny settings; its numbers mean nothing.
 
 Each run keeps the epoch with the best validation macro-F1. For every run the job saves logits on
@@ -21,6 +26,7 @@ import time
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 
 from training.protocol import load_prepared, prepare_csv
 
@@ -28,7 +34,10 @@ SOURCE_SHA256 = "3ff66de7b91cb1b2fd06ac5dd136f495859114808d19b1688c66a21ba1d74d7
 SPLIT_SHA256 = "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929"
 XLMR = {"base": "FacebookAI/xlm-roberta-large", "revision": "c23d21b0620b635a76227c604d44e43a9f0ee389"}
 MBERT = {"base": "google-bert/bert-base-multilingual-cased", "revision": None}
+APP = {"base": "SiobhanGoh/CP2_Emotion_Model_New", "revision": "9bc6645ce7a8e02761c59386ffd16969bed1bc55",
+       "subfolder": "corrected-2026-10"}  # the model the web app runs today
 BATCH = {"batch_size": 16, "accumulation": 2}  # effective batch 32
+TEACHER_FILE = Path(__file__).with_name("distill_teacher.json")
 BUDGET_HOURS = 11.0  # Kaggle stops a session at 12 hours
 
 EXPERIMENTS = {
@@ -45,6 +54,12 @@ EXPERIMENTS = {
          "data": "silver", **BATCH},
         *[{"name": f"mbert-silver-s{s}", "family": "mbert-silver", "init": "mbert-silver-stage1",
            "learning_rate": 2e-5, "epochs": 4, "seed": s, **BATCH} for s in range(1, 3)],
+    ],
+    "distill": [
+        *[{"name": f"student-app-s{s}", "family": "student-app", **APP, "learning_rate": 2e-5, "epochs": 3, "seed": s,
+           "distill": True, **BATCH} for s in range(1, 3)],
+        *[{"name": f"student-mbert-s{s}", "family": "student-mbert", **MBERT, "learning_rate": 3e-5, "epochs": 3, "seed": s,
+           "distill": True, **BATCH} for s in range(1, 3)],
     ],
     "smoke": [
         {"name": "smoke-stage1", "family": "stage1", **MBERT, "learning_rate": 2e-5, "epochs": 1, "seed": 1,
@@ -67,7 +82,26 @@ def find_corpus(input_dir):
     raise FileNotFoundError("No CSV in the Kaggle dataset matches the frozen corpus checksum.")
 
 
-def run(experiment, input_dir, out_dir, work_dir="/tmp/rojak", train_fn=None, logits_fn=None, silver_fn=None):
+def load_teacher(input_dir, frames, teacher=None):
+    """Teacher probabilities on train and transfer rows: the members' temperature-scaled softmax, averaged."""
+    teacher = teacher or json.loads(TEACHER_FILE.read_text())
+    out = {"train": [], "transfer": []}
+    for m in teacher["members"]:
+        found = sorted(Path(input_dir).rglob(f"runs/{m['run']}/logits.npz"))
+        if len(found) != 1:
+            raise FileNotFoundError(f"Expected one logits file for teacher member {m['run']}, found {len(found)}.")
+        with np.load(found[0]) as z:
+            for k in out:
+                if len(z[k]) != len(frames[k]):
+                    raise ValueError(f"Teacher {m['run']} {k} logits do not match the {k} rows.")
+                v = z[k].astype(np.float64) / m["temperature"]
+                v = np.exp(v - v.max(1, keepdims=True))
+                out[k].append(v / v.sum(1, keepdims=True))
+    return {k: np.mean(v, axis=0) for k, v in out.items()}
+
+
+def run(experiment, input_dir, out_dir, work_dir="/tmp/rojak", train_fn=None, logits_fn=None, silver_fn=None,
+        teacher=None):
     from training import extra_data
     from training.run import train_bert
     train_fn = train_fn or train_bert
@@ -86,6 +120,15 @@ def run(experiment, input_dir, out_dir, work_dir="/tmp/rojak", train_fn=None, lo
     (out / "extra_data_audit.json").write_text(json.dumps(audit, indent=2))
     frames = {"validation": gold[gold.split == "validation"], "test": gold[gold.split == "test"],
               "train": gold[gold.split == "train"], "transfer": silver}
+    soft = None
+    if any(spec.get("distill") for spec in plan):
+        teacher = teacher or json.loads(TEACHER_FILE.read_text())
+        if teacher["transfer_text_sha256"] != audit["retained_text_sha256"]:
+            raise ValueError("The extra tweets differ from the ones the teacher saw.")
+        probs = load_teacher(input_dir, frames, teacher)
+        students = pd.concat([frames["train"][["text", "label_id"]],
+                              frames["transfer"][["text"]].assign(label_id=-1)], ignore_index=True)
+        soft = np.concatenate([probs["train"], probs["transfer"]]).astype(np.float32)
     summary = {"experiment": experiment, "protocol": manifest["protocol"], "split_sha256": SPLIT_SHA256,
                "transfer_text_sha256": audit["retained_text_sha256"], "runs": {}, "skipped": []}
     best = {}
@@ -106,7 +149,11 @@ def run(experiment, input_dir, out_dir, work_dir="/tmp/rojak", train_fn=None, lo
             kwargs["init_from"] = work / "runs" / spec["init"] / "model"
         else:
             kwargs.update(base=spec["base"], revision=spec["revision"])
-        if train_rows is not None:
+            if spec.get("subfolder"):
+                kwargs["subfolder"] = spec["subfolder"]
+        if spec.get("distill"):
+            kwargs.update(train_frame=students, soft_targets=soft, train_name="gold train + extra tweets, teacher soft labels")
+        elif train_rows is not None:
             kwargs.update(train_frame=train_rows, train_name="extra tweets (silver)")
         elif spec.get("limit"):
             kwargs.update(train_frame=frames["train"].head(spec["limit"]), train_name="train split (smoke subset)")

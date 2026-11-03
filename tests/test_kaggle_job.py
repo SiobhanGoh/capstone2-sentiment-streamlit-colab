@@ -148,6 +148,89 @@ def test_kaggle_entry_embeds_this_commits_training_code(tmp_path):
     blob = re.search(r"b64decode\('([A-Za-z0-9+/=]+)'\)", script).group(1)
     names = tarfile.open(fileobj=io.BytesIO(base64.b64decode(blob)), mode="r:gz").getnames()
     assert {"training/kaggle_job.py", "training/run.py", "training/protocol.py", "training/extra_data.py"} <= set(names)
-    assert all(n.startswith("training/") and n.endswith(".py") for n in names)
+    assert all(n.startswith("training/") and (n.endswith(".py") or n == "training/distill_teacher.json") for n in names)
     with pytest.raises(ValueError):
         kaggle_entry.render("nope", "x")
+
+
+def test_soften_and_distillation_loss_match_the_formula():
+    torch = pytest.importorskip("torch")
+    from training.run import distillation_loss, soften
+    p = np.array([[0.7, 0.2, 0.1], [0.2, 0.3, 0.5]])
+    t = soften(p, 2.0)
+    expected = np.sqrt(p) / np.sqrt(p).sum(1, keepdims=True)
+    assert np.allclose(t, expected, atol=1e-6)
+    logits = np.array([[2.0, 0.0, -1.0], [0.5, 0.1, 0.3]])
+    labels = np.array([0, -1])  # second row has no gold label
+    loss = float(distillation_loss(torch.tensor(logits), torch.tensor(labels), torch.tensor(t), 0.5, 2.0, torch))
+    ls = logits / 2 - np.log(np.exp(logits / 2).sum(1, keepdims=True))
+    kd = (t * (np.log(t) - ls)).sum(1) * 4
+    ce = np.array([-(logits[0, 0] - np.log(np.exp(logits[0]).sum())), 0.0])
+    assert loss == pytest.approx(float((0.5 * kd + 0.5 * ce).mean()), rel=1e-5)
+
+
+def teacher_logits(tmp_path, kernel, run, frames, fill):
+    d = tmp_path / "input" / kernel / "out" / "runs" / run
+    d.mkdir(parents=True)
+    np.savez(d / "logits.npz", **{k: np.full((n, 3), 0.0) + fill for k, n in frames.items()})
+
+
+def test_load_teacher_averages_temperature_scaled_members(tmp_path):
+    frames = {"train": pd.DataFrame({"text": ["a", "b"]}), "transfer": pd.DataFrame({"text": ["c"]})}
+    teacher_logits(tmp_path, "rojak-sentiment-large", "xlmr-large-s1", {"train": 2, "transfer": 1}, np.array([2.0, 0, 0]))
+    teacher_logits(tmp_path, "rojak-sentiment-silver", "mbert-silver-s1", {"train": 2, "transfer": 1}, np.array([0, 0, 4.0]))
+    spec = {"members": [{"run": "xlmr-large-s1", "temperature": 2.0}, {"run": "mbert-silver-s1", "temperature": 4.0}]}
+    probs = kaggle_job.load_teacher(tmp_path / "input", frames, spec)
+    e = np.exp([1.0, 0, 0]); a = e / e.sum()
+    b = np.exp([0, 0, 1.0]) / np.exp([0, 0, 1.0]).sum()
+    assert np.allclose(probs["train"], (a + b) / 2) and probs["transfer"].shape == (1, 3)
+    with pytest.raises(FileNotFoundError):
+        kaggle_job.load_teacher(tmp_path / "input", frames, {"members": [{"run": "missing", "temperature": 1}]})
+    with pytest.raises(ValueError, match="do not match"):
+        kaggle_job.load_teacher(tmp_path / "input", {**frames, "transfer": pd.DataFrame({"text": ["c", "d"]})}, spec)
+
+
+def test_distill_run_teaches_students_on_gold_and_extra_rows(corpus):
+    calls = []
+    silver = pd.DataFrame({"text": ["a b", "c d", "e f"], "label_id": [0, 1, 2]})
+    audit = {"retained_text_sha256": "x", "retained_rows": 3}
+    teacher_logits(corpus, "rojak-sentiment-large", "xlmr-large-s1", {"train": 42, "transfer": 3}, np.array([1.0, 0, 0]))
+    spec = {"members": [{"run": "xlmr-large-s1", "temperature": 1.0}], "transfer_text_sha256": "x"}
+    logits = lambda model_dir, frames: {k: np.zeros((len(v), 3), np.float32) for k, v in frames.items()}
+    summary = kaggle_job.run("distill", corpus / "input", corpus / "out", work_dir=corpus / "work", train_fn=fake_train(calls),
+                             logits_fn=logits, silver_fn=lambda g: (silver, audit), teacher=spec)
+    assert [c[0] for c in calls] == [s["name"] for s in kaggle_job.EXPERIMENTS["distill"]]
+    kw = calls[0][1]
+    assert kw["subfolder"] == "corrected-2026-10" and kw["base"] == "SiobhanGoh/CP2_Emotion_Model_New"
+    rows, soft = kw["train_frame"], kw["soft_targets"]
+    assert len(rows) == len(soft) == 45 and (rows.label_id == -1).sum() == 3 and (rows.label_id >= 0).sum() == 42
+    assert set(summary["kept_models"]) == {"student-app", "student-mbert"}
+    with pytest.raises(ValueError, match="extra tweets differ"):
+        kaggle_job.run("distill", corpus / "input", corpus / "out2", work_dir=corpus / "work2", train_fn=fake_train([]),
+                       logits_fn=logits, silver_fn=lambda g: (silver, audit), teacher={**spec, "transfer_text_sha256": "y"})
+
+
+def test_train_bert_distils_end_to_end_with_a_tiny_model(tmp_path):
+    pytest.importorskip("torch")
+    transformers = pytest.importorskip("transformers")
+    from training.run import train_bert
+    words = ["teruk", "biasa", "bagus", "nombor"] + [str(i) for i in range(20)]
+    vocab = tmp_path / "vocab.txt"
+    vocab.write_text("\n".join(["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]", *words]))
+    tiny = tmp_path / "tiny"
+    transformers.BertTokenizerFast(vocab_file=str(vocab), do_lower_case=True).save_pretrained(tiny)
+    config = transformers.BertConfig(vocab_size=len(words) + 5, hidden_size=16, num_hidden_layers=1, num_attention_heads=2,
+                                     intermediate_size=32, num_labels=3)
+    transformers.BertForSequenceClassification(config).save_pretrained(tiny)
+    rows = [{"Tweet": f"{w} nombor {i}", "Sentiment": s} for s, w in
+            {"NEGATIVE": "teruk", "NEUTRAL": "biasa", "POSITIVE": "bagus"}.items() for i in range(20)]
+    pd.DataFrame(rows).to_csv(tmp_path / "c.csv", index=False)
+    prepare_csv(tmp_path / "c.csv", tmp_path / "data")
+    train = pd.DataFrame({"text": ["teruk nombor 1", "bagus nombor 2", "biasa 3"], "label_id": [0, 2, -1]})
+    soft = np.array([[0.8, 0.1, 0.1], [0.1, 0.1, 0.8], [0.2, 0.6, 0.2]], dtype=np.float32)
+    train_bert(tmp_path / "data", tmp_path / "out", epochs=1, batch_size=2, accumulation=1, init_from=tiny,
+               train_frame=train, soft_targets=soft)
+    meta = json.loads((tmp_path / "out" / "training.json").read_text())
+    assert meta["status"] == "complete" and meta["distillation"]["rows_without_gold_label"] == 1
+    with pytest.raises(ValueError, match="align"):
+        train_bert(tmp_path / "data", tmp_path / "out2", epochs=1, init_from=tiny, train_frame=train, soft_targets=soft[:2])

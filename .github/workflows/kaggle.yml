@@ -23,7 +23,7 @@ on:
         required: true
         default: smoke
         type: choice
-        options: [smoke, large, silver]
+        options: [smoke, large, silver, distill]
 permissions:
   contents: write
 concurrency:
@@ -46,7 +46,7 @@ jobs:
             ACTION=$(jq -r .action training/kaggle_request.json); EXPERIMENT=$(jq -r .experiment training/kaggle_request.json)
           fi
           case "$ACTION" in launch|status|collect) ;; *) echo "::error::Unknown action $ACTION"; exit 1;; esac
-          case "$EXPERIMENT" in smoke|large|silver) ;; *) echo "::error::Unknown experiment $EXPERIMENT"; exit 1;; esac
+          case "$EXPERIMENT" in smoke|large|silver|distill) ;; *) echo "::error::Unknown experiment $EXPERIMENT"; exit 1;; esac
           echo "action=$ACTION" >> "$GITHUB_OUTPUT"; echo "experiment=$EXPERIMENT" >> "$GITHUB_OUTPUT"
           echo "KERNEL=$KAGGLE_USERNAME/rojak-sentiment-$EXPERIMENT" >> "$GITHUB_ENV"
           echo "### $ACTION $EXPERIMENT" >> "$GITHUB_STEP_SUMMARY"
@@ -69,11 +69,16 @@ jobs:
         run: |
           mkdir kernel
           python training/kaggle_entry.py "${{ steps.req.outputs.experiment }}" "$GITHUB_SHA" kernel/kaggle_entry.py
+          # Distillation reads the teacher's logits from the earlier runs' outputs.
+          sources='[]'
+          if [ "${{ steps.req.outputs.experiment }}" = distill ]; then
+            sources="[\"$KAGGLE_USERNAME/rojak-sentiment-large\", \"$KAGGLE_USERNAME/rojak-sentiment-silver\"]"
+          fi
           cat > kernel/kernel-metadata.json <<EOF
           {"id": "$KERNEL", "title": "rojak-sentiment-${{ steps.req.outputs.experiment }}", "code_file": "kaggle_entry.py",
            "language": "python", "kernel_type": "script", "is_private": true, "enable_gpu": true,
            "enable_internet": true, "dataset_sources": ["$KAGGLE_USERNAME/rojak-sentiment-private"],
-           "competition_sources": [], "kernel_sources": [], "model_sources": []}
+           "competition_sources": [], "kernel_sources": $sources, "model_sources": []}
           EOF
           # Ask for a T4: recent PyTorch builds may not support the older P100 default.
           kaggle kernels push -p kernel --accelerator NvidiaTeslaT4 || kaggle kernels push -p kernel
