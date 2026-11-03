@@ -4,7 +4,12 @@ name: Kaggle training
 # corpus uploaded on Kaggle as the private dataset <username>/rojak-sentiment-private.
 # Collect pushes only numbers (metrics and logits) to the kaggle-results branch: no corpus text,
 # no extra tweets and no model weights; the kept models stay in the private Kaggle output.
+# Run it by hand from the Actions tab (once on the default branch), or by pushing a change to
+# training/kaggle_request.json on the browser-model branch, e.g. {"action": "launch", "experiment": "smoke"}.
 on:
+  push:
+    branches: [browser-model]
+    paths: [training/kaggle_request.json]
   workflow_dispatch:
     inputs:
       action:
@@ -22,16 +27,29 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: kaggle-${{ inputs.experiment }}
+  group: kaggle
 jobs:
   kaggle:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
       KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
-      KERNEL: ${{ secrets.KAGGLE_USERNAME }}/rojak-sentiment-${{ inputs.experiment }}
     steps:
       - uses: actions/checkout@v4
+      - name: Request
+        id: req
+        env:
+          ACTION: ${{ inputs.action }}
+          EXPERIMENT: ${{ inputs.experiment }}
+        run: |
+          if [ -z "$ACTION" ]; then
+            ACTION=$(jq -r .action training/kaggle_request.json); EXPERIMENT=$(jq -r .experiment training/kaggle_request.json)
+          fi
+          case "$ACTION" in launch|status|collect) ;; *) echo "::error::Unknown action $ACTION"; exit 1;; esac
+          case "$EXPERIMENT" in smoke|large|silver) ;; *) echo "::error::Unknown experiment $EXPERIMENT"; exit 1;; esac
+          echo "action=$ACTION" >> "$GITHUB_OUTPUT"; echo "experiment=$EXPERIMENT" >> "$GITHUB_OUTPUT"
+          echo "KERNEL=$KAGGLE_USERNAME/rojak-sentiment-$EXPERIMENT" >> "$GITHUB_ENV"
+          echo "### $ACTION $EXPERIMENT" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -47,12 +65,12 @@ jobs:
           python -m pip install -q --upgrade kaggle
           kaggle --version
       - name: Launch
-        if: inputs.action == 'launch'
+        if: steps.req.outputs.action == 'launch'
         run: |
           mkdir kernel
-          python training/kaggle_entry.py "${{ inputs.experiment }}" "$GITHUB_SHA" kernel/kaggle_entry.py
+          python training/kaggle_entry.py "${{ steps.req.outputs.experiment }}" "$GITHUB_SHA" kernel/kaggle_entry.py
           cat > kernel/kernel-metadata.json <<EOF
-          {"id": "$KERNEL", "title": "rojak-sentiment-${{ inputs.experiment }}", "code_file": "kaggle_entry.py",
+          {"id": "$KERNEL", "title": "rojak-sentiment-${{ steps.req.outputs.experiment }}", "code_file": "kaggle_entry.py",
            "language": "python", "kernel_type": "script", "is_private": true, "enable_gpu": true,
            "enable_internet": true, "dataset_sources": ["$KAGGLE_USERNAME/rojak-sentiment-private"],
            "competition_sources": [], "kernel_sources": [], "model_sources": []}
@@ -60,7 +78,7 @@ jobs:
           kaggle kernels push -p kernel
       - name: Status
         id: status
-        if: inputs.action != 'launch'
+        if: steps.req.outputs.action != 'launch'
         run: |
           s=$(kaggle kernels status "$KERNEL" 2>&1) || true
           echo "$s"
@@ -68,7 +86,7 @@ jobs:
           echo "state=$state" >> "$GITHUB_OUTPUT"
           echo "### Kaggle $KERNEL: ${state:-unknown}" >> "$GITHUB_STEP_SUMMARY"
       - name: Collect numbers
-        if: inputs.action == 'collect' && (steps.status.outputs.state == 'complete' || steps.status.outputs.state == 'error')
+        if: steps.req.outputs.action == 'collect' && (steps.status.outputs.state == 'complete' || steps.status.outputs.state == 'error')
         run: |
           mkdir -p fetched
           kaggle kernels output "$KERNEL" -p fetched --force || true
@@ -78,7 +96,7 @@ jobs:
           else
             git init -q -b kaggle-results publish && git -C publish remote add origin "$url"
           fi
-          dest="results/${{ inputs.experiment }}"
+          dest="results/${{ steps.req.outputs.experiment }}"
           rm -rf "publish/$dest" && mkdir -p "publish/$dest"
           cd fetched
           # Numbers only: JSON records and logits arrays. Weights and any text files are left out.
@@ -90,6 +108,6 @@ jobs:
           git config user.name "SiobhanGoh"
           git config user.email "siobhangoh17@gmail.com"
           git add -A
-          git commit -q -m "Kaggle ${{ inputs.experiment }} results (${{ steps.status.outputs.state }}, code ${GITHUB_SHA::7})" || echo "nothing new"
+          git commit -q -m "Kaggle ${{ steps.req.outputs.experiment }} results (${{ steps.status.outputs.state }}, code ${GITHUB_SHA::7})" || echo "nothing new"
           git push -q origin kaggle-results
-          echo "Pushed results/${{ inputs.experiment }} to kaggle-results" >> "$GITHUB_STEP_SUMMARY"
+          echo "Pushed results/${{ steps.req.outputs.experiment }} to kaggle-results" >> "$GITHUB_STEP_SUMMARY"
