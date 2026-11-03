@@ -1,0 +1,19 @@
+{
+  "chosen_by": "training/kaggle_select.py: highest 5-fold CV macro-F1 inside validation (xlmr-large2-mean+tfidf); the TF-IDF part is left out of the teacher and refitted on the student",
+  "members": [
+    {
+      "run": "xlmr-large2-s1",
+      "temperature": 2.543926689834741
+    },
+    {
+      "run": "xlmr-large2-s2",
+      "temperature": 1.800989408194553
+    },
+    {
+      "run": "xlmr-large2-s3",
+      "temperature": 2.3777054351230014
+    }
+  ],
+  "transfer_text_sha256": "0a2efe32571bb8269d0e9b78c20e15c27c301b55405c0eff6be771ff714bd268",
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929"
+}
