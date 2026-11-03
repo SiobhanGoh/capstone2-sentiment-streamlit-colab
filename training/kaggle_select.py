@@ -71,6 +71,14 @@ def candidates(runs, y_val, app_logits=None):
     if len(means) > 1:
         out["all-mean"] = {"members": sorted(n for f in means for n, r in runs.items() if r["family"] == f),
                            "z": log_mean(list(means.values()))}
+    # Added before any combined score was seen: the app's mBERT voting with a Kaggle family, since
+    # different architectures usually make more different mistakes than seeds of one model.
+    if app_logits is not None:
+        app_p = member_probs(app_logits, y_val)[0]
+        for f in families:
+            names = sorted(n for n, r in runs.items() if r["family"] == f)
+            fam = means.get(f) or probs[names[0]]
+            out[f"app+{f}"] = {"members": ["published mBERT", *names], "z": log_mean([app_p, fam])}
     return out
 
 
