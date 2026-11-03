@@ -30,7 +30,7 @@ This notebook fine-tunes three stronger base models under exactly the same corre
 
 **The rule, fixed before any training:** each candidate picks its best epoch on validation. The winner is the candidate with the highest validation macro-F1, chosen *before* any test score is computed. Test scores for all candidates are then recorded once, for transparency, and are not used to change the choice.
 
-**How to run:** Runtime → Change runtime type → **T4 GPU**, then Runtime → **Run all**. It takes roughly 1–1.5 hours. Finished models are saved to your Google Drive, so if Colab disconnects, run all again and it carries on from where it stopped.
+**How to run:** Runtime → Change runtime type → **T4 GPU**, then Runtime → **Run all**. If you ran an earlier copy of this notebook in the same session, use Runtime → **Disconnect and delete runtime** first, so the packages start clean. It takes roughly 1–1.5 hours. Finished models are saved to your Google Drive, so if Colab disconnects, run all again and it carries on from where it stopped.
 
 **What to send back:** the `candidates_comparison.json` file the last cell downloads. It holds only scores, never any comment text.
 """),
@@ -42,11 +42,16 @@ assert gpu.returncode == 0, "No GPU found. Use Runtime → Change runtime type �
 print("GPU:", gpu.stdout.strip())
 
 import os
-if not os.path.exists("/content/capstone2-sentiment-streamlit-colab"):
+if os.path.exists("/content/capstone2-sentiment-streamlit-colab"):
+    !git -C /content/capstone2-sentiment-streamlit-colab pull -q
+else:
     !git clone -q --branch {BRANCH} https://github.com/SiobhanGoh/capstone2-sentiment-streamlit-colab.git /content/capstone2-sentiment-streamlit-colab
 %cd /content/capstone2-sentiment-streamlit-colab
 !git log --oneline -1
 %pip install -q -r requirements-training.txt
+# Colab's preinstalled torchvision/torchaudio are built for its newer PyTorch and break imports
+# once PyTorch 2.6 is installed. Neither is needed for text models.
+%pip uninstall -q -y torchvision torchaudio
 """),
     md("## 2. Load your corpus and rebuild the frozen split\nThe file must be the exact CSV used for the corrected evaluation. Its checksum and the split fingerprint are both checked, so the test set is guaranteed to be the same 981 inputs."),
     code(f"""
