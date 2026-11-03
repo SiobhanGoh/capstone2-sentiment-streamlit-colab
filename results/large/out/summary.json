@@ -1,0 +1,58 @@
+{
+  "experiment": "large",
+  "protocol": "sentiment-disjoint-v1",
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "transfer_text_sha256": "0a2efe32571bb8269d0e9b78c20e15c27c301b55405c0eff6be771ff714bd268",
+  "runs": {
+    "xlmr-large-s1": {
+      "family": "xlmr-large",
+      "validation": {
+        "accuracy": 0.7033639143730887,
+        "macro_f1": 0.6949757440667014
+      },
+      "selected_epoch": 5,
+      "hours": 0.267
+    },
+    "xlmr-large-s2": {
+      "family": "xlmr-large",
+      "validation": {
+        "accuracy": 0.6901121304791029,
+        "macro_f1": 0.6819295795325203
+      },
+      "selected_epoch": 5,
+      "hours": 0.255
+    },
+    "xlmr-large-s3": {
+      "family": "xlmr-large",
+      "validation": {
+        "accuracy": 0.7054026503567788,
+        "macro_f1": 0.6966278765379216
+      },
+      "selected_epoch": 5,
+      "hours": 0.254
+    },
+    "xlmr-large-s4": {
+      "family": "xlmr-large",
+      "validation": {
+        "accuracy": 0.6860346585117227,
+        "macro_f1": 0.6789289669035758
+      },
+      "selected_epoch": 4,
+      "hours": 0.254
+    },
+    "xlmr-large-s5": {
+      "family": "xlmr-large",
+      "validation": {
+        "accuracy": 0.7023445463812437,
+        "macro_f1": 0.6918288372772222
+      },
+      "selected_epoch": 5,
+      "hours": 0.258
+    }
+  },
+  "skipped": [],
+  "kept_models": {
+    "xlmr-large": "xlmr-large-s3"
+  },
+  "hours": 1.295
+}

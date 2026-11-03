@@ -1,0 +1,19 @@
+{
+  "source": "mesolitica/chatgpt-explain-sentiment@93e03257d1ab80cf482306daacc160e59d5e7b22/sentiment.jsonl",
+  "source_sha256": "167b0574a35a409bcfee24b39ef2b195b69301e2ba8008fb7fa95a47eb7000c2",
+  "parsed_rows": 162895,
+  "conflicting_label_rows": 609,
+  "duplicate_rows": 12009,
+  "exact_overlap_train": 1,
+  "exact_overlap_validation": 0,
+  "exact_overlap_test": 0,
+  "label_agreement_on_train_overlap": 1.0,
+  "near_duplicate_of_validation_or_test": 0,
+  "retained_rows": 150276,
+  "class_counts": {
+    "NEGATIVE": 60215,
+    "NEUTRAL": 60272,
+    "POSITIVE": 29789
+  },
+  "retained_text_sha256": "0a2efe32571bb8269d0e9b78c20e15c27c301b55405c0eff6be771ff714bd268"
+}
