@@ -1,0 +1,136 @@
+{
+  "protocol": "sentiment-disjoint-v1",
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "test_rows": 981,
+  "model": "SiobhanGoh/malay-english-sentiment-onnx fp16 (published browser model)",
+  "selection_rule": "Highest 5-fold cross-validated macro-F1 inside the validation split; test scored once afterwards.",
+  "selected": "blend",
+  "calibration": {
+    "temperature": 1.4816044090344909,
+    "test_ece_before": 0.09106352588087778,
+    "test_ece_after": 0.031473299414375135
+  },
+  "options": {
+    "mbert": {
+      "params": {
+        "temperature": 1.4816044090344909,
+        "weight": 1.0,
+        "offsets": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "validation_cv_macro_f1": 0.7421822513956052,
+      "test": {
+        "accuracy": 0.7604485219164119,
+        "macro_f1": 0.7556863945342297
+      },
+      "test_ece": 0.031473299414375135,
+      "comparison_with_mbert": {
+        "only_reference_right": 0,
+        "only_candidate_right": 0,
+        "p_value": 1.0,
+        "accuracy_diff_95ci": [
+          0.0,
+          0.0
+        ],
+        "macro_f1_diff_95ci": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "mbert+offsets": {
+      "params": {
+        "temperature": 1.4816044090344909,
+        "weight": 1.0,
+        "offsets": [
+          0.0,
+          -0.0,
+          -0.5
+        ]
+      },
+      "validation_cv_macro_f1": 0.7442465509819284,
+      "test": {
+        "accuracy": 0.7716615698267074,
+        "macro_f1": 0.7639374791265846
+      },
+      "test_ece": 0.031473299414375135,
+      "comparison_with_mbert": {
+        "only_reference_right": 18,
+        "only_candidate_right": 29,
+        "p_value": 0.14386508844054902,
+        "accuracy_diff_95ci": [
+          -0.0020387359836900876,
+          0.024464831804281384
+        ],
+        "macro_f1_diff_95ci": [
+          -0.004792807975260349,
+          0.021262235745979234
+        ]
+      }
+    },
+    "blend": {
+      "params": {
+        "temperature": 1.4816044090344909,
+        "weight": 0.75,
+        "offsets": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "validation_cv_macro_f1": 0.7479842698929579,
+      "test": {
+        "accuracy": 0.7737003058103975,
+        "macro_f1": 0.7667621578426006
+      },
+      "test_ece": 0.059382666473171156,
+      "comparison_with_mbert": {
+        "only_reference_right": 12,
+        "only_candidate_right": 25,
+        "p_value": 0.04703102743951604,
+        "accuracy_diff_95ci": [
+          0.0010193679918450993,
+          0.025484199796126372
+        ],
+        "macro_f1_diff_95ci": [
+          -0.0010510350709586527,
+          0.02346735666865924
+        ]
+      }
+    },
+    "blend+offsets": {
+      "params": {
+        "temperature": 1.4816044090344909,
+        "weight": 1.0,
+        "offsets": [
+          0.0,
+          -0.0,
+          -0.5
+        ]
+      },
+      "validation_cv_macro_f1": 0.7363631229472385,
+      "test": {
+        "accuracy": 0.7716615698267074,
+        "macro_f1": 0.7639374791265846
+      },
+      "test_ece": 0.03147329306505266,
+      "comparison_with_mbert": {
+        "only_reference_right": 18,
+        "only_candidate_right": 29,
+        "p_value": 0.14386508844054902,
+        "accuracy_diff_95ci": [
+          -0.0020387359836900876,
+          0.024464831804281384
+        ],
+        "macro_f1_diff_95ci": [
+          -0.004792807975260349,
+          0.021262235745979234
+        ]
+      }
+    }
+  },
+  "note": "Retrospective internal evaluation on the existing corpus; not external validation."
+}

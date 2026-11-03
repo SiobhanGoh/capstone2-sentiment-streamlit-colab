@@ -26,6 +26,21 @@
     "original_macro_f1": 0.7556863945342297,
     "browser_accuracy": 0.7604485219164119,
     "browser_macro_f1": 0.7556863945342297,
-    "label_agreement_with_original": 1.0
+    "label_agreement_with_original": 1.0,
+    "scoring_accuracy": 0.7737003058103975,
+    "scoring_macro_f1": 0.7667621578426006,
+    "scoring_vs_model_p_value": 0.04703102743951604,
+    "scoring_ece": 0.059382666473171156,
+    "model_ece_raw": 0.09106352588087778,
+    "scoring_extra_correct": 13
+  },
+  "scoring": {
+    "method": "blend",
+    "temperature": 1.4816044090344909,
+    "blend_weight": 0.75,
+    "tfidf": {
+      "file": "/tfidf.json",
+      "sha256": "c82313378fbf302c8bb3e922b9e10d8250d40e4e3c53a8b778e91ec3e05b9afa"
+    }
   }
 }

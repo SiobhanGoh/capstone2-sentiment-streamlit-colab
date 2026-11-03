@@ -17,8 +17,8 @@ export function checkLabelOrder(id2label) {
   }
 }
 
-export function toResult(cleaned, logits, tokenCount) {
-  const scores = softmax(logits);
+// `scores` are the final class probabilities (calibrated and blended); defaults to a plain softmax.
+export function toResult(cleaned, logits, tokenCount, scores = softmax(logits)) {
   if (scores.length !== 3 || !scores.every(Number.isFinite)) {
     throw new Error('The model returned invalid scores.');
   }

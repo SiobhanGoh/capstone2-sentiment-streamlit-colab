@@ -3,6 +3,22 @@ import { AutoModelForSequenceClassification, AutoTokenizer, env } from '@hugging
 import release from './model_release.json';
 import { cleanText } from './lib/clean.js';
 import { BATCH_SIZE, MAX_LENGTH, checkLabelOrder, toResult } from './lib/inference.js';
+import { blendScores, prepareTfidf, tfidfProba } from './lib/blend.js';
+
+async function sha256(text) {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+// The TF-IDF half of the blend; checked against its published checksum before use.
+async function loadTfidf(spec) {
+  if (!spec?.file) return null;
+  const response = await fetch(new URL(spec.file, self.location.origin));
+  if (!response.ok) throw new Error('The text-pattern model could not be downloaded.');
+  const text = await response.text();
+  if ((await sha256(text)) !== spec.sha256) throw new Error('The text-pattern model does not match the evaluated release.');
+  return prepareTfidf(JSON.parse(text));
+}
 
 let loading = null;
 
@@ -50,14 +66,16 @@ function load() {
       ...options, dtype: spec.dtype, device: 'wasm',
     });
     checkLabelOrder(model.config.id2label);
-    return { tokenizer, model };
+    const tfidf = await loadTfidf(release.scoring?.tfidf);
+    return { tokenizer, model, tfidf };
   })();
   loading.catch(() => { loading = null; });
   return loading;
 }
 
 async function predict(id, texts) {
-  const { tokenizer, model } = await load();
+  const { tokenizer, model, tfidf } = await load();
+  const scoring = release.scoring ?? {};
   const prepared = texts.map(cleanText);
   if (prepared.some((t) => !t)) {
     throw new Error('Please enter text that remains after links and mentions are removed.');
@@ -69,7 +87,11 @@ async function predict(id, texts) {
     const inputs = tokenizer(batch, { padding: true, truncation: true, max_length: MAX_LENGTH });
     const { logits } = await model(inputs);
     const rows = logits.tolist();
-    batch.forEach((text, i) => results.push(toResult(text, rows[i], counts[i])));
+    batch.forEach((text, i) => {
+      const scores = blendScores(rows[i], tfidf ? tfidfProba(tfidf, text) : null,
+        { temperature: scoring.temperature ?? 1, weight: tfidf ? scoring.blend_weight ?? 1 : 1 });
+      results.push(toResult(text, rows[i], counts[i], scores));
+    });
     post('batch', { id, done: results.length, total: prepared.length });
   }
   return results;

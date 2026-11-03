@@ -2,7 +2,7 @@ import { cleanText } from './clean.js';
 import { LABELS } from './inference.js';
 
 export const SCORE_NOTE =
-  'Scores are uncalibrated model outputs, not the chance of being correct or a measure of emotion intensity.';
+  'Scores are adjusted on validation data so they track how often labels are right: on the test set they were off by about 6 points on average, down from 9. They are estimates, not certainties, and do not measure emotion intensity.';
 export const SAMPLE_NOTE =
   'These results describe only the analysed comments. YouTube retrieval uses top-level comments ordered by relevance, not a representative audience sample.';
 export const MAX_COMMENTS = 1000;

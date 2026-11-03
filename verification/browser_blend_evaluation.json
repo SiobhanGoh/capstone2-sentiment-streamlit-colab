@@ -1,0 +1,13 @@
+{
+  "protocol": "sentiment-disjoint-v1",
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "what": "The web app's own worker (transformers.js fp16 model, temperature, TF-IDF blend) run in headless Chrome on the frozen test split, compared with training/post_hoc.py's selected blend.",
+  "tfidf_sha256": "c82313378fbf302c8bb3e922b9e10d8250d40e4e3c53a8b778e91ec3e05b9afa",
+  "variant": "model_fp16.onnx",
+  "test_inputs": 981,
+  "browser_accuracy": 0.7737003058103975,
+  "browser_macro_f1": 0.7667621578426006,
+  "label_agreement_with_python": 1.0,
+  "max_abs_score_diff_vs_python": 0.0031509561770255434,
+  "scoring": "blend"
+}

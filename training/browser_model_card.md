@@ -27,7 +27,7 @@ Scored on the same frozen 981-input test partition as the capstone's corrected c
 
 The full-precision export reproduces the original PyTorch result exactly (same confusion matrix). Run in a browser through transformers.js, the 16-bit file gave the same label as the Python evaluation on all 981 inputs (largest score difference 0.0042).
 
-These are retrospective internal results on the existing corpus, not new external validation. Softmax scores are uncalibrated. Expect errors on sarcasm, slang, heavy code-switching and topics unlike the training data.
+These are retrospective internal results on the existing corpus, not new external validation. Raw softmax scores are overconfident (test calibration error 9.1 points); the web app divides logits by a validation-fitted temperature of 1.48 before showing them. Expect errors on sarcasm, slang, heavy code-switching and topics unlike the training data.
 
 ## Use
 

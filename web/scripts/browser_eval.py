@@ -53,16 +53,29 @@ def main():
     assert all(clean_text(t) == t for t in texts), "cleaning is not idempotent on the test text"
     browser = asyncio.run(run(args.url, texts))
     logits = np.load(Path(args.python_logits) / f"{args.variant}.logits.npy")
-    python = np.exp(logits - logits.max(1, keepdims=True))
+    # Expected scores: the release's scoring (temperature, then blend with the TF-IDF model), else a plain softmax.
+    release = json.loads((ROOT / "web/src/model_release.json").read_text())
+    scoring = release.get("scoring", {})
+    temperature = scoring.get("temperature", 1.0)
+    z = logits / temperature
+    python = np.exp(z - z.max(1, keepdims=True))
     python /= python.sum(1, keepdims=True)
+    if scoring.get("tfidf"):
+        from training.export_tfidf import reference_proba
+        tf = json.loads((ROOT / "web/public" / scoring["tfidf"]["file"].lstrip("/")).read_text(encoding="utf-8"))
+        vocab = {t: i for i, t in enumerate(tf["terms"])}
+        tfidf = np.array([reference_proba(t, vocab, tf["idf"], tf["coef"], tf["intercept"]) for t in texts])
+        w = scoring["blend_weight"]
+        python = w * python + (1 - w) * tfidf
     y = test.label_id.to_numpy()
     report = {
         "variant": args.variant,
         "test_inputs": len(texts),
         "browser_accuracy": float(accuracy_score(y, browser.argmax(1))),
         "browser_macro_f1": float(f1_score(y, browser.argmax(1), average="macro")),
-        "label_agreement_with_python_onnx": float((browser.argmax(1) == python.argmax(1)).mean()),
-        "max_abs_score_diff_vs_python_onnx": float(np.abs(browser - python).max()),
+        "label_agreement_with_python": float((browser.argmax(1) == python.argmax(1)).mean()),
+        "max_abs_score_diff_vs_python": float(np.abs(browser - python).max()),
+        "scoring": scoring.get("method", "model only"),
     }
     print(json.dumps(report, indent=2))
     if args.out:

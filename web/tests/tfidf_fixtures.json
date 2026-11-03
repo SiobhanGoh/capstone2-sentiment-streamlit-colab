@@ -1,0 +1,138 @@
+[
+{
+"text": "service dekat kedai ni bagus, staff friendly dan sangat membantu.",
+"expected": [
+0.03797490276574772,
+0.027465814199223917,
+0.9345592830350284
+]
+},
+{
+"text": "i really enjoyed this video. thank you for the clear explanation.",
+"expected": [
+0.04626673913268426,
+0.04628453989157176,
+0.907448720975744
+]
+},
+{
+"text": "saya akan hantar dokumen itu esok pagi.",
+"expected": [
+0.6622841977341107,
+0.1585714437864868,
+0.17914435847940252
+]
+},
+{
+"text": "the store opens at 10 am.",
+"expected": [
+0.49784144623797766,
+0.2799165220954732,
+0.22224203166654916
+]
+},
+{
+"text": "service lambat, order salah, memang mengecewakan.",
+"expected": [
+0.6522217179784424,
+0.2991881172586716,
+0.04859016476288598
+]
+},
+{
+"text": "i am disappointed. i waited a long time and the problem is still unresolved.",
+"expected": [
+0.7397237203175536,
+0.13572425840890168,
+0.12455202127354467
+]
+},
+{
+"text": "best gila video ni, bila nak upload part 2?",
+"expected": [
+0.3212951778799195,
+0.07609643031516984,
+0.6026083918049107
+]
+},
+{
+"text": "makanan sedap tapi service slow sikit lah",
+"expected": [
+0.8485715249026324,
+0.010712455630608367,
+0.14071601946675938
+]
+},
+{
+"text": "tak faham kenapa orang suka benda ni",
+"expected": [
+0.8095293961854578,
+0.05494612437805556,
+0.13552447943648666
+]
+},
+{
+"text": "ok je, nothing special",
+"expected": [
+0.17158474603639612,
+0.1313215069840297,
+0.6970937469795742
+]
+},
+{
+"text": "terbaik! terima kasih sebab share",
+"expected": [
+0.3864025232358885,
+0.08635466491563722,
+0.5272428118484743
+]
+},
+{
+"text": "worst experience ever, never coming back",
+"expected": [
+0.8278889285220642,
+0.030965511488003434,
+0.14114555998993245
+]
+},
+{
+"text": "best gila video ni! editing terbaik 😍",
+"expected": [
+0.2759340696539516,
+0.03264997516901739,
+0.691415955177031
+]
+},
+{
+"text": "kl traffic teruk sangat nak pergi sana",
+"expected": [
+0.8750583088013731,
+0.033734367796951166,
+0.09120732340167559
+]
+},
+{
+"text": "naïve café été — x_y z 12 345",
+"expected": [
+0.6180401463029647,
+0.2748877830516719,
+0.10707207064536346
+]
+},
+{
+"text": "ok",
+"expected": [
+0.4052149416189632,
+0.49001668292031486,
+0.10476837546072205
+]
+},
+{
+"text": "džemal i̇stanbul ss",
+"expected": [
+0.2935205871110273,
+0.43104276576851536,
+0.27543664712045735
+]
+}
+]

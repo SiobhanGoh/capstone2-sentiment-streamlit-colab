@@ -28,25 +28,22 @@ function FactCard({ front, value, back }) {
 
 export default function About() {
   const ev = release.evaluation;
-  const verified = ev.browser_accuracy != null;
   const spec = release.browser_model;
   return (
     <div className="space-y-5">
       <Card>
         <h1 className="text-3xl font-bold sm:text-4xl">About the model</h1>
         <p className="mt-3 max-w-[68ch] text-ink-soft dark:text-ube-100">
-          A multilingual BERT (bert-base-multilingual-cased) fine-tuned to label Malay, English and code-switched social text as negative, neutral or positive. It was built for a 2025–26 degree capstone and runs in your browser through ONNX, so typed and uploaded text is not sent anywhere.
+          A multilingual BERT (bert-base-multilingual-cased) fine-tuned to label Malay, English and code-switched social text as negative, neutral or positive. It was built for a 2025–26 degree capstone and runs in your browser through ONNX, so typed and uploaded text is not sent anywhere. Its scores are combined with a small word-pattern model (TF-IDF with logistic regression), three parts to one, a mix chosen on validation data only.
         </p>
       </Card>
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <FactCard front="Test accuracy, original model" value={pct(ev.original_accuracy)}
-          back={`Measured once on ${ev.test_inputs} held-out inputs after choosing settings on a separate validation split. Retrospective internal evidence, not new external validation.`} />
-        <FactCard front="Macro-F1, original model" value={ev.original_macro_f1.toFixed(3)}
-          back="The average F1 across the three classes, so the smaller neutral class counts as much as the others." />
-        <FactCard front="Browser model on the same test" value={verified ? pct(ev.browser_accuracy) : 'Pending'}
-          back={verified
-            ? `The compressed copy that runs here scored ${pct(ev.browser_accuracy)} accuracy and agreed with the original model's label on ${pct(ev.label_agreement_with_original)} of the ${ev.test_inputs} test inputs.`
-            : 'The compressed copy for browsers is checked on the same test inputs before it is published.'} />
+        <FactCard front="Test accuracy, this app" value={pct(ev.scoring_accuracy ?? ev.browser_accuracy)}
+          back={`Measured once on ${ev.test_inputs} held-out inputs after every setting was chosen on a separate validation split. The model alone scored ${pct(ev.original_accuracy)}; the combined scores got ${ev.scoring_extra_correct} more inputs right (McNemar p = ${(ev.scoring_vs_model_p_value ?? 1).toFixed(3)}). Retrospective internal evidence, not new external validation.`} />
+        <FactCard front="Macro-F1, this app" value={(ev.scoring_macro_f1 ?? ev.original_macro_f1).toFixed(3)}
+          back={`The average F1 across the three classes, so the smaller neutral class counts as much as the others. The model alone: ${ev.original_macro_f1.toFixed(3)}. That gain is within the range of chance on this test set.`} />
+        <FactCard front="Score reliability" value={`±${Math.round((ev.scoring_ece ?? 0) * 100)} pts`}
+          back={`On average, a score differs from how often that label is actually right by about ${Math.round((ev.scoring_ece ?? 0) * 100)} points, down from ${Math.round((ev.model_ece_raw ?? 0) * 100)} before adjustment (expected calibration error on the test set).`} />
         <FactCard front="Longest input read" value={`${release.max_length} tokens`}
           back="Longer text is cut to its first 128 model tokens, and the result says when that happened." />
       </div>
@@ -67,6 +64,9 @@ export default function About() {
             <div><dt className="text-ink-faint">Pinned revision</dt><dd>{spec.revision || 'Not yet published'}</dd></div>
             <div><dt className="text-ink-faint">Converted from</dt><dd>{release.source_checkpoint.repo_id} @ {release.source_checkpoint.revision.slice(0, 12)}</dd></div>
             <div><dt className="text-ink-faint">Original weights SHA-256</dt><dd>{release.source_checkpoint.model_sha256}</dd></div>
+            {release.scoring && (
+              <div><dt className="text-ink-faint">Scoring</dt><dd>Temperature {release.scoring.temperature.toFixed(3)}, blend weight {release.scoring.blend_weight} (model) / {(1 - release.scoring.blend_weight).toFixed(2)} (word patterns), word-pattern file SHA-256 {release.scoring.tfidf.sha256}</dd></div>
+            )}
           </dl>
           <a className="btn-soft mt-5" href={REPO} target="_blank" rel="noreferrer">Source and evaluation protocol</a>
         </Card>

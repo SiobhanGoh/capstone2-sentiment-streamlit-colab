@@ -76,7 +76,7 @@ The corrected checkpoint was deployed on **23 October 2026**. The app pins model
 
 Public checks confirmed a single-text prediction, retrieval and analysis of 30 real YouTube comments, and CSV/PDF downloads. This establishes feature operation, not predictive accuracy on YouTube. The app rejects empty cleaned input, excludes unusable comments, clears stale results, handles retrieval failures explicitly and supports pasted comments without an API key. Session history remains per session; reruns do not duplicate predictions.
 
-The summaries show sentiment counts and class scores. Unvalidated emotion-intensity, engagement and business-risk scores have been removed. Softmax values are labelled as uncalibrated model outputs. PDFs paginate and escape comment text; characters unsupported by the PDF font use explicit names/codes, while CSV preserves original text and neutralises spreadsheet-formula prefixes.
+The summaries show sentiment counts and class scores. Unvalidated emotion-intensity, engagement and business-risk scores have been removed. Class scores are temperature-scaled on validation and described as estimates, not certainties. PDFs paginate and escape comment text; characters unsupported by the PDF font use explicit names/codes, while CSV preserves original text and neutralises spreadsheet-formula prefixes.
 
 Live exploratory checks also found errors: the straightforward negative Malay sentence “Servis lambat dan sangat mengecewakan. 😭” was predicted Positive (model score 0.8927), and “Kedai dibuka pada pukul sembilan.” was predicted Positive (0.8190). These hand-written probes are not an accuracy benchmark, but they demonstrate that the internal test score does not establish reliable everyday-domain behaviour. Do not treat the demonstration as a production-ready general sentiment service.
 
@@ -97,6 +97,19 @@ The browser model is a 16-bit ONNX conversion of the same pinned checkpoint, pub
 | 8-bit ONNX (rejected) | 179 MB | 75.84% | 0.7490 | 89.8% |
 
 The full-precision export reproduces the PyTorch confusion matrix exactly. Running the web app's own code in headless Chrome over the same inputs gave identical labels to the Python evaluation (largest score difference 0.0042). The 8-bit file was not published because it changed about 1 in 10 labels. These checks show the conversion preserved the model; they are not new external validation, and the limitations above still apply.
+
+### Small accuracy and score-reliability gain without retraining
+
+Training larger models on a free Colab T4 did not help: three Malay and multilingual candidates, selected on validation only, all scored at or below mBERT on test (best 75.84%). Instead the app now adjusts mBERT's output with options that run on a CPU in seconds ([script](training/post_hoc.py), [record](verification/post_hoc_evaluation.json)). Four options were fixed in advance and compared by 5-fold cross-validation inside the validation split; the test split was scored once, afterwards.
+
+| Option | Validation CV macro-F1 | Test accuracy | Test macro-F1 | vs mBERT (McNemar p) |
+|---|---:|---:|---:|---:|
+| mBERT as published | 0.7422 | 76.04% | 0.7557 | — |
+| mBERT + class offsets | 0.7442 | 77.17% | 0.7639 | 0.144 |
+| **3:1 blend of mBERT and the TF-IDF baseline (selected)** | 0.7480 | **77.37%** | **0.7668** | **0.047** |
+| Blend + class offsets | 0.7364 | 77.17% | 0.7639 | 0.144 |
+
+The selected blend gets 25 test inputs right that mBERT gets wrong, and 12 the other way round: +1.33 accuracy points (95% bootstrap interval +0.10 to +2.55). That is a small gain at the edge of statistical significance, not a large one; the macro-F1 interval (−0.11 to +2.35 points) includes zero. A temperature fitted on validation also makes the scores track how often labels are right: average calibration error on test fell from 9.1 to 5.9 points for the blend (3.1 for mBERT alone). The TF-IDF weights are served as a public file (`web/public/tfidf.json`, words and bigrams with their weights; no comment text). The web app's own code reproduces the Python blend [on all 981 test inputs](verification/browser_blend_evaluation.json). Same caveat: retrospective internal evidence on the existing corpus.
 
 ## Run the Streamlit app
 

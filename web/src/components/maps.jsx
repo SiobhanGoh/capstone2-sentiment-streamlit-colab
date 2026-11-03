@@ -262,7 +262,7 @@ export default function ExploreMaps({ rows, onTheme, onPick, focus }) {
       <div className="flex flex-wrap items-center gap-3">
         <h2 className="mr-auto flex items-center gap-1 text-2xl font-semibold">
           Explore the comments
-          <InfoTip label="About these maps">These maps only rearrange the labelled comments so patterns are easier to spot. Positions come from uncalibrated model scores, and word and place matches are simple text matches.</InfoTip>
+          <InfoTip label="About these maps">These maps only rearrange the labelled comments so patterns are easier to spot. Positions come from the model's scores, and word and place matches are simple text matches.</InfoTip>
         </h2>
         <div role="tablist" aria-label="Map" className="neu-inset inline-flex max-w-full gap-1 overflow-x-auto rounded-full p-1">
           {TABS.map((t) => (
