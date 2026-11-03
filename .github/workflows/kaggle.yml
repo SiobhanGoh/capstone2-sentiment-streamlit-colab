@@ -62,7 +62,7 @@ jobs:
           if [ -n "$TOKEN" ]; then echo "KAGGLE_API_TOKEN=$TOKEN" >> "$GITHUB_ENV";
           elif [ -n "$KEY" ]; then echo "KAGGLE_KEY=$KEY" >> "$GITHUB_ENV";
           else echo "::error::Add the KAGGLE_API_TOKEN (or legacy KAGGLE_KEY) repository secret."; exit 1; fi
-          python -m pip install -q --upgrade kaggle
+          python -m pip install -q --upgrade kaggle six
           kaggle --version
       - name: Launch
         if: steps.req.outputs.action == 'launch'
