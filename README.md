@@ -88,7 +88,7 @@ Screenshot: a functional positive example, not accuracy evidence. [Deployment fi
 
 [`web/`](https://capstone2-sentiment-streamlit-colab.pages.dev/) is the new front end, live at **capstone2-sentiment-streamlit-colab.pages.dev**: a React site where the model runs **inside the visitor's browser** through ONNX and transformers.js, so typed and uploaded text never leaves their device and there is no server to fall asleep. It covers single-text analysis with all three class scores, comment analysis from pasted text, YouTube or an uploaded CSV (up to 1,000 at a time), search and filter, CSV and PDF exports, and per-browser history. Setup and free Cloudflare Pages deployment are in [web/README.md](web/README.md).
 
-The browser model is a 16-bit ONNX conversion of the same pinned checkpoint, published at [`SiobhanGoh/malay-english-sentiment-onnx`](https://huggingface.co/SiobhanGoh/malay-english-sentiment-onnx). It was checked on the same frozen 981-input test partition before release ([record](verification/browser_model_evaluation.json)):
+The first browser model (October 2026) was a 16-bit ONNX conversion of the same pinned checkpoint, published at [`SiobhanGoh/malay-english-sentiment-onnx`](https://huggingface.co/SiobhanGoh/malay-english-sentiment-onnx). It was checked on the same frozen 981-input test partition before release ([record](verification/browser_model_evaluation.json)):
 
 | Model file | Size | Test accuracy | Macro-F1 | Same label as full precision |
 |---|---:|---:|---:|---:|
@@ -98,7 +98,27 @@ The browser model is a 16-bit ONNX conversion of the same pinned checkpoint, pub
 
 The full-precision export reproduces the PyTorch confusion matrix exactly. Running the web app's own code in headless Chrome over the same inputs gave identical labels to the Python evaluation (largest score difference 0.0042). The 8-bit file was not published because it changed about 1 in 10 labels. These checks show the conversion preserved the model; they are not new external validation, and the limitations above still apply.
 
-### Small accuracy and score-reliability gain without retraining
+### Current model: distilled from XLM-RoBERTa-large on Kaggle (80.33%)
+
+Since November 2026 the web app runs a **distilled** model ([Hugging Face revision `7452008`](https://huggingface.co/SiobhanGoh/malay-english-sentiment-onnx/tree/7452008881da33359fd4600be46efbee0381531e)). Training ran on Kaggle's free T4 GPU, launched from GitHub Actions ([workflow](.github/workflows/kaggle.yml), [job](training/kaggle_job.py)); the private corpus stays a private Kaggle dataset and only numbers come back.
+
+1. **Teacher.** XLM-RoBERTa-large fine-tuned on the 4,577 training comments, three seeds. A first schedule was too short (validation macro-F1 still rising when it ended, best 0.697) and is kept in the record; the longer one reached 0.759–0.773 against mBERT's 0.742.
+2. **What did not help.** A first stage on 150,276 ChatGPT-labelled Malaysian tweets ([mesolitica/chatgpt-explain-sentiment](https://huggingface.co/datasets/mesolitica/chatgpt-explain-sentiment)) left models at mBERT's level: those labels agree poorly with this corpus. None of the tweets matched a validation or test comment, exactly or nearly.
+3. **Distillation.** Three large models are about 3.3 GB, too big for a browser, so the published mBERT checkpoint was retrained to copy the teacher's soft labels over the training comments and the tweets (used as unlabelled text). The student is the same size as before.
+
+Every choice (schedule, teacher, student, blend) was made on validation; each test score was computed once afterwards ([selection](verification/kaggle_selection.json), [student](verification/distill_selection.json), [ONNX check](verification/student_onnx_evaluation.json), [browser check](verification/browser_student_evaluation.json)).
+
+| Test, 981 inputs | Accuracy | Macro-F1 |
+|---|---:|---:|
+| Original fine-tuned mBERT | 76.04% | 0.7557 |
+| Previous web app (mBERT + TF-IDF) | 77.37% | 0.7668 |
+| Teacher: 3 × XLM-RoBERTa-large + TF-IDF (not deployable) | 79.00% | 0.7846 |
+| Distilled student alone, 16-bit | 79.61% | 0.7943 |
+| **Web app now: student + TF-IDF** | **80.33%** | **0.8001** |
+
+Against the previous web app the new one gets 78 test inputs right that it got wrong, and 49 the other way round (McNemar exact p = 0.013; 95% bootstrap interval for the accuracy gain +0.7 to +5.2 points). Against the original mBERT: 93 and 51 (p < 0.001). The published 16-bit file gives the same label as the trained PyTorch student on every validation and test input, and the web app's own code in headless Chrome reproduces the Python result on all 981 test inputs. Average calibration error on test is about 6.6 points. Caveat: validation guided many choices across this project and the test split has been scored for several experiments, so the true gain is probably somewhat smaller than measured; this remains retrospective internal evidence. Because training used mesolitica data offered for research, non-commercial use, the published model carries the same restriction.
+
+### Earlier step: small gain without retraining (77.37%)
 
 Training larger models on a free Colab T4 did not help: three Malay and multilingual candidates, selected on validation only, all scored at or below mBERT on test (best 75.84%). Instead the app now adjusts mBERT's output with options that run on a CPU in seconds ([script](training/post_hoc.py), [record](verification/post_hoc_evaluation.json)). Four options were fixed in advance and compared by 5-fold cross-validation inside the validation split; the test split was scored once, afterwards.
 

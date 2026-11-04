@@ -325,7 +325,7 @@ export async function buildReport(rows, meta) {
     meta.sampling || 'User-supplied comments; not a representative sample.',
     'Review individual comments before acting. Sarcasm, slang, code-switching and new topics may produce errors. This classifier does not assess business risk or mental health.',
     rows.some((r) => printable(r.comment) !== String(r.comment)) && 'Emoji and characters this PDF font cannot draw appear as [emoji] or a Unicode code. The CSV download keeps the original text.',
-    `Model: ${spec.repo_id} (${spec.dtype}), revision ${spec.revision || 'unreleased'}, converted from ${release.source_checkpoint.repo_id}. Internal test accuracy ${pct(release.evaluation.scoring_accuracy ?? release.evaluation.original_accuracy, 2)} on ${release.evaluation.test_inputs} inputs${release.scoring?.method === 'blend' ? ' (model blended 3:1 with a TF-IDF baseline, chosen on validation)' : ''}; retrospective, not external validation.`,
+    `Model: ${spec.repo_id} (${spec.dtype}), revision ${spec.revision || 'unreleased'}, distilled from ${release.distillation?.teacher ?? 'a larger teacher'} into ${release.source_checkpoint.repo_id}. Internal test accuracy ${pct(release.evaluation.scoring_accuracy ?? release.evaluation.original_accuracy, 2)} on ${release.evaluation.test_inputs} inputs${release.scoring?.method === 'blend' ? ` (model blended ${Math.round(release.scoring.blend_weight * 100)}:${Math.round((1 - release.scoring.blend_weight) * 100)} with a TF-IDF baseline, chosen on validation)` : ''}; retrospective, not external validation.`,
   ].filter(Boolean).map((t) => lines(t, CW - 32, 'regular', 8));
   const aboutH = 40 + about.reduce((a, l) => a + l.length * 11 + 5, 0);
   ensure(aboutH);

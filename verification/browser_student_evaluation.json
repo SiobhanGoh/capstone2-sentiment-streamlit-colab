@@ -1,0 +1,14 @@
+{
+  "protocol": "sentiment-disjoint-v1",
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "what": "The web app's own worker (transformers.js, published 16-bit student, temperature and TF-IDF blend) in headless Chrome on the frozen test split, compared with the Python blend of the same file's ONNX logits.",
+  "hf_revision": "7452008881da33359fd4600be46efbee0381531e",
+  "onnx_sha256": "5206ab1d95917b7b3acd2c68ca7d52391b52c82087325b3580ea0516fc032392",
+  "variant": "model_fp16.onnx",
+  "test_inputs": 981,
+  "browser_accuracy": 0.8032619775739042,
+  "browser_macro_f1": 0.8001012481560873,
+  "label_agreement_with_python": 1.0,
+  "max_abs_score_diff_vs_python": 0.0008220073261916427,
+  "scoring": "blend"
+}

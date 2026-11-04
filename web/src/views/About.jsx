@@ -34,16 +34,16 @@ export default function About() {
       <Card>
         <h1 className="text-3xl font-bold sm:text-4xl">About the model</h1>
         <p className="mt-3 max-w-[68ch] text-ink-soft dark:text-ube-100">
-          A multilingual BERT (bert-base-multilingual-cased) fine-tuned to label Malay, English and code-switched social text as negative, neutral or positive. It was built for a 2025–26 degree capstone and runs in your browser through ONNX, so typed and uploaded text is not sent anywhere. Its scores are combined with a small word-pattern model (TF-IDF with logistic regression), three parts to one, a mix chosen on validation data only.
+          A multilingual BERT (bert-base-multilingual-cased) that labels Malay, English and code-switched social text as negative, neutral or positive. It was built for a 2025–26 degree capstone, then taught by three much larger XLM-RoBERTa models so it keeps most of their accuracy at a size that runs in your browser. It runs through ONNX on your device, so typed and uploaded text is not sent anywhere. Its scores are combined with a small word-pattern model (TF-IDF with logistic regression), about two parts to one, a mix chosen on validation data only.
         </p>
       </Card>
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <FactCard front="Test accuracy, this app" value={pct(ev.scoring_accuracy ?? ev.browser_accuracy)}
-          back={`Measured once on ${ev.test_inputs} held-out inputs after every setting was chosen on a separate validation split. The model alone scored ${pct(ev.original_accuracy)}; the combined scores got ${ev.scoring_extra_correct} more inputs right (McNemar p = ${(ev.scoring_vs_model_p_value ?? 1).toFixed(3)}). Retrospective internal evidence, not new external validation.`} />
+          back={`Measured on ${ev.test_inputs} held-out inputs after every setting was chosen on a separate validation split. The original capstone model scored ${pct(ev.original_accuracy)} and the previous version of this app ${pct(ev.previous_app_accuracy)}; against that version this one gets ${ev.vs_previous_app.only_app_right - ev.vs_previous_app.only_previous_right} more inputs right (McNemar p = ${ev.vs_previous_app.p_value.toFixed(3)}). Retrospective internal evidence, not new external validation.`} />
         <FactCard front="Macro-F1, this app" value={(ev.scoring_macro_f1 ?? ev.original_macro_f1).toFixed(3)}
-          back={`The average F1 across the three classes, so the smaller neutral class counts as much as the others. The model alone: ${ev.original_macro_f1.toFixed(3)}. That gain is within the range of chance on this test set.`} />
+          back={`The average F1 across the three classes, so the smaller neutral class counts as much as the others. The original capstone model: ${ev.original_macro_f1.toFixed(3)}; the previous version of this app: ${ev.previous_app_macro_f1.toFixed(3)}.`} />
         <FactCard front="Score reliability" value={`±${Math.round((ev.scoring_ece ?? 0) * 100)} pts`}
-          back={`On average, a score differs from how often that label is actually right by about ${Math.round((ev.scoring_ece ?? 0) * 100)} points, down from ${Math.round((ev.model_ece_raw ?? 0) * 100)} before adjustment (expected calibration error on the test set).`} />
+          back={`On average, a score differs from how often that label is actually right by about ${Math.round((ev.scoring_ece ?? 0) * 100)} points (expected calibration error on the test set). Treat a score as a rough estimate, not a certainty.`} />
         <FactCard front="Longest input read" value={`${release.max_length} tokens`}
           back="Longer text is cut to its first 128 model tokens, and the result says when that happened." />
       </div>
@@ -62,7 +62,8 @@ export default function About() {
           <dl className="mt-3 space-y-2 break-all text-sm">
             <div><dt className="text-ink-faint">Browser model</dt><dd>{spec.repo_id} · {spec.dtype}</dd></div>
             <div><dt className="text-ink-faint">Pinned revision</dt><dd>{spec.revision || 'Not yet published'}</dd></div>
-            <div><dt className="text-ink-faint">Converted from</dt><dd>{release.source_checkpoint.repo_id} @ {release.source_checkpoint.revision.slice(0, 12)}</dd></div>
+            <div><dt className="text-ink-faint">Distilled from</dt><dd>{release.distillation?.teacher}; student initialised from the checkpoint below</dd></div>
+            <div><dt className="text-ink-faint">Original checkpoint</dt><dd>{release.source_checkpoint.repo_id} @ {release.source_checkpoint.revision.slice(0, 12)}</dd></div>
             <div><dt className="text-ink-faint">Original weights SHA-256</dt><dd>{release.source_checkpoint.model_sha256}</dd></div>
             {release.scoring && (
               <div><dt className="text-ink-faint">Scoring</dt><dd>Temperature {release.scoring.temperature.toFixed(3)}, blend weight {release.scoring.blend_weight} (model) / {(1 - release.scoring.blend_weight).toFixed(2)} (word patterns), word-pattern file SHA-256 {release.scoring.tfidf.sha256}</dd></div>
