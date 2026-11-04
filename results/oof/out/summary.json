@@ -1,0 +1,56 @@
+{
+  "experiment": "oof",
+  "protocol": "sentiment-disjoint-v1",
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "transfer_text_sha256": "0a2efe32571bb8269d0e9b78c20e15c27c301b55405c0eff6be771ff714bd268",
+  "runs": {
+    "oof-xlmr-f0": {
+      "family": "oof",
+      "validation": {
+        "accuracy": 0.7594291539245668,
+        "macro_f1": 0.7552373402720587
+      },
+      "selected_epoch": 7,
+      "hours": 0.249
+    },
+    "oof-xlmr-f1": {
+      "family": "oof",
+      "validation": {
+        "accuracy": 0.7573904179408767,
+        "macro_f1": 0.7549332128134268
+      },
+      "selected_epoch": 8,
+      "hours": 0.236
+    },
+    "oof-xlmr-f2": {
+      "family": "oof",
+      "validation": {
+        "accuracy": 0.7084607543323139,
+        "macro_f1": 0.6983145705574568
+      },
+      "selected_epoch": 3,
+      "hours": 0.233
+    },
+    "oof-xlmr-f3": {
+      "family": "oof",
+      "validation": {
+        "accuracy": 0.7594291539245668,
+        "macro_f1": 0.7578842251960957
+      },
+      "selected_epoch": 7,
+      "hours": 0.237
+    },
+    "oof-xlmr-f4": {
+      "family": "oof",
+      "validation": {
+        "accuracy": 0.7584097859327217,
+        "macro_f1": 0.7551655126589091
+      },
+      "selected_epoch": 8,
+      "hours": 0.237
+    }
+  },
+  "skipped": [],
+  "kept_models": {},
+  "hours": 1.197
+}
