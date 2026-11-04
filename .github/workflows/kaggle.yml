@@ -107,6 +107,8 @@ jobs:
           fi
           dest="results/${{ steps.req.outputs.experiment }}"
           rm -rf "publish/$dest" && mkdir -p "publish/$dest"
+          # The run summary (numbers only) also goes in the job log, readable even if the push below fails.
+          [ -f fetched/out/summary.json ] && cat fetched/out/summary.json
           cd fetched
           # Numbers only: JSON records and logits arrays. Weights and any text files are left out.
           find . \( -name '*.json' -o -name 'logits.npz' \) -not -path './out/models/*' | while read f; do
@@ -118,7 +120,7 @@ jobs:
           git config user.email "siobhangoh17@gmail.com"
           git add -A
           git commit -q -m "Kaggle ${{ steps.req.outputs.experiment }} results (${{ steps.status.outputs.state }}, code ${GITHUB_SHA::7})" || echo "nothing new"
-          git push -q origin kaggle-results
+          for i in 1 2 3 4 5; do git push -q origin kaggle-results && break; echo "push failed, retrying in $((i*20))s"; sleep $((i*20)); done
           echo "Pushed results/${{ steps.req.outputs.experiment }} to kaggle-results" >> "$GITHUB_STEP_SUMMARY"
       # Publish the checked distilled student (approved by the owner on 4 Nov 2026). Only for 'export'.
       - name: Publish student to Hugging Face
