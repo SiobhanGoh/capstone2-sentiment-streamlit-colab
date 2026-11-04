@@ -1,0 +1,7 @@
+{
+  "repo_id": "SiobhanGoh/malay-english-sentiment-onnx",
+  "revision": "7452008881da33359fd4600be46efbee0381531e",
+  "onnx_file": "onnx/model_fp16.onnx",
+  "onnx_sha256": "5206ab1d95917b7b3acd2c68ca7d52391b52c82087325b3580ea0516fc032392",
+  "student": "student-app-s1"
+}
