@@ -39,6 +39,7 @@ APP = {"base": "SiobhanGoh/CP2_Emotion_Model_New", "revision": "9bc6645ce7a8e027
        "subfolder": "corrected-2026-10"}  # the model the web app runs today
 BATCH = {"batch_size": 16, "accumulation": 2}  # effective batch 32
 TEACHER_FILE = Path(__file__).with_name("distill_teacher.json")
+FIXES_FILE = Path(__file__).with_name("train_label_fixes.json")
 # Qwen2.5-7B-Instruct further trained by mesolitica on Malaysian data (Manglish, state dialects).
 QWEN = {"base": "mesolitica/Malaysian-Qwen2.5-7B-Instruct", "revision": "83a0e145c726385502898ab7e016982eae1b684d"}
 FOLDS = 5
@@ -95,6 +96,13 @@ EXPERIMENTS = {
         {"name": f"oof-xlmr-f{k}", "family": "oof", **XLMR, "learning_rate": 2e-5, "epochs": 8, "seed": 1,
          "batch_size": 16, "accumulation": 1, "fold": k, "skip_transfer": True} for k in range(FOLDS)
     ],
+    # Cleaner training labels (training/train_label_fixes.json), same settings as large2, three seeds each.
+    # Fixed before any result: relabel only where a blind relabel and the out-of-fold model agree, or drop
+    # every flagged training row. Validation and test labels are never changed.
+    "clean": [
+        {"name": f"xlmr-{fix}-s{s}", "family": f"xlmr-{fix}", **XLMR, "learning_rate": 2e-5, "epochs": 8, "seed": s,
+         "batch_size": 16, "accumulation": 1, "label_fix": fix} for fix in ("relabel", "dropflag") for s in range(1, 4)
+    ],
     # Not training: converts the chosen student to ONNX and scores the files (training/kaggle_export.py).
     "export": [],
     "smoke": [
@@ -116,6 +124,21 @@ def find_corpus(input_dir):
         if sha256_file(path) == SOURCE_SHA256:
             return path
     raise FileNotFoundError("No CSV in the Kaggle dataset matches the frozen corpus checksum.")
+
+
+def fixed_train(train, fix, fixes):
+    """The train split with cleaner labels: 'relabel' changes agreed rows, 'dropflag' removes flagged rows."""
+    train = train[["text", "label_id"]].reset_index(drop=True)
+    if fixes["train_rows"] != len(train):
+        raise ValueError("The label fixes were made for a different train split.")
+    if fix == "relabel":
+        train = train.copy()
+        for row, label in fixes["relabel"].items():
+            train.loc[int(row), "label_id"] = int(label)
+        return train
+    if fix == "dropflag":
+        return train.drop(index=fixes["flagged"]).reset_index(drop=True)
+    raise ValueError(f"Unknown label fix {fix!r}.")
 
 
 def fold_ids(labels, folds=FOLDS, seed=42):
@@ -176,6 +199,11 @@ def run(experiment, input_dir, out_dir, work_dir="/tmp/rojak", train_fn=None, lo
     frames = {"validation": gold[gold.split == "validation"], "test": gold[gold.split == "test"],
               "train": gold[gold.split == "train"], "transfer": silver}
     folds = fold_ids(frames["train"].label_id.to_numpy())
+    fixes = None
+    if any(spec.get("label_fix") for spec in plan):
+        fixes = json.loads(FIXES_FILE.read_text())
+        if fixes["split_sha256"] != SPLIT_SHA256:
+            raise ValueError("The label fixes were made for a different split.")
     soft = None
     if any(spec.get("distill") for spec in plan):
         teacher = teacher or json.loads(TEACHER_FILE.read_text())
@@ -211,6 +239,9 @@ def run(experiment, input_dir, out_dir, work_dir="/tmp/rojak", train_fn=None, lo
             kwargs.update(train_frame=students, soft_targets=soft, train_name="gold train + extra tweets, teacher soft labels")
         elif train_rows is not None:
             kwargs.update(train_frame=train_rows, train_name="extra tweets (silver)")
+        elif spec.get("label_fix"):
+            kwargs.update(train_frame=fixed_train(frames["train"], spec["label_fix"], fixes),
+                          train_name=f"train split, label fix '{spec['label_fix']}'")
         elif "fold" in spec:
             kwargs.update(train_frame=frames["train"][folds != spec["fold"]],
                           train_name=f"train split without fold {spec['fold']} of {FOLDS}")

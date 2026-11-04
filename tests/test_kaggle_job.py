@@ -148,7 +148,7 @@ def test_kaggle_entry_embeds_this_commits_training_code(tmp_path):
     blob = re.search(r"b64decode\('([A-Za-z0-9+/=]+)'\)", script).group(1)
     names = tarfile.open(fileobj=io.BytesIO(base64.b64decode(blob)), mode="r:gz").getnames()
     assert {"training/kaggle_job.py", "training/run.py", "training/protocol.py", "training/extra_data.py"} <= set(names)
-    assert all(n.startswith("training/") and (n.endswith(".py") or n == "training/distill_teacher.json") for n in names)
+    assert all(n.startswith("training/") and (n.endswith(".py") or n in ("training/distill_teacher.json", "training/train_label_fixes.json")) for n in names)
     with pytest.raises(ValueError):
         kaggle_entry.render("nope", "x")
 
@@ -311,3 +311,13 @@ def test_length_order_puts_short_texts_first():
     texts = ["panjang sekali ayat ini", "ok", "agak sederhana"]
     order = length_order(texts)
     assert [texts[i] for i in order] == ["ok", "agak sederhana", "panjang sekali ayat ini"]
+
+
+def test_fixed_train_relabels_or_drops_only_listed_rows():
+    train = pd.DataFrame({"text": list("abcd"), "label_id": [0, 1, 2, 0]})
+    fixes = {"train_rows": 4, "relabel": {"1": 0, "3": 2}, "flagged": [1, 2]}
+    assert kaggle_job.fixed_train(train, "relabel", fixes).label_id.tolist() == [0, 0, 2, 2]
+    assert kaggle_job.fixed_train(train, "dropflag", fixes).text.tolist() == ["a", "d"]
+    assert train.label_id.tolist() == [0, 1, 2, 0]  # the original frame is untouched
+    with pytest.raises(ValueError):
+        kaggle_job.fixed_train(train.head(3), "relabel", fixes)

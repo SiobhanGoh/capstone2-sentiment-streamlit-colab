@@ -23,7 +23,7 @@ on:
         required: true
         default: smoke
         type: choice
-        options: [smoke, large, large2, silver, distill, export, llm, llm-smoke, oof]
+        options: [smoke, large, large2, silver, distill, export, llm, llm-smoke, oof, clean]
 permissions:
   contents: write
 concurrency:
@@ -46,7 +46,7 @@ jobs:
             ACTION=$(jq -r .action training/kaggle_request.json); EXPERIMENT=$(jq -r .experiment training/kaggle_request.json)
           fi
           case "$ACTION" in launch|status|collect|publish|cleanup) ;; *) echo "::error::Unknown action $ACTION"; exit 1;; esac
-          case "$EXPERIMENT" in smoke|large|large2|silver|distill|export|llm|llm-smoke|oof) ;; *) echo "::error::Unknown experiment $EXPERIMENT"; exit 1;; esac
+          case "$EXPERIMENT" in smoke|large|large2|silver|distill|export|llm|llm-smoke|oof|clean) ;; *) echo "::error::Unknown experiment $EXPERIMENT"; exit 1;; esac
           echo "action=$ACTION" >> "$GITHUB_OUTPUT"; echo "experiment=$EXPERIMENT" >> "$GITHUB_OUTPUT"
           echo "KERNEL=$KAGGLE_USERNAME/rojak-sentiment-$EXPERIMENT" >> "$GITHUB_ENV"
           echo "### $ACTION $EXPERIMENT" >> "$GITHUB_STEP_SUMMARY"
