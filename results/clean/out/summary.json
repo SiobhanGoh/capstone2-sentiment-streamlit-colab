@@ -1,0 +1,68 @@
+{
+  "experiment": "clean",
+  "protocol": "sentiment-disjoint-v1",
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "transfer_text_sha256": "0a2efe32571bb8269d0e9b78c20e15c27c301b55405c0eff6be771ff714bd268",
+  "runs": {
+    "xlmr-relabel-s1": {
+      "family": "xlmr-relabel",
+      "validation": {
+        "accuracy": 0.7502548419979612,
+        "macro_f1": 0.7449694906202057
+      },
+      "selected_epoch": 8,
+      "hours": 0.411
+    },
+    "xlmr-relabel-s2": {
+      "family": "xlmr-relabel",
+      "validation": {
+        "accuracy": 0.7543323139653415,
+        "macro_f1": 0.7489563318440323
+      },
+      "selected_epoch": 6,
+      "hours": 0.395
+    },
+    "xlmr-relabel-s3": {
+      "family": "xlmr-relabel",
+      "validation": {
+        "accuracy": 0.7380224260958206,
+        "macro_f1": 0.7357629947939331
+      },
+      "selected_epoch": 7,
+      "hours": 0.395
+    },
+    "xlmr-dropflag-s1": {
+      "family": "xlmr-dropflag",
+      "validation": {
+        "accuracy": 0.7584097859327217,
+        "macro_f1": 0.7546832135944447
+      },
+      "selected_epoch": 8,
+      "hours": 0.349
+    },
+    "xlmr-dropflag-s2": {
+      "family": "xlmr-dropflag",
+      "validation": {
+        "accuracy": 0.7594291539245668,
+        "macro_f1": 0.7554628957303793
+      },
+      "selected_epoch": 6,
+      "hours": 0.347
+    },
+    "xlmr-dropflag-s3": {
+      "family": "xlmr-dropflag",
+      "validation": {
+        "accuracy": 0.6136595310907238,
+        "macro_f1": 0.6004886126505554
+      },
+      "selected_epoch": 1,
+      "hours": 0.343
+    }
+  },
+  "skipped": [],
+  "kept_models": {
+    "xlmr-relabel": "xlmr-relabel-s2",
+    "xlmr-dropflag": "xlmr-dropflag-s2"
+  },
+  "hours": 2.244
+}
