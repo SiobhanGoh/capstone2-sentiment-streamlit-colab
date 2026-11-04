@@ -1,0 +1,107 @@
+{
+  "student": "student-app-s1",
+  "source_files": {
+    "config.json": "a6ca179753f497a4f2529508b3f7023d99c3c9beda1265cbc88a156531f6341b",
+    "model.safetensors": "3fc7164ec188a396db021c80e6ff85f52ea918698c31250a523fe968ac13aab1",
+    "special_tokens_map.json": "5d5b662e421ea9fac075174bb0688ee0d9431699900b90662acd44b2a350503a",
+    "tokenizer.json": "2559494e39f3b9db569650f75dd5cee79571a63950be9f4d52bafb453fe6e793",
+    "tokenizer_config.json": "799ee89cc1b1b0eaef8771f635a1149dec7a062e27ec5a9b604cc1e54629f893",
+    "vocab.txt": "fe0fda7c425b48c516fc8f160d594c8022a0808447475c1a7c6d6479763f310c"
+  },
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "files": {
+    "config.json": {
+      "sha256": "7b9c4f660eca00415f0e3b4e2016f92b5087df72cb03a5d2fa92e3a69b5ab4e2",
+      "bytes": 996
+    },
+    "onnx/model.onnx": {
+      "sha256": "48c50bcfc47df68c889d4c40a41c94f1f36f857e4ccd3c2d99e644f42cc8111f",
+      "bytes": 711633396
+    },
+    "onnx/model_fp16.onnx": {
+      "sha256": "5206ab1d95917b7b3acd2c68ca7d52391b52c82087325b3580ea0516fc032392",
+      "bytes": 355751278
+    },
+    "onnx/model_quantized.onnx": {
+      "sha256": "e7290ff84bdc897d01daed6fa70cf437759703d3e540428971de280e1cd6d7b4",
+      "bytes": 178613007
+    },
+    "special_tokens_map.json": {
+      "sha256": "5d5b662e421ea9fac075174bb0688ee0d9431699900b90662acd44b2a350503a",
+      "bytes": 695
+    },
+    "tokenizer.json": {
+      "sha256": "2559494e39f3b9db569650f75dd5cee79571a63950be9f4d52bafb453fe6e793",
+      "bytes": 2919615
+    },
+    "tokenizer_config.json": {
+      "sha256": "799ee89cc1b1b0eaef8771f635a1149dec7a062e27ec5a9b604cc1e54629f893",
+      "bytes": 1413
+    },
+    "vocab.txt": {
+      "sha256": "fe0fda7c425b48c516fc8f160d594c8022a0808447475c1a7c6d6479763f310c",
+      "bytes": 995526
+    }
+  },
+  "variants": {
+    "model.onnx": {
+      "sha256": "48c50bcfc47df68c889d4c40a41c94f1f36f857e4ccd3c2d99e644f42cc8111f",
+      "bytes": 711633396,
+      "validation_accuracy": 0.7910295616717635,
+      "test_accuracy": 0.7961264016309888,
+      "validation_label_agreement_with_student": 1.0,
+      "test_label_agreement_with_student": 1.0,
+      "test_max_abs_logit_diff_vs_student": 0.00568312406539917
+    },
+    "model_quantized.onnx": {
+      "sha256": "e7290ff84bdc897d01daed6fa70cf437759703d3e540428971de280e1cd6d7b4",
+      "bytes": 178613007,
+      "validation_accuracy": 0.2609582059123344,
+      "test_accuracy": 0.2599388379204893,
+      "validation_label_agreement_with_student": 0.2701325178389399,
+      "test_label_agreement_with_student": 0.26809378185524974,
+      "test_max_abs_logit_diff_vs_student": 2.5077621936798096
+    },
+    "model_fp16.onnx": {
+      "sha256": "5206ab1d95917b7b3acd2c68ca7d52391b52c82087325b3580ea0516fc032392",
+      "bytes": 355751278,
+      "validation_accuracy": 0.7910295616717635,
+      "test_accuracy": 0.7961264016309888,
+      "validation_label_agreement_with_student": 1.0,
+      "test_label_agreement_with_student": 1.0,
+      "test_max_abs_logit_diff_vs_student": 0.007351994514465332
+    }
+  },
+  "notes": {},
+  "public_sentence_check": {
+    "model.onnx": {
+      "max_abs_logit_diff": 8.344650268554688e-07,
+      "label_agreement": 1.0
+    },
+    "model_quantized.onnx": {
+      "max_abs_logit_diff": 2.3572115898132324,
+      "label_agreement": 0.08333333333333333
+    },
+    "model_fp16.onnx": {
+      "max_abs_logit_diff": 0.0006878376007080078,
+      "label_agreement": 1.0
+    }
+  },
+  "blended_test": {
+    "variant": "model_fp16.onnx",
+    "accuracy": 0.8032619775739042,
+    "macro_f1": 0.8001012481560873,
+    "ece": 0.06628726239376004,
+    "params": {
+      "temperature": 1.080890589729962,
+      "weight": 0.65,
+      "offsets": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "published_variant": "model_fp16.onnx",
+  "note": "8-bit file not used: it breaks this student (26% accuracy). The 16-bit file matches the trained student's label on every validation and test input."
+}
