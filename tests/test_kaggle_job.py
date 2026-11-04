@@ -260,3 +260,27 @@ def test_kaggle_export_converts_and_scores_the_student(corpus, monkeypatch):
     with np.load(corpus / "out" / "onnx_eval" / "model" / "logits.npz") as z:
         assert z["test"].shape == (9, 3) and z["validation"].shape == (9, 3)
     assert (corpus / "out" / "models" / "browser-model" / "onnx" / "model.onnx").exists()
+
+
+def test_fold_ids_are_stratified_and_reproducible():
+    labels = np.array([0] * 50 + [1] * 30 + [2] * 20)
+    f = kaggle_job.fold_ids(labels)
+    assert (f == kaggle_job.fold_ids(labels)).all() and set(f) == set(range(5))
+    for k in range(5):
+        assert np.bincount(labels[f == k], minlength=3).tolist() == [10, 6, 4]
+
+
+def test_oof_run_trains_without_each_fold_and_keeps_no_models(corpus):
+    calls = []
+    silver = pd.DataFrame({"text": ["a b"], "label_id": [0]})
+    seen = []
+    logits = lambda model_dir, frames: seen.append(sorted(frames)) or {k: np.zeros((len(v), 3), np.float32) for k, v in frames.items()}
+    out = corpus / "out"
+    summary = kaggle_job.run("oof", corpus / "input", out, work_dir=corpus / "work", train_fn=fake_train(calls),
+                             logits_fn=logits, silver_fn=lambda g: (silver, {"retained_text_sha256": "x"}))
+    assert len(calls) == 5 and all(sorted(s) == ["test", "train", "validation"] for s in seen)
+    sizes = [len(c[1]["train_frame"]) for c in calls]
+    assert sum(sizes) == 4 * 42 and summary["kept_models"] == {}
+    with np.load(out / "runs" / "oof-xlmr-f0" / "logits.npz") as z:
+        held = z["train_fold"] == 0
+        assert held.sum() == 42 - sizes[0] and "transfer" not in z.files

@@ -39,6 +39,9 @@ APP = {"base": "SiobhanGoh/CP2_Emotion_Model_New", "revision": "9bc6645ce7a8e027
        "subfolder": "corrected-2026-10"}  # the model the web app runs today
 BATCH = {"batch_size": 16, "accumulation": 2}  # effective batch 32
 TEACHER_FILE = Path(__file__).with_name("distill_teacher.json")
+# Qwen2.5-7B-Instruct further trained by mesolitica on Malaysian data (Manglish, state dialects).
+QWEN = {"base": "mesolitica/Malaysian-Qwen2.5-7B-Instruct", "revision": "83a0e145c726385502898ab7e016982eae1b684d"}
+FOLDS = 5
 BUDGET_HOURS = 11.0  # Kaggle stops a session at 12 hours
 
 EXPERIMENTS = {
@@ -68,6 +71,21 @@ EXPERIMENTS = {
         *[{"name": f"student-mbert-s{s}", "family": "student-mbert", **MBERT, "learning_rate": 3e-5, "epochs": 3, "seed": s,
            "distill": True, **BATCH} for s in range(1, 3)],
     ],
+    # A 7B chat model as a classifier (training/llm.py, QLoRA), two seeds. Fixed before any result.
+    "llm": [
+        {"name": f"qwen7b-s{s}", "family": "qwen7b", "kind": "llm", **QWEN, "learning_rate": 1e-4, "epochs": 3, "seed": s,
+         "batch_size": 8, "accumulation": 2} for s in (1, 2)
+    ],
+    "llm-smoke": [
+        {"name": "qwen7b-smoke", "family": "smoke", "kind": "llm", **QWEN, "learning_rate": 1e-4, "epochs": 1, "seed": 1,
+         "batch_size": 8, "accumulation": 1, "limit": 64},
+    ],
+    # Out-of-fold predictions on the train split, to find comments whose label looks wrong: each fold's
+    # model never saw the comments it predicts. Same settings as large2.
+    "oof": [
+        {"name": f"oof-xlmr-f{k}", "family": "oof", **XLMR, "learning_rate": 2e-5, "epochs": 8, "seed": 1,
+         "batch_size": 16, "accumulation": 1, "fold": k, "skip_transfer": True} for k in range(FOLDS)
+    ],
     # Not training: converts the chosen student to ONNX and scores the files (training/kaggle_export.py).
     "export": [],
     "smoke": [
@@ -89,6 +107,16 @@ def find_corpus(input_dir):
         if sha256_file(path) == SOURCE_SHA256:
             return path
     raise FileNotFoundError("No CSV in the Kaggle dataset matches the frozen corpus checksum.")
+
+
+def fold_ids(labels, folds=FOLDS, seed=42):
+    """Stratified fold number for each training row, reproducible anywhere from the labels alone."""
+    labels = np.asarray(labels)
+    rng = np.random.default_rng(seed)
+    order = np.concatenate([rng.permutation(np.where(labels == k)[0]) for k in range(3)])
+    out = np.empty(len(labels), dtype=int)
+    out[order] = np.arange(len(labels)) % folds
+    return out
 
 
 def load_teacher(input_dir, frames, teacher=None):
@@ -129,6 +157,7 @@ def run(experiment, input_dir, out_dir, work_dir="/tmp/rojak", train_fn=None, lo
     (out / "extra_data_audit.json").write_text(json.dumps(audit, indent=2))
     frames = {"validation": gold[gold.split == "validation"], "test": gold[gold.split == "test"],
               "train": gold[gold.split == "train"], "transfer": silver}
+    folds = fold_ids(frames["train"].label_id.to_numpy())
     soft = None
     if any(spec.get("distill") for spec in plan):
         teacher = teacher or json.loads(TEACHER_FILE.read_text())
@@ -164,13 +193,30 @@ def run(experiment, input_dir, out_dir, work_dir="/tmp/rojak", train_fn=None, lo
             kwargs.update(train_frame=students, soft_targets=soft, train_name="gold train + extra tweets, teacher soft labels")
         elif train_rows is not None:
             kwargs.update(train_frame=train_rows, train_name="extra tweets (silver)")
+        elif "fold" in spec:
+            kwargs.update(train_frame=frames["train"][folds != spec["fold"]],
+                          train_name=f"train split without fold {spec['fold']} of {FOLDS}")
         elif spec.get("limit"):
             kwargs.update(train_frame=frames["train"].head(spec["limit"]), train_name="train split (smoke subset)")
-        train_fn(data_dir, run_dir, **kwargs)
+        llm = spec.get("kind") == "llm"
+        if llm and train_fn is train_bert:
+            from training.llm import train_llm as fn
+        else:
+            fn = train_fn
+        fn(data_dir, run_dir, **kwargs)
         meta = json.loads((run_dir / "training.json").read_text())
         limit = spec.get("limit")
-        logits = (logits_fn or saved_logits)(run_dir / "model",
-                                              {k: (v.head(limit) if limit and k == "transfer" else v) for k, v in frames.items()})
+        wanted = {k: (v.head(limit) if limit and k == "transfer" else v) for k, v in frames.items()
+                  if not (spec.get("skip_transfer") and k == "transfer")}
+        if logits_fn is not None:
+            logits = logits_fn(run_dir / "model", wanted)
+        elif llm:
+            from training.llm import saved_logits as llm_logits
+            logits = llm_logits(run_dir / "model", wanted)
+        else:
+            logits = saved_logits(run_dir / "model", wanted)
+        if "fold" in spec:
+            logits["train_fold"] = folds
         dest = out / "runs" / spec["name"]
         dest.mkdir(parents=True, exist_ok=True)
         (dest / "training.json").write_text(json.dumps({**meta, "spec": spec}, indent=2))
@@ -179,7 +225,9 @@ def run(experiment, input_dir, out_dir, work_dir="/tmp/rojak", train_fn=None, lo
         summary["runs"][spec["name"]] = {"family": spec["family"], "validation": meta["selected_validation"],
                                          "selected_epoch": meta["selected_epoch"], "hours": round((time.time() - t0) / 3600, 3)}
         family = spec["family"]
-        if family != "stage1":
+        if family == "oof":
+            shutil.rmtree(run_dir / "model", ignore_errors=True)  # only the predictions are needed
+        elif family != "stage1":
             if family not in best or val > best[family][1]:
                 if family in best:
                     shutil.rmtree(work / "runs" / best[family][0] / "model", ignore_errors=True)
@@ -189,7 +237,11 @@ def run(experiment, input_dir, out_dir, work_dir="/tmp/rojak", train_fn=None, lo
         last_hours = (time.time() - t0) / 3600
         (out / "summary.json").write_text(json.dumps(summary, indent=2))
     for family, (name, _) in best.items():
-        save_half(work / "runs" / name / "model", out / "models" / name)
+        src = work / "runs" / name / "model"
+        if (src / "adapter_config.json").exists():  # a LoRA adapter is already small; copy it as it is
+            shutil.copytree(src, out / "models" / name)
+        else:
+            save_half(src, out / "models" / name)
     summary["kept_models"] = {f: n for f, (n, _) in best.items()}
     summary["hours"] = round((time.time() - started) / 3600, 3)
     (out / "summary.json").write_text(json.dumps(summary, indent=2))

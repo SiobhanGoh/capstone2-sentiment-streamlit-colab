@@ -36,7 +36,7 @@ def load_runs(results_dir):
     for meta_path in sorted(Path(results_dir).rglob("runs/*/training.json")):
         meta = json.loads(meta_path.read_text())
         family = meta.get("spec", {}).get("family")
-        if meta.get("status") != "complete" or family in (None, "stage1", "smoke"):
+        if meta.get("status") != "complete" or family in (None, "stage1", "smoke", "oof"):
             continue
         with np.load(meta_path.parent / "logits.npz") as z:
             runs[meta_path.parent.name] = {"family": family, "val_f1": meta["selected_validation"]["macro_f1"],
