@@ -42,6 +42,15 @@ TEACHER_FILE = Path(__file__).with_name("distill_teacher.json")
 # Qwen2.5-7B-Instruct further trained by mesolitica on Malaysian data (Manglish, state dialects).
 QWEN = {"base": "mesolitica/Malaysian-Qwen2.5-7B-Instruct", "revision": "83a0e145c726385502898ab7e016982eae1b684d"}
 FOLDS = 5
+# A 7B model predicts ~25 rows/s on a T4, so it labels a fixed random subset of the extra tweets.
+TRANSFER_SUBSET = 50000
+
+
+def transfer_subset(n_rows, n, seed=0):
+    """Sorted row positions of a fixed random subset of the extra tweets (all of them if n >= n_rows)."""
+    if n >= n_rows:
+        return np.arange(n_rows)
+    return np.sort(np.random.default_rng(seed).choice(n_rows, n, replace=False))
 BUDGET_HOURS = 11.0  # Kaggle stops a session at 12 hours
 
 EXPERIMENTS = {
@@ -74,7 +83,7 @@ EXPERIMENTS = {
     # A 7B chat model as a classifier (training/llm.py, QLoRA), two seeds. Fixed before any result.
     "llm": [
         {"name": f"qwen7b-s{s}", "family": "qwen7b", "kind": "llm", **QWEN, "learning_rate": 1e-4, "epochs": 3, "seed": s,
-         "batch_size": 8, "accumulation": 2} for s in (1, 2)
+         "batch_size": 8, "accumulation": 2, "transfer_subset": TRANSFER_SUBSET} for s in (1, 2)
     ],
     "llm-smoke": [
         {"name": "qwen7b-smoke", "family": "smoke", "kind": "llm", **QWEN, "learning_rate": 1e-4, "epochs": 1, "seed": 1,
@@ -122,19 +131,28 @@ def fold_ids(labels, folds=FOLDS, seed=42):
 def load_teacher(input_dir, frames, teacher=None):
     """Teacher probabilities on train and transfer rows: the members' temperature-scaled softmax, averaged."""
     teacher = teacher or json.loads(TEACHER_FILE.read_text())
-    out = {"train": [], "transfer": []}
+    loaded = []
     for m in teacher["members"]:
         found = sorted(Path(input_dir).rglob(f"runs/{m['run']}/logits.npz"))
         if len(found) != 1:
             raise FileNotFoundError(f"Expected one logits file for teacher member {m['run']}, found {len(found)}.")
         with np.load(found[0]) as z:
-            for k in out:
-                if len(z[k]) != len(frames[k]):
-                    raise ValueError(f"Teacher {m['run']} {k} logits do not match the {k} rows.")
-                v = z[k].astype(np.float64) / m["temperature"]
-                v = np.exp(v - v.max(1, keepdims=True))
-                out[k].append(v / v.sum(1, keepdims=True))
-    return {k: np.mean(v, axis=0) for k, v in out.items()}
+            index = z["transfer_index"] if "transfer_index" in z.files else np.arange(len(frames["transfer"]))
+            if len(z["train"]) != len(frames["train"]) or len(z["transfer"]) != len(index):
+                raise ValueError(f"Teacher {m['run']} logits do not match the train or transfer rows.")
+            loaded.append((m, z["train"], z["transfer"], index))
+    # Extra tweets every member labelled (a 7B member labels a subset).
+    common = loaded[0][3]
+    for *_, index in loaded[1:]:
+        common = np.intersect1d(common, index)
+    out = {"train": [], "transfer": []}
+    for m, train, transfer, index in loaded:
+        pick = np.searchsorted(index, common)
+        for k, v in [("train", train), ("transfer", transfer[pick])]:
+            v = v.astype(np.float64) / m["temperature"]
+            v = np.exp(v - v.max(1, keepdims=True))
+            out[k].append(v / v.sum(1, keepdims=True))
+    return {"train": np.mean(out["train"], axis=0), "transfer": np.mean(out["transfer"], axis=0), "transfer_index": common}
 
 
 def run(experiment, input_dir, out_dir, work_dir="/tmp/rojak", train_fn=None, logits_fn=None, silver_fn=None,
@@ -165,7 +183,7 @@ def run(experiment, input_dir, out_dir, work_dir="/tmp/rojak", train_fn=None, lo
             raise ValueError("The extra tweets differ from the ones the teacher saw.")
         probs = load_teacher(input_dir, frames, teacher)
         students = pd.concat([frames["train"][["text", "label_id"]],
-                              frames["transfer"][["text"]].assign(label_id=-1)], ignore_index=True)
+                              frames["transfer"].iloc[probs["transfer_index"]][["text"]].assign(label_id=-1)], ignore_index=True)
         soft = np.concatenate([probs["train"], probs["transfer"]]).astype(np.float32)
     summary = {"experiment": experiment, "protocol": manifest["protocol"], "split_sha256": SPLIT_SHA256,
                "transfer_text_sha256": audit["retained_text_sha256"], "runs": {}, "skipped": []}
@@ -206,7 +224,10 @@ def run(experiment, input_dir, out_dir, work_dir="/tmp/rojak", train_fn=None, lo
         fn(data_dir, run_dir, **kwargs)
         meta = json.loads((run_dir / "training.json").read_text())
         limit = spec.get("limit")
-        wanted = {k: (v.head(limit) if limit and k == "transfer" else v) for k, v in frames.items()
+        index = transfer_subset(len(frames["transfer"]), spec.get("transfer_subset", len(frames["transfer"])))
+        if limit:
+            index = index[:limit]
+        wanted = {k: (v.iloc[index] if k == "transfer" else v) for k, v in frames.items()
                   if not (spec.get("skip_transfer") and k == "transfer")}
         if logits_fn is not None:
             logits = logits_fn(run_dir / "model", wanted)
@@ -217,6 +238,8 @@ def run(experiment, input_dir, out_dir, work_dir="/tmp/rojak", train_fn=None, lo
             logits = saved_logits(run_dir / "model", wanted)
         if "fold" in spec:
             logits["train_fold"] = folds
+        if "transfer" in wanted and len(index) != len(frames["transfer"]):
+            logits["transfer_index"] = index
         dest = out / "runs" / spec["name"]
         dest.mkdir(parents=True, exist_ok=True)
         (dest / "training.json").write_text(json.dumps({**meta, "spec": spec}, indent=2))

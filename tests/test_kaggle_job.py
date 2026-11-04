@@ -284,3 +284,30 @@ def test_oof_run_trains_without_each_fold_and_keeps_no_models(corpus):
     with np.load(out / "runs" / "oof-xlmr-f0" / "logits.npz") as z:
         held = z["train_fold"] == 0
         assert held.sum() == 42 - sizes[0] and "transfer" not in z.files
+
+
+def test_teacher_uses_only_tweets_every_member_labelled(tmp_path):
+    frames = {"train": pd.DataFrame({"text": ["a"]}), "transfer": pd.DataFrame({"text": ["x", "y", "z"]})}
+    full = tmp_path / "input" / "large2" / "out" / "runs" / "xlmr"
+    full.mkdir(parents=True)
+    np.savez(full / "logits.npz", train=np.zeros((1, 3)), transfer=np.array([[1.0, 0, 0], [0, 1.0, 0], [0, 0, 1.0]]))
+    sub = tmp_path / "input" / "llm" / "out" / "runs" / "qwen"
+    sub.mkdir(parents=True)
+    np.savez(sub / "logits.npz", train=np.zeros((1, 3)), transfer=np.array([[1.0, 0, 0], [0, 0, 1.0]]), transfer_index=np.array([0, 2]))
+    spec = {"members": [{"run": "xlmr", "temperature": 1.0}, {"run": "qwen", "temperature": 1.0}]}
+    probs = kaggle_job.load_teacher(tmp_path / "input", frames, spec)
+    assert probs["transfer_index"].tolist() == [0, 2] and probs["transfer"].shape == (2, 3)
+    assert probs["transfer"][1].argmax() == 2  # tweet z, labelled by both members
+
+
+def test_transfer_subset_is_fixed_sorted_and_capped():
+    a = kaggle_job.transfer_subset(1000, 100)
+    assert len(a) == 100 and (np.diff(a) > 0).all() and (a == kaggle_job.transfer_subset(1000, 100)).all()
+    assert kaggle_job.transfer_subset(10, 50).tolist() == list(range(10))
+
+
+def test_length_order_puts_short_texts_first():
+    from training.llm import length_order
+    texts = ["panjang sekali ayat ini", "ok", "agak sederhana"]
+    order = length_order(texts)
+    assert [texts[i] for i in order] == ["ok", "agak sederhana", "panjang sekali ayat ini"]

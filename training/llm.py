@@ -34,14 +34,24 @@ def load_base(base, revision, torch):
     return tokenizer, model
 
 
+def length_order(texts):
+    """Row order by text length, so each batch pads little; the results are put back in input order."""
+    return np.argsort([len(t) for t in texts], kind="stable")
+
+
 def predict_logits(model, tokenizer, frame, torch, batch_size=32):
     model.eval()
+    if len(frame) == 0:
+        return np.zeros((0, 3), dtype=np.float32)
+    order = length_order(frame.text.tolist())
     out = []
     with torch.inference_mode():
-        for inputs, _ in token_batches(frame, tokenizer, batch_size, torch, "cuda"):
+        for inputs, _ in token_batches(frame.iloc[order], tokenizer, batch_size, torch, "cuda"):
             with torch.autocast(device_type="cuda", dtype=torch.float16):
                 out.append(model(**inputs).logits.float().cpu().numpy())
-    return np.concatenate(out) if out else np.zeros((0, 3), dtype=np.float32)
+    logits = np.empty((len(frame), 3), dtype=np.float32)
+    logits[order] = np.concatenate(out)
+    return logits
 
 
 def train_llm(data_dir, output_dir, *, base, revision, epochs=3, batch_size=8, accumulation=2, learning_rate=1e-4,
