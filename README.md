@@ -118,6 +118,13 @@ Every choice (schedule, teacher, student, blend) was made on validation; each te
 
 Against the previous web app the new one gets 78 test inputs right that it got wrong, and 49 the other way round (McNemar exact p = 0.013; 95% bootstrap interval for the accuracy gain +0.7 to +5.2 points). Against the original mBERT: 93 and 51 (p < 0.001). The published 16-bit file gives the same label as the trained PyTorch student on every validation and test input, and the web app's own code in headless Chrome reproduces the Python result on all 981 test inputs. Average calibration error on test is about 6.6 points. Caveat: validation guided many choices across this project and the test split has been scored for several experiments, so the true gain is probably somewhat smaller than measured; this remains retrospective internal evidence. Because training used mesolitica data offered for research, non-commercial use, the published model carries the same restriction.
 
+### Tried after that, and not adopted
+
+Both were judged on validation only; neither beat the current approach, so the test split was not used again ([record](verification/further_experiments.json)).
+
+- **A 7B chat model as the classifier.** [Malaysian-Qwen2.5-7B-Instruct](https://huggingface.co/mesolitica/Malaysian-Qwen2.5-7B-Instruct) fine-tuned with QLoRA on the free T4 reached a validation macro-F1 of about 0.68 (XLM-RoBERTa-large: 0.76–0.77). It memorised the training comments rather than generalising, and adding it to the XLM-R ensemble lowered validation scores.
+- **Cleaner training labels.** Cross-validated predictions flagged 782 training comments (17%) as possibly mislabelled. A blind relabel of those plus 50 controls (by Claude, an AI, shown only the text) agreed with the original labels on just 56% of the controls, leaning towards Neutral: a different labelling convention rather than clear errors. Retraining with 329 labels changed where the relabel and the held-out model agreed, or with the flagged rows removed, lowered validation macro-F1 (0.753 and 0.761 against 0.781), so the original labels stay.
+
 ### Earlier step: small gain without retraining (77.37%)
 
 Training larger models on a free Colab T4 did not help: three Malay and multilingual candidates, selected on validation only, all scored at or below mBERT on test (best 75.84%). Instead the app now adjusts mBERT's output with options that run on a CPU in seconds ([script](training/post_hoc.py), [record](verification/post_hoc_evaluation.json)). Four options were fixed in advance and compared by 5-fold cross-validation inside the validation split; the test split was scored once, afterwards.

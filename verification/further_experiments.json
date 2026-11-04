@@ -1,0 +1,85 @@
+{
+  "protocol": "sentiment-disjoint-v1",
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "test_scored": false,
+  "note": "Validation only. Neither experiment beat the deployed approach, so the test split was not looked at again.",
+  "llm_7b": {
+    "model": "mesolitica/Malaysian-Qwen2.5-7B-Instruct@83a0e14, QLoRA (4-bit base, LoRA r=16), 3 epochs",
+    "runs": {
+      "qwen7b-s1": {
+        "validation_macro_f1": 0.6717700517966122,
+        "validation_accuracy": 0.6778797145769623,
+        "selected_epoch": 3
+      },
+      "qwen7b-s2": {
+        "validation_macro_f1": 0.6818197165715681,
+        "validation_accuracy": 0.6890927624872579,
+        "selected_epoch": 3
+      }
+    },
+    "seed_ensemble_cv_macro_f1": 0.6911,
+    "added_to_xlmr_large_ensemble_cv_macro_f1": 0.7753,
+    "xlmr_large_ensemble_cv_macro_f1": 0.781,
+    "finding": "Training loss fell to about 0.35 while validation macro-F1 stalled near 0.68: it memorised rather than generalised in this setup."
+  },
+  "label_cleaning": {
+    "flagging": {
+      "out_of_fold_accuracy": 0.7391304347826086,
+      "flagged_rows": 782,
+      "flagged_share": 0.1708542713567839,
+      "flagged_by_label": {
+        "NEGATIVE": 232,
+        "NEUTRAL": 241,
+        "POSITIVE": 309
+      }
+    },
+    "blind_relabel": {
+      "by": "Claude (an AI), shown only the text",
+      "rows": 832,
+      "flagged": 782,
+      "controls": 50,
+      "agreement_with_original_on_controls": 0.56,
+      "agreement_with_original_on_flagged": 0.257,
+      "finding": "The relabels lean towards Neutral far more than the corpus does: a different labelling convention, not clear evidence of label errors."
+    },
+    "relabelled_rows_where_ai_and_model_agree": 329,
+    "runs": {
+      "xlmr-relabel-s1": {
+        "validation_macro_f1": 0.7449694906202057,
+        "validation_accuracy": 0.7502548419979612,
+        "selected_epoch": 8
+      },
+      "xlmr-relabel-s2": {
+        "validation_macro_f1": 0.7489563318440323,
+        "validation_accuracy": 0.7543323139653415,
+        "selected_epoch": 6
+      },
+      "xlmr-relabel-s3": {
+        "validation_macro_f1": 0.7357629947939331,
+        "validation_accuracy": 0.7380224260958206,
+        "selected_epoch": 7
+      },
+      "xlmr-dropflag-s1": {
+        "validation_macro_f1": 0.7546832135944447,
+        "validation_accuracy": 0.7584097859327217,
+        "selected_epoch": 8
+      },
+      "xlmr-dropflag-s2": {
+        "validation_macro_f1": 0.7554628957303793,
+        "validation_accuracy": 0.7594291539245668,
+        "selected_epoch": 6
+      },
+      "xlmr-dropflag-s3": {
+        "validation_macro_f1": 0.6004886126505554,
+        "validation_accuracy": 0.6136595310907238,
+        "selected_epoch": 1
+      }
+    },
+    "seed_ensemble_cv_macro_f1": {
+      "original_labels": 0.781,
+      "relabel": 0.7532,
+      "drop_flagged": 0.7611
+    },
+    "finding": "Both cleaned training sets were worse on validation, so the original labels are kept."
+  }
+}
