@@ -1,0 +1,7 @@
+{
+  "commit": "d9bc37ead4680c85ee79cac19cd294ed63147ece",
+  "experiment": "llm-smoke",
+  "torch": "2.11.0+cu130",
+  "transformers": "4.57.6",
+  "gpu": "Tesla T4"
+}

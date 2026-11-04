@@ -1,0 +1,45 @@
+[{"stream_name":"stderr","time":22.36993924,"data":"ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.\n"}
+,{"stream_name":"stderr","time":22.369976847,"data":"gradio-client 2.7.2 requires huggingface-hub\u003c3.0,\u003e=1.16.0, but you have huggingface-hub 0.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":22.369990998,"data":"gradio 6.30.0 requires huggingface-hub\u003c3.0,\u003e=1.16.0, but you have huggingface-hub 0.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":22.369995668,"data":"gradio 6.30.0 requires pillow\u003c13.0,\u003e=8.0, but you have pillow 13.0.0 which is incompatible.\n"}
+,{"stream_name":"stderr","time":22.369999783,"data":"diffusers 0.42.0 requires huggingface-hub\u003c3.0,\u003e=1.32.0, but you have huggingface-hub 0.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":69.77146658,"data":"WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n"}
+,{"stream_name":"stderr","time":69.771504266,"data":"I0000 00:00:1793771567.708545      37 cudart_stub.cc:31] Could not find cuda drivers on your machine, GPU will not be used.\n"}
+,{"stream_name":"stderr","time":1915.490860974,"data":"\rFetching 4 files:   0%|          | 0/4 [00:00\u003c?, ?it/s]\rFetching 4 files:  25%|██▌       | 1/4 [30:28\u003c1:31:26, 1828.79s/it]\rFetching 4 files: 100%|██████████| 4/4 [30:28\u003c00:00, 457.20s/it]   \n"}
+,{"stream_name":"stderr","time":1954.596685899,"data":"\rLoading checkpoint shards:   0%|          | 0/4 [00:00\u003c?, ?it/s]\rLoading checkpoint shards:  25%|██▌       | 1/4 [00:10\u003c00:31, 10.35s/it]\rLoading checkpoint shards:  50%|█████     | 2/4 [00:21\u003c00:21, 10.63s/it]\rLoading checkpoint shards:  75%|███████▌  | 3/4 [00:38\u003c00:13, 13.69s/it]\rLoading checkpoint shards: 100%|██████████| 4/4 [00:38\u003c00:00,  9.63s/it]\n"}
+,{"stream_name":"stderr","time":1954.597569368,"data":"Some weights of Qwen2ForSequenceClassification were not initialized from the model checkpoint at mesolitica/Malaysian-Qwen2.5-7B-Instruct and are newly initialized: ['score.weight']\n"}
+,{"stream_name":"stderr","time":1954.597596284,"data":"You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.\n"}
+,{"stream_name":"stderr","time":1955.283311542,"data":"`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.\n"}
+,{"stream_name":"stdout","time":2050.749585416,"data":"{\"epoch\": 1, \"train_loss\": 4.460043400526047, \"seconds\": 94.29, \"val_macro_f1\": 0.2301622836901036}\n"}
+,{"stream_name":"stderr","time":2070.278148381,"data":"\rLoading checkpoint shards:   0%|          | 0/4 [00:00\u003c?, ?it/s]\rLoading checkpoint shards:  25%|██▌       | 1/4 [00:05\u003c00:16,  5.52s/it]\rLoading checkpoint shards:  50%|█████     | 2/4 [00:12\u003c00:12,  6.12s/it]\rLoading checkpoint shards:  75%|███████▌  | 3/4 [00:17\u003c00:05,  5.89s/it]\rLoading checkpoint shards: 100%|██████████| 4/4 [00:17\u003c00:00,  4.42s/it]\n"}
+,{"stream_name":"stderr","time":2070.278955552,"data":"Some weights of Qwen2ForSequenceClassification were not initialized from the model checkpoint at mesolitica/Malaysian-Qwen2.5-7B-Instruct and are newly initialized: ['score.weight']\n"}
+,{"stream_name":"stderr","time":2070.278975794,"data":"You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.\n"}
+,{"stream_name":"stdout","time":2597.493991913,"data":"{\n"}
+,{"stream_name":"stdout","time":2597.494029566,"data":" \"experiment\": \"llm-smoke\",\n"}
+,{"stream_name":"stdout","time":2597.494035033,"data":" \"protocol\": \"sentiment-disjoint-v1\",\n"}
+,{"stream_name":"stdout","time":2597.494049295,"data":" \"split_sha256\": \"692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929\",\n"}
+,{"stream_name":"stdout","time":2597.494053593,"data":" \"transfer_text_sha256\": \"0a2efe32571bb8269d0e9b78c20e15c27c301b55405c0eff6be771ff714bd268\",\n"}
+,{"stream_name":"stdout","time":2597.49405712,"data":" \"runs\": {\n"}
+,{"stream_name":"stdout","time":2597.494060293,"data":"  \"qwen7b-smoke\": {\n"}
+,{"stream_name":"stdout","time":2597.494064187,"data":"   \"family\": \"smoke\",\n"}
+,{"stream_name":"stdout","time":2597.494068002,"data":"   \"validation\": {\n"}
+,{"stream_name":"stdout","time":2597.494072393,"data":"    \"accuracy\": 0.2691131498470948,\n"}
+,{"stream_name":"stdout","time":2597.494076108,"data":"    \"macro_f1\": 0.2301622836901036\n"}
+,{"stream_name":"stdout","time":2597.494079463,"data":"   },\n"}
+,{"stream_name":"stdout","time":2597.494082346,"data":"   \"selected_epoch\": 1,\n"}
+,{"stream_name":"stdout","time":2597.494085677,"data":"   \"hours\": 0.707\n"}
+,{"stream_name":"stdout","time":2597.494089323,"data":"  }\n"}
+,{"stream_name":"stdout","time":2597.494092468,"data":" },\n"}
+,{"stream_name":"stdout","time":2597.494096099,"data":" \"skipped\": [],\n"}
+,{"stream_name":"stdout","time":2597.49409935,"data":" \"kept_models\": {\n"}
+,{"stream_name":"stdout","time":2597.49410254,"data":"  \"smoke\": \"qwen7b-smoke\"\n"}
+,{"stream_name":"stdout","time":2597.494106118,"data":" },\n"}
+,{"stream_name":"stdout","time":2597.494109098,"data":" \"hours\": 0.712\n"}
+,{"stream_name":"stdout","time":2597.49411224,"data":"}\n"}
+,{"stream_name":"stderr","time":2604.02308883,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":2604.023117119,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":2604.246089153,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":2604.246111339,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":2604.992504933,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":2605.626210089,"data":"[NbConvertApp] Writing 326359 bytes to __results__.html\n"}
+]

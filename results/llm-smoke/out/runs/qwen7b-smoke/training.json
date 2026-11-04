@@ -1,0 +1,98 @@
+{
+  "base_model": "mesolitica/Malaysian-Qwen2.5-7B-Instruct",
+  "base_revision": "83a0e145c726385502898ab7e016982eae1b684d",
+  "method": "QLoRA (4-bit NF4 base, LoRA adapters)",
+  "lora_r": 16,
+  "train_data": "train split (smoke subset)",
+  "train_rows": 64,
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "epochs": 1,
+  "batch_size": 8,
+  "accumulation": 1,
+  "learning_rate": 0.0001,
+  "max_length": 128,
+  "seed": 1,
+  "device": "cuda",
+  "selection": "validation macro-F1 only",
+  "trainable_parameters": 40380928,
+  "status": "complete",
+  "selected_epoch": 1,
+  "selected_validation": {
+    "accuracy": 0.2691131498470948,
+    "macro_f1": 0.2301622836901036
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 4.460043400526047,
+      "validation": {
+        "accuracy": 0.2691131498470948,
+        "macro_f1": 0.2301622836901036,
+        "confusion_matrix": [
+          [
+            190,
+            161,
+            48
+          ],
+          [
+            180,
+            40,
+            36
+          ],
+          [
+            204,
+            88,
+            34
+          ]
+        ],
+        "classification_report": {
+          "NEGATIVE": {
+            "precision": 0.3310104529616725,
+            "recall": 0.47619047619047616,
+            "f1-score": 0.39054470709146966,
+            "support": 399.0
+          },
+          "NEUTRAL": {
+            "precision": 0.1384083044982699,
+            "recall": 0.15625,
+            "f1-score": 0.14678899082568808,
+            "support": 256.0
+          },
+          "POSITIVE": {
+            "precision": 0.288135593220339,
+            "recall": 0.10429447852760736,
+            "f1-score": 0.15315315315315314,
+            "support": 326.0
+          },
+          "accuracy": 0.2691131498470948,
+          "macro avg": {
+            "precision": 0.2525181168934271,
+            "recall": 0.24557831823936116,
+            "f1-score": 0.2301622836901036,
+            "support": 981.0
+          },
+          "weighted avg": {
+            "precision": 0.2665014271896992,
+            "recall": 0.2691131498470948,
+            "f1-score": 0.2480461240660555,
+            "support": 981.0
+          }
+        }
+      },
+      "seconds": 94.29
+    }
+  ],
+  "spec": {
+    "name": "qwen7b-smoke",
+    "family": "smoke",
+    "kind": "llm",
+    "base": "mesolitica/Malaysian-Qwen2.5-7B-Instruct",
+    "revision": "83a0e145c726385502898ab7e016982eae1b684d",
+    "learning_rate": 0.0001,
+    "epochs": 1,
+    "seed": 1,
+    "batch_size": 8,
+    "accumulation": 1,
+    "limit": 64
+  }
+}
