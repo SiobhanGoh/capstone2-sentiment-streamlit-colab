@@ -13,11 +13,11 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: launch, status, collect or publish
+        description: launch, status, collect, publish or cleanup
         required: true
         default: status
         type: choice
-        options: [launch, status, collect, publish]
+        options: [launch, status, collect, publish, cleanup]
       experiment:
         description: Experiment in training/kaggle_job.py
         required: true
@@ -45,7 +45,7 @@ jobs:
           if [ -z "$ACTION" ]; then
             ACTION=$(jq -r .action training/kaggle_request.json); EXPERIMENT=$(jq -r .experiment training/kaggle_request.json)
           fi
-          case "$ACTION" in launch|status|collect|publish) ;; *) echo "::error::Unknown action $ACTION"; exit 1;; esac
+          case "$ACTION" in launch|status|collect|publish|cleanup) ;; *) echo "::error::Unknown action $ACTION"; exit 1;; esac
           case "$EXPERIMENT" in smoke|large|large2|silver|distill|export) ;; *) echo "::error::Unknown experiment $EXPERIMENT"; exit 1;; esac
           echo "action=$ACTION" >> "$GITHUB_OUTPUT"; echo "experiment=$EXPERIMENT" >> "$GITHUB_OUTPUT"
           echo "KERNEL=$KAGGLE_USERNAME/rojak-sentiment-$EXPERIMENT" >> "$GITHUB_ENV"
@@ -144,4 +144,6 @@ jobs:
           git commit -q -m "Record the published distilled student revision"
           git pull -q --rebase origin browser-model && git push -q origin HEAD:browser-model
           cat verification/student_model_release.json >> "$GITHUB_STEP_SUMMARY"
-
+      - name: Delete the temporary transfer branch
+        if: steps.req.outputs.action == 'cleanup'
+        run: git push origin --delete model-transfer || echo "No transfer branch to delete."

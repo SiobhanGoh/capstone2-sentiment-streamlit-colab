@@ -4,6 +4,7 @@ import release from './model_release.json';
 import { cleanText } from './lib/clean.js';
 import { BATCH_SIZE, MAX_LENGTH, checkLabelOrder, toResult } from './lib/inference.js';
 import { blendScores, prepareTfidf, tfidfProba } from './lib/blend.js';
+import { pruneOldModels } from './lib/cache.js';
 
 async function sha256(text) {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
@@ -67,6 +68,8 @@ function load() {
     });
     checkLabelOrder(model.config.id2label);
     const tfidf = await loadTfidf(release.scoring?.tfidf);
+    // Free the space taken by earlier model versions; never block or fail loading over it.
+    if (!localPath) pruneOldModels(spec.repo_id, spec.revision).catch(() => {});
     return { tokenizer, model, tfidf };
   })();
   loading.catch(() => { loading = null; });
