@@ -1,0 +1,47 @@
+[{"stream_name":"stderr","time":23.452254193,"data":"ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.\n"}
+,{"stream_name":"stderr","time":23.452349914,"data":"gradio-client 2.7.2 requires huggingface-hub\u003c3.0,\u003e=1.16.0, but you have huggingface-hub 0.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":23.452355174,"data":"gradio 6.30.0 requires huggingface-hub\u003c3.0,\u003e=1.16.0, but you have huggingface-hub 0.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":23.452357938,"data":"gradio 6.30.0 requires pillow\u003c13.0,\u003e=8.0, but you have pillow 13.0.0 which is incompatible.\n"}
+,{"stream_name":"stderr","time":23.452360475,"data":"diffusers 0.42.0 requires huggingface-hub\u003c3.0,\u003e=1.32.0, but you have huggingface-hub 0.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":48.420548639,"data":"The tokenizer you are loading from '/kaggle/input/notebooks/siobhangoh/rojak-sentiment-distill/out/models/student-app-s1' with an incorrect regex pattern: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503/discussions/84#69121093e8b480e709447d5e. This will lead to incorrect tokenization. You should set the `fix_mistral_regex=True` flag when loading this tokenizer to fix this issue.\n"}
+,{"stream_name":"stderr","time":64.757239808,"data":"WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n"}
+,{"stream_name":"stderr","time":64.757264843,"data":"I0000 00:00:1793755585.092442      37 cudart_stub.cc:31] Could not find cuda drivers on your machine, GPU will not be used.\n"}
+,{"stream_name":"stderr","time":138.027356376,"data":"/usr/local/lib/python3.13/dist-packages/transformers/modeling_attn_mask_utils.py:196: TracerWarning: torch.tensor results are registered as constants in the trace. You can safely ignore this warning if you use this function to create tensors out of constant variables that would be the same every time you call this function. In any other case, this might cause the trace to be incorrect.\n"}
+,{"stream_name":"stderr","time":138.027393831,"data":"  inverted_mask = torch.tensor(1.0, dtype=dtype) - expanded_mask\n"}
+,{"stream_name":"stderr","time":150.608200988,"data":"WARNING:root:Please consider to run pre-processing before quantization. Refer to example: https://github.com/microsoft/onnxruntime-inference-examples/blob/main/quantization/image_classification/cpu/ReadMe.md \n"}
+,{"stream_name":"stdout","time":586.741347393,"data":"{\n"}
+,{"stream_name":"stdout","time":586.741442293,"data":" \"model.onnx\": {\n"}
+,{"stream_name":"stdout","time":586.74144788,"data":"  \"sha256\": \"48c50bcfc47df68c889d4c40a41c94f1f36f857e4ccd3c2d99e644f42cc8111f\",\n"}
+,{"stream_name":"stdout","time":586.741452361,"data":"  \"bytes\": 711633396,\n"}
+,{"stream_name":"stdout","time":586.741456593,"data":"  \"validation_accuracy\": 0.7910295616717635,\n"}
+,{"stream_name":"stdout","time":586.741460825,"data":"  \"test_accuracy\": 0.7961264016309888,\n"}
+,{"stream_name":"stdout","time":586.741464943,"data":"  \"validation_label_agreement_with_student\": 1.0,\n"}
+,{"stream_name":"stdout","time":586.741468921,"data":"  \"test_label_agreement_with_student\": 1.0,\n"}
+,{"stream_name":"stdout","time":586.741473138,"data":"  \"test_max_abs_logit_diff_vs_student\": 0.00568312406539917\n"}
+,{"stream_name":"stdout","time":586.741476995,"data":" },\n"}
+,{"stream_name":"stdout","time":586.741480665,"data":" \"model_quantized.onnx\": {\n"}
+,{"stream_name":"stdout","time":586.741485355,"data":"  \"sha256\": \"e7290ff84bdc897d01daed6fa70cf437759703d3e540428971de280e1cd6d7b4\",\n"}
+,{"stream_name":"stdout","time":586.741489911,"data":"  \"bytes\": 178613007,\n"}
+,{"stream_name":"stdout","time":586.741506269,"data":"  \"validation_accuracy\": 0.2609582059123344,\n"}
+,{"stream_name":"stdout","time":586.741510664,"data":"  \"test_accuracy\": 0.2599388379204893,\n"}
+,{"stream_name":"stdout","time":586.741513891,"data":"  \"validation_label_agreement_with_student\": 0.2701325178389399,\n"}
+,{"stream_name":"stdout","time":586.741517263,"data":"  \"test_label_agreement_with_student\": 0.26809378185524974,\n"}
+,{"stream_name":"stdout","time":586.741520988,"data":"  \"test_max_abs_logit_diff_vs_student\": 2.5077621936798096\n"}
+,{"stream_name":"stdout","time":586.741524425,"data":" },\n"}
+,{"stream_name":"stdout","time":586.74152744,"data":" \"model_fp16.onnx\": {\n"}
+,{"stream_name":"stdout","time":586.74153049,"data":"  \"sha256\": \"5206ab1d95917b7b3acd2c68ca7d52391b52c82087325b3580ea0516fc032392\",\n"}
+,{"stream_name":"stdout","time":586.741533568,"data":"  \"bytes\": 355751278,\n"}
+,{"stream_name":"stdout","time":586.741537075,"data":"  \"validation_accuracy\": 0.7910295616717635,\n"}
+,{"stream_name":"stdout","time":586.741540482,"data":"  \"test_accuracy\": 0.7961264016309888,\n"}
+,{"stream_name":"stdout","time":586.741544003,"data":"  \"validation_label_agreement_with_student\": 1.0,\n"}
+,{"stream_name":"stdout","time":586.741547349,"data":"  \"test_label_agreement_with_student\": 1.0,\n"}
+,{"stream_name":"stdout","time":586.741550653,"data":"  \"test_max_abs_logit_diff_vs_student\": 0.007351994514465332\n"}
+,{"stream_name":"stdout","time":586.741554227,"data":" }\n"}
+,{"stream_name":"stdout","time":586.741557443,"data":"}\n"}
+,{"stream_name":"stderr","time":594.90842291,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":594.908457457,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":595.167706377,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":595.167750584,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":595.980681437,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":596.47445677,"data":"[NbConvertApp] Writing 320337 bytes to __results__.html\n"}
+]

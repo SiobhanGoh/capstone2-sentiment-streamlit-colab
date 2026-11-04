@@ -1,0 +1,7 @@
+{
+  "commit": "6724c3d82594de4c72afe1591e7d94c910e5bf33",
+  "experiment": "export",
+  "torch": "2.11.0+cu130",
+  "transformers": "4.57.6",
+  "gpu": "Tesla T4"
+}
