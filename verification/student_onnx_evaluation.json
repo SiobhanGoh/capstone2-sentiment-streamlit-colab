@@ -100,8 +100,40 @@
         0.0,
         0.0
       ]
+    },
+    "vs_previous_web_app": {
+      "previous_accuracy": 0.7737003058103975,
+      "only_previous_right": 49,
+      "only_new_right": 78,
+      "p_value": 0.01266068452047716,
+      "accuracy_diff_95ci": [
+        0.007135575942915473,
+        0.051987767584097844
+      ],
+      "macro_f1_diff_95ci": [
+        0.01054909480879379,
+        0.056506790469148055
+      ]
+    },
+    "vs_original_mbert": {
+      "original_accuracy": 0.7604485219164119,
+      "only_original_right": 51,
+      "only_new_right": 93,
+      "p_value": 0.0005851398425063647,
+      "accuracy_diff_95ci": [
+        0.019367991845056,
+        0.06625891946992868
+      ],
+      "macro_f1_diff_95ci": [
+        0.020032884133756937,
+        0.06908413095058531
+      ]
     }
   },
   "published_variant": "model_fp16.onnx",
-  "note": "8-bit file not used: it breaks this student (26% accuracy). The 16-bit file matches the trained student's label on every validation and test input."
+  "note": "8-bit file not used: it breaks this student (26% accuracy). The 16-bit file matches the trained student's label on every validation and test input.",
+  "student_alone_test": {
+    "accuracy": 0.7961264016309888,
+    "macro_f1": 0.7942312482189783
+  }
 }

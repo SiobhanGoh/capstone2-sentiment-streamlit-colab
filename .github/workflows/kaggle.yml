@@ -13,11 +13,11 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: launch, status or collect
+        description: launch, status, collect or publish
         required: true
         default: status
         type: choice
-        options: [launch, status, collect]
+        options: [launch, status, collect, publish]
       experiment:
         description: Experiment in training/kaggle_job.py
         required: true
@@ -45,7 +45,7 @@ jobs:
           if [ -z "$ACTION" ]; then
             ACTION=$(jq -r .action training/kaggle_request.json); EXPERIMENT=$(jq -r .experiment training/kaggle_request.json)
           fi
-          case "$ACTION" in launch|status|collect) ;; *) echo "::error::Unknown action $ACTION"; exit 1;; esac
+          case "$ACTION" in launch|status|collect|publish) ;; *) echo "::error::Unknown action $ACTION"; exit 1;; esac
           case "$EXPERIMENT" in smoke|large|large2|silver|distill|export) ;; *) echo "::error::Unknown experiment $EXPERIMENT"; exit 1;; esac
           echo "action=$ACTION" >> "$GITHUB_OUTPUT"; echo "experiment=$EXPERIMENT" >> "$GITHUB_OUTPUT"
           echo "KERNEL=$KAGGLE_USERNAME/rojak-sentiment-$EXPERIMENT" >> "$GITHUB_ENV"
@@ -120,3 +120,28 @@ jobs:
           git commit -q -m "Kaggle ${{ steps.req.outputs.experiment }} results (${{ steps.status.outputs.state }}, code ${GITHUB_SHA::7})" || echo "nothing new"
           git push -q origin kaggle-results
           echo "Pushed results/${{ steps.req.outputs.experiment }} to kaggle-results" >> "$GITHUB_STEP_SUMMARY"
+      # Publish the checked distilled student (approved by the owner on 4 Nov 2026). Only for 'export'.
+      - name: Publish student to Hugging Face
+        if: steps.req.outputs.action == 'publish' && steps.req.outputs.experiment == 'export' && steps.status.outputs.state == 'complete'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          test -n "$HF_TOKEN" || { echo "::error::Add the HF_TOKEN repository secret."; exit 1; }
+          python -m pip install -q huggingface_hub==0.36.2
+          mkdir -p fetched staging
+          kaggle kernels output "$KERNEL" -p fetched --force
+          python training/publish_student.py --model fetched/out/models/browser-model --repo SiobhanGoh/malay-english-sentiment-onnx \
+            --evaluation verification/student_onnx_evaluation.json --staging staging --out verification/student_model_release.json
+          # Temporary hand-off for the in-browser check: split below GitHub's 100 MB limit; deleted after the check.
+          mkdir transfer && cp -r staging/. transfer/ && cd transfer
+          for f in $(find . -name '*.onnx'); do split -b 95m -d -a 2 "$f" "$f.part"; rm "$f"; done
+          git init -q -b model-transfer && git config user.name "SiobhanGoh" && git config user.email "siobhangoh17@gmail.com"
+          git add -A && git commit -q -m "Temporary student model transfer (${GITHUB_SHA::7})"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" model-transfer
+          cd ..
+          git config user.name "SiobhanGoh" && git config user.email "siobhangoh17@gmail.com"
+          git add verification/student_model_release.json
+          git commit -q -m "Record the published distilled student revision"
+          git pull -q --rebase origin browser-model && git push -q origin HEAD:browser-model
+          cat verification/student_model_release.json >> "$GITHUB_STEP_SUMMARY"
+
