@@ -1,0 +1,7 @@
+{
+  "commit": "934174cd4226675be0f1afb163f29e198d8b0c6e",
+  "experiment": "llm",
+  "torch": "2.11.0+cu130",
+  "transformers": "4.57.6",
+  "gpu": "Tesla T4"
+}

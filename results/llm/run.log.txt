@@ -1,0 +1,131 @@
+[{"stream_name":"stderr","time":23.911540652,"data":"ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.\n"}
+,{"stream_name":"stderr","time":23.911590294,"data":"gradio-client 2.7.2 requires huggingface-hub\u003c3.0,\u003e=1.16.0, but you have huggingface-hub 0.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":23.911597593,"data":"gradio 6.30.0 requires huggingface-hub\u003c3.0,\u003e=1.16.0, but you have huggingface-hub 0.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":23.911602353,"data":"gradio 6.30.0 requires pillow\u003c13.0,\u003e=8.0, but you have pillow 13.0.0 which is incompatible.\n"}
+,{"stream_name":"stderr","time":23.911606423,"data":"diffusers 0.42.0 requires huggingface-hub\u003c3.0,\u003e=1.32.0, but you have huggingface-hub 0.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":73.902412727,"data":"WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n"}
+,{"stream_name":"stderr","time":73.902447624,"data":"I0000 00:00:1793775578.685529      37 cudart_stub.cc:31] Could not find cuda drivers on your machine, GPU will not be used.\n"}
+,{"stream_name":"stderr","time":142.956312065,"data":"\rFetching 4 files:   0%|          | 0/4 [00:00\u003c?, ?it/s]\rFetching 4 files:  25%|██▌       | 1/4 [00:58\u003c02:54, 58.22s/it]\rFetching 4 files: 100%|██████████| 4/4 [00:58\u003c00:00, 14.56s/it]\n"}
+,{"stream_name":"stderr","time":189.79443706,"data":"\rLoading checkpoint shards:   0%|          | 0/4 [00:00\u003c?, ?it/s]\rLoading checkpoint shards:  25%|██▌       | 1/4 [00:08\u003c00:24,  8.30s/it]\rLoading checkpoint shards:  50%|█████     | 2/4 [00:17\u003c00:17,  8.90s/it]\rLoading checkpoint shards:  75%|███████▌  | 3/4 [00:32\u003c00:11, 11.55s/it]\rLoading checkpoint shards: 100%|██████████| 4/4 [00:32\u003c00:00,  8.08s/it]\n"}
+,{"stream_name":"stderr","time":189.795380019,"data":"Some weights of Qwen2ForSequenceClassification were not initialized from the model checkpoint at mesolitica/Malaysian-Qwen2.5-7B-Instruct and are newly initialized: ['score.weight']\n"}
+,{"stream_name":"stderr","time":189.795394174,"data":"You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.\n"}
+,{"stream_name":"stderr","time":190.52871056,"data":"`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.\n"}
+,{"stream_name":"stdout","time":294.741958749,"data":"{\"epoch\": 1, \"batch\": 50, \"batches\": 573, \"loss\": 4.0948, \"elapsed_seconds\": 104}\n"}
+,{"stream_name":"stdout","time":395.074936247,"data":"{\"epoch\": 1, \"batch\": 100, \"batches\": 573, \"loss\": 3.2857, \"elapsed_seconds\": 205}\n"}
+,{"stream_name":"stdout","time":495.964384362,"data":"{\"epoch\": 1, \"batch\": 150, \"batches\": 573, \"loss\": 2.7245, \"elapsed_seconds\": 305}\n"}
+,{"stream_name":"stdout","time":593.500043251,"data":"{\"epoch\": 1, \"batch\": 200, \"batches\": 573, \"loss\": 2.3697, \"elapsed_seconds\": 403}\n"}
+,{"stream_name":"stdout","time":697.171017642,"data":"{\"epoch\": 1, \"batch\": 250, \"batches\": 573, \"loss\": 2.1131, \"elapsed_seconds\": 507}\n"}
+,{"stream_name":"stdout","time":799.219637908,"data":"{\"epoch\": 1, \"batch\": 300, \"batches\": 573, \"loss\": 1.9493, \"elapsed_seconds\": 609}\n"}
+,{"stream_name":"stdout","time":904.601914376,"data":"{\"epoch\": 1, \"batch\": 350, \"batches\": 573, \"loss\": 1.8453, \"elapsed_seconds\": 714}\n"}
+,{"stream_name":"stdout","time":1007.239766935,"data":"{\"epoch\": 1, \"batch\": 400, \"batches\": 573, \"loss\": 1.7453, \"elapsed_seconds\": 817}\n"}
+,{"stream_name":"stdout","time":1112.651433932,"data":"{\"epoch\": 1, \"batch\": 450, \"batches\": 573, \"loss\": 1.6593, \"elapsed_seconds\": 922}\n"}
+,{"stream_name":"stdout","time":1215.670794053,"data":"{\"epoch\": 1, \"batch\": 500, \"batches\": 573, \"loss\": 1.584, \"elapsed_seconds\": 1025}\n"}
+,{"stream_name":"stdout","time":1317.780652271,"data":"{\"epoch\": 1, \"batch\": 550, \"batches\": 573, \"loss\": 1.5308, \"elapsed_seconds\": 1127}\n"}
+,{"stream_name":"stdout","time":1410.431518173,"data":"{\"epoch\": 1, \"train_loss\": 1.5123255641880669, \"seconds\": 1219.3, \"val_macro_f1\": 0.43063447753094647}\n"}
+,{"stream_name":"stdout","time":1516.808490943,"data":"{\"epoch\": 2, \"batch\": 50, \"batches\": 573, \"loss\": 0.7898, \"elapsed_seconds\": 106}\n"}
+,{"stream_name":"stdout","time":1618.177785632,"data":"{\"epoch\": 2, \"batch\": 100, \"batches\": 573, \"loss\": 0.7933, \"elapsed_seconds\": 208}\n"}
+,{"stream_name":"stdout","time":1718.46113976,"data":"{\"epoch\": 2, \"batch\": 150, \"batches\": 573, \"loss\": 0.7939, \"elapsed_seconds\": 308}\n"}
+,{"stream_name":"stdout","time":1816.436378247,"data":"{\"epoch\": 2, \"batch\": 200, \"batches\": 573, \"loss\": 0.7901, \"elapsed_seconds\": 406}\n"}
+,{"stream_name":"stdout","time":1916.887837096,"data":"{\"epoch\": 2, \"batch\": 250, \"batches\": 573, \"loss\": 0.799, \"elapsed_seconds\": 506}\n"}
+,{"stream_name":"stdout","time":2019.00826486,"data":"{\"epoch\": 2, \"batch\": 300, \"batches\": 573, \"loss\": 0.7754, \"elapsed_seconds\": 609}\n"}
+,{"stream_name":"stdout","time":2120.846017675,"data":"{\"epoch\": 2, \"batch\": 350, \"batches\": 573, \"loss\": 0.7593, \"elapsed_seconds\": 710}\n"}
+,{"stream_name":"stdout","time":2224.521081469,"data":"{\"epoch\": 2, \"batch\": 400, \"batches\": 573, \"loss\": 0.7501, \"elapsed_seconds\": 814}\n"}
+,{"stream_name":"stdout","time":2329.088635393,"data":"{\"epoch\": 2, \"batch\": 450, \"batches\": 573, \"loss\": 0.7464, \"elapsed_seconds\": 919}\n"}
+,{"stream_name":"stdout","time":2430.147294252,"data":"{\"epoch\": 2, \"batch\": 500, \"batches\": 573, \"loss\": 0.7376, \"elapsed_seconds\": 1020}\n"}
+,{"stream_name":"stdout","time":2534.281512281,"data":"{\"epoch\": 2, \"batch\": 550, \"batches\": 573, \"loss\": 0.7364, \"elapsed_seconds\": 1124}\n"}
+,{"stream_name":"stdout","time":2626.953150543,"data":"{\"epoch\": 2, \"train_loss\": 0.729953781082368, \"seconds\": 1215.96, \"val_macro_f1\": 0.6435668745771417}\n"}
+,{"stream_name":"stdout","time":2728.993446365,"data":"{\"epoch\": 3, \"batch\": 50, \"batches\": 573, \"loss\": 0.4166, \"elapsed_seconds\": 102}\n"}
+,{"stream_name":"stdout","time":2831.049901132,"data":"{\"epoch\": 3, \"batch\": 100, \"batches\": 573, \"loss\": 0.431, \"elapsed_seconds\": 204}\n"}
+,{"stream_name":"stdout","time":2933.421353456,"data":"{\"epoch\": 3, \"batch\": 150, \"batches\": 573, \"loss\": 0.4205, \"elapsed_seconds\": 306}\n"}
+,{"stream_name":"stdout","time":3042.849793031,"data":"{\"epoch\": 3, \"batch\": 200, \"batches\": 573, \"loss\": 0.3941, \"elapsed_seconds\": 416}\n"}
+,{"stream_name":"stdout","time":3142.065856176,"data":"{\"epoch\": 3, \"batch\": 250, \"batches\": 573, \"loss\": 0.3877, \"elapsed_seconds\": 515}\n"}
+,{"stream_name":"stdout","time":3243.689767818,"data":"{\"epoch\": 3, \"batch\": 300, \"batches\": 573, \"loss\": 0.3677, \"elapsed_seconds\": 617}\n"}
+,{"stream_name":"stdout","time":3347.056553129,"data":"{\"epoch\": 3, \"batch\": 350, \"batches\": 573, \"loss\": 0.3669, \"elapsed_seconds\": 720}\n"}
+,{"stream_name":"stdout","time":3448.096141457,"data":"{\"epoch\": 3, \"batch\": 400, \"batches\": 573, \"loss\": 0.3574, \"elapsed_seconds\": 821}\n"}
+,{"stream_name":"stdout","time":3547.782283676,"data":"{\"epoch\": 3, \"batch\": 450, \"batches\": 573, \"loss\": 0.3528, \"elapsed_seconds\": 921}\n"}
+,{"stream_name":"stdout","time":3652.065003685,"data":"{\"epoch\": 3, \"batch\": 500, \"batches\": 573, \"loss\": 0.3507, \"elapsed_seconds\": 1025}\n"}
+,{"stream_name":"stdout","time":3754.788056661,"data":"{\"epoch\": 3, \"batch\": 550, \"batches\": 573, \"loss\": 0.3491, \"elapsed_seconds\": 1128}\n"}
+,{"stream_name":"stdout","time":3845.511567064,"data":"{\"epoch\": 3, \"train_loss\": 0.34940117730695697, \"seconds\": 1218.03, \"val_macro_f1\": 0.6717700517966122}\n"}
+,{"stream_name":"stderr","time":3864.322092452,"data":"\rLoading checkpoint shards:   0%|          | 0/4 [00:00\u003c?, ?it/s]\rLoading checkpoint shards:  25%|██▌       | 1/4 [00:05\u003c00:16,  5.62s/it]\rLoading checkpoint shards:  50%|█████     | 2/4 [00:12\u003c00:12,  6.16s/it]\rLoading checkpoint shards:  75%|███████▌  | 3/4 [00:17\u003c00:05,  5.93s/it]\rLoading checkpoint shards: 100%|██████████| 4/4 [00:17\u003c00:00,  4.45s/it]\n"}
+,{"stream_name":"stderr","time":3864.323004034,"data":"Some weights of Qwen2ForSequenceClassification were not initialized from the model checkpoint at mesolitica/Malaysian-Qwen2.5-7B-Instruct and are newly initialized: ['score.weight']\n"}
+,{"stream_name":"stderr","time":3864.32301826,"data":"You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.\n"}
+,{"stream_name":"stderr","time":5815.312366293,"data":"\rLoading checkpoint shards:   0%|          | 0/4 [00:00\u003c?, ?it/s]\rLoading checkpoint shards:  25%|██▌       | 1/4 [00:05\u003c00:15,  5.19s/it]\rLoading checkpoint shards:  50%|█████     | 2/4 [00:11\u003c00:11,  5.94s/it]\rLoading checkpoint shards:  75%|███████▌  | 3/4 [00:17\u003c00:05,  5.81s/it]\rLoading checkpoint shards: 100%|██████████| 4/4 [00:17\u003c00:00,  4.33s/it]\n"}
+,{"stream_name":"stderr","time":5815.313395683,"data":"Some weights of Qwen2ForSequenceClassification were not initialized from the model checkpoint at mesolitica/Malaysian-Qwen2.5-7B-Instruct and are newly initialized: ['score.weight']\n"}
+,{"stream_name":"stderr","time":5815.313416629,"data":"You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.\n"}
+,{"stream_name":"stdout","time":5918.393179051,"data":"{\"epoch\": 1, \"batch\": 50, \"batches\": 573, \"loss\": 3.526, \"elapsed_seconds\": 102}\n"}
+,{"stream_name":"stdout","time":6017.92137297,"data":"{\"epoch\": 1, \"batch\": 100, \"batches\": 573, \"loss\": 2.9558, \"elapsed_seconds\": 201}\n"}
+,{"stream_name":"stdout","time":6124.655652732,"data":"{\"epoch\": 1, \"batch\": 150, \"batches\": 573, \"loss\": 2.4301, \"elapsed_seconds\": 308}\n"}
+,{"stream_name":"stdout","time":6227.736840707,"data":"{\"epoch\": 1, \"batch\": 200, \"batches\": 573, \"loss\": 2.1143, \"elapsed_seconds\": 411}\n"}
+,{"stream_name":"stdout","time":6330.794699905,"data":"{\"epoch\": 1, \"batch\": 250, \"batches\": 573, \"loss\": 1.9698, \"elapsed_seconds\": 514}\n"}
+,{"stream_name":"stdout","time":6434.660398039,"data":"{\"epoch\": 1, \"batch\": 300, \"batches\": 573, \"loss\": 1.8134, \"elapsed_seconds\": 618}\n"}
+,{"stream_name":"stdout","time":6534.15429784,"data":"{\"epoch\": 1, \"batch\": 350, \"batches\": 573, \"loss\": 1.6893, \"elapsed_seconds\": 718}\n"}
+,{"stream_name":"stdout","time":6637.609286621,"data":"{\"epoch\": 1, \"batch\": 400, \"batches\": 573, \"loss\": 1.5999, \"elapsed_seconds\": 821}\n"}
+,{"stream_name":"stdout","time":6737.494301861,"data":"{\"epoch\": 1, \"batch\": 450, \"batches\": 573, \"loss\": 1.5287, \"elapsed_seconds\": 921}\n"}
+,{"stream_name":"stdout","time":6842.756083548,"data":"{\"epoch\": 1, \"batch\": 500, \"batches\": 573, \"loss\": 1.4684, \"elapsed_seconds\": 1026}\n"}
+,{"stream_name":"stdout","time":6943.860035124,"data":"{\"epoch\": 1, \"batch\": 550, \"batches\": 573, \"loss\": 1.4139, \"elapsed_seconds\": 1127}\n"}
+,{"stream_name":"stdout","time":7034.356765398,"data":"{\"epoch\": 1, \"train_loss\": 1.3902590578035119, \"seconds\": 1217.31, \"val_macro_f1\": 0.5777352944840249}\n"}
+,{"stream_name":"stdout","time":7134.609295067,"data":"{\"epoch\": 2, \"batch\": 50, \"batches\": 573, \"loss\": 0.8292, \"elapsed_seconds\": 100}\n"}
+,{"stream_name":"stdout","time":7236.485405774,"data":"{\"epoch\": 2, \"batch\": 100, \"batches\": 573, \"loss\": 0.7955, \"elapsed_seconds\": 202}\n"}
+,{"stream_name":"stdout","time":7336.384439404,"data":"{\"epoch\": 2, \"batch\": 150, \"batches\": 573, \"loss\": 0.7742, \"elapsed_seconds\": 302}\n"}
+,{"stream_name":"stdout","time":7432.317488046,"data":"{\"epoch\": 2, \"batch\": 200, \"batches\": 573, \"loss\": 0.7982, \"elapsed_seconds\": 398}\n"}
+,{"stream_name":"stdout","time":7539.419446559,"data":"{\"epoch\": 2, \"batch\": 250, \"batches\": 573, \"loss\": 0.7849, \"elapsed_seconds\": 505}\n"}
+,{"stream_name":"stdout","time":7641.180971361,"data":"{\"epoch\": 2, \"batch\": 300, \"batches\": 573, \"loss\": 0.78, \"elapsed_seconds\": 607}\n"}
+,{"stream_name":"stdout","time":7745.899204366,"data":"{\"epoch\": 2, \"batch\": 350, \"batches\": 573, \"loss\": 0.7734, \"elapsed_seconds\": 712}\n"}
+,{"stream_name":"stdout","time":7849.263092737,"data":"{\"epoch\": 2, \"batch\": 400, \"batches\": 573, \"loss\": 0.7686, \"elapsed_seconds\": 815}\n"}
+,{"stream_name":"stdout","time":7953.460876918,"data":"{\"epoch\": 2, \"batch\": 450, \"batches\": 573, \"loss\": 0.7633, \"elapsed_seconds\": 919}\n"}
+,{"stream_name":"stdout","time":8056.190561864,"data":"{\"epoch\": 2, \"batch\": 500, \"batches\": 573, \"loss\": 0.7573, \"elapsed_seconds\": 1022}\n"}
+,{"stream_name":"stdout","time":8157.47388494,"data":"{\"epoch\": 2, \"batch\": 550, \"batches\": 573, \"loss\": 0.7466, \"elapsed_seconds\": 1123}\n"}
+,{"stream_name":"stdout","time":8250.214609748,"data":"{\"epoch\": 2, \"train_loss\": 0.748681410210919, \"seconds\": 1215.28, \"val_macro_f1\": 0.6803602165777268}\n"}
+,{"stream_name":"stdout","time":8350.927808581,"data":"{\"epoch\": 3, \"batch\": 50, \"batches\": 573, \"loss\": 0.4927, \"elapsed_seconds\": 101}\n"}
+,{"stream_name":"stdout","time":8454.693216653,"data":"{\"epoch\": 3, \"batch\": 100, \"batches\": 573, \"loss\": 0.4369, \"elapsed_seconds\": 204}\n"}
+,{"stream_name":"stdout","time":8556.27093893,"data":"{\"epoch\": 3, \"batch\": 150, \"batches\": 573, \"loss\": 0.4178, \"elapsed_seconds\": 306}\n"}
+,{"stream_name":"stdout","time":8659.292179897,"data":"{\"epoch\": 3, \"batch\": 200, \"batches\": 573, \"loss\": 0.4115, \"elapsed_seconds\": 409}\n"}
+,{"stream_name":"stdout","time":8759.77644742,"data":"{\"epoch\": 3, \"batch\": 250, \"batches\": 573, \"loss\": 0.4189, \"elapsed_seconds\": 510}\n"}
+,{"stream_name":"stdout","time":8859.514524282,"data":"{\"epoch\": 3, \"batch\": 300, \"batches\": 573, \"loss\": 0.4094, \"elapsed_seconds\": 609}\n"}
+,{"stream_name":"stdout","time":8960.792031189,"data":"{\"epoch\": 3, \"batch\": 350, \"batches\": 573, \"loss\": 0.4013, \"elapsed_seconds\": 711}\n"}
+,{"stream_name":"stdout","time":9061.288248915,"data":"{\"epoch\": 3, \"batch\": 400, \"batches\": 573, \"loss\": 0.3919, \"elapsed_seconds\": 811}\n"}
+,{"stream_name":"stdout","time":9167.011529211,"data":"{\"epoch\": 3, \"batch\": 450, \"batches\": 573, \"loss\": 0.3842, \"elapsed_seconds\": 917}\n"}
+,{"stream_name":"stdout","time":9271.304540238,"data":"{\"epoch\": 3, \"batch\": 500, \"batches\": 573, \"loss\": 0.3831, \"elapsed_seconds\": 1021}\n"}
+,{"stream_name":"stdout","time":9372.057260006,"data":"{\"epoch\": 3, \"batch\": 550, \"batches\": 573, \"loss\": 0.3768, \"elapsed_seconds\": 1122}\n"}
+,{"stream_name":"stdout","time":9463.768060368,"data":"{\"epoch\": 3, \"train_loss\": 0.3742144675421517, \"seconds\": 1212.94, \"val_macro_f1\": 0.6818197165715681}\n"}
+,{"stream_name":"stderr","time":9482.245047318,"data":"\rLoading checkpoint shards:   0%|          | 0/4 [00:00\u003c?, ?it/s]\rLoading checkpoint shards:  25%|██▌       | 1/4 [00:05\u003c00:15,  5.30s/it]\rLoading checkpoint shards:  50%|█████     | 2/4 [00:11\u003c00:12,  6.02s/it]\rLoading checkpoint shards:  75%|███████▌  | 3/4 [00:17\u003c00:05,  5.89s/it]\rLoading checkpoint shards: 100%|██████████| 4/4 [00:17\u003c00:00,  4.39s/it]\n"}
+,{"stream_name":"stderr","time":9482.246211533,"data":"Some weights of Qwen2ForSequenceClassification were not initialized from the model checkpoint at mesolitica/Malaysian-Qwen2.5-7B-Instruct and are newly initialized: ['score.weight']\n"}
+,{"stream_name":"stderr","time":9482.246228955,"data":"You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.\n"}
+,{"stream_name":"stdout","time":11413.614255218,"data":"{\n"}
+,{"stream_name":"stdout","time":11413.614292726,"data":" \"experiment\": \"llm\",\n"}
+,{"stream_name":"stdout","time":11413.614297154,"data":" \"protocol\": \"sentiment-disjoint-v1\",\n"}
+,{"stream_name":"stdout","time":11413.614300516,"data":" \"split_sha256\": \"692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929\",\n"}
+,{"stream_name":"stdout","time":11413.614303956,"data":" \"transfer_text_sha256\": \"0a2efe32571bb8269d0e9b78c20e15c27c301b55405c0eff6be771ff714bd268\",\n"}
+,{"stream_name":"stdout","time":11413.614307099,"data":" \"runs\": {\n"}
+,{"stream_name":"stdout","time":11413.614309928,"data":"  \"qwen7b-s1\": {\n"}
+,{"stream_name":"stdout","time":11413.614312781,"data":"   \"family\": \"qwen7b\",\n"}
+,{"stream_name":"stdout","time":11413.614315949,"data":"   \"validation\": {\n"}
+,{"stream_name":"stdout","time":11413.614318808,"data":"    \"accuracy\": 0.6778797145769623,\n"}
+,{"stream_name":"stdout","time":11413.61432171,"data":"    \"macro_f1\": 0.6717700517966122\n"}
+,{"stream_name":"stdout","time":11413.614324551,"data":"   },\n"}
+,{"stream_name":"stdout","time":11413.614327386,"data":"   \"selected_epoch\": 3,\n"}
+,{"stream_name":"stdout","time":11413.614330211,"data":"   \"hours\": 1.596\n"}
+,{"stream_name":"stdout","time":11413.614333035,"data":"  },\n"}
+,{"stream_name":"stdout","time":11413.614335773,"data":"  \"qwen7b-s2\": {\n"}
+,{"stream_name":"stdout","time":11413.614338645,"data":"   \"family\": \"qwen7b\",\n"}
+,{"stream_name":"stdout","time":11413.614341453,"data":"   \"validation\": {\n"}
+,{"stream_name":"stdout","time":11413.614344351,"data":"    \"accuracy\": 0.6890927624872579,\n"}
+,{"stream_name":"stdout","time":11413.614347201,"data":"    \"macro_f1\": 0.6818197165715681\n"}
+,{"stream_name":"stdout","time":11413.614350026,"data":"   },\n"}
+,{"stream_name":"stdout","time":11413.614352734,"data":"   \"selected_epoch\": 3,\n"}
+,{"stream_name":"stdout","time":11413.614355569,"data":"   \"hours\": 1.56\n"}
+,{"stream_name":"stdout","time":11413.614358384,"data":"  }\n"}
+,{"stream_name":"stdout","time":11413.6143611,"data":" },\n"}
+,{"stream_name":"stdout","time":11413.614363828,"data":" \"skipped\": [],\n"}
+,{"stream_name":"stdout","time":11413.61436661,"data":" \"kept_models\": {\n"}
+,{"stream_name":"stdout","time":11413.614369377,"data":"  \"qwen7b\": \"qwen7b-s2\"\n"}
+,{"stream_name":"stdout","time":11413.614372254,"data":" },\n"}
+,{"stream_name":"stdout","time":11413.614374981,"data":" \"hours\": 3.16\n"}
+,{"stream_name":"stdout","time":11413.614377829,"data":"}\n"}
+,{"stream_name":"stderr","time":11421.324241753,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":11421.324310934,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":11421.614621047,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":11421.614643768,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":11422.461318308,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":11423.166963404,"data":"[NbConvertApp] Writing 327065 bytes to __results__.html\n"}
+]

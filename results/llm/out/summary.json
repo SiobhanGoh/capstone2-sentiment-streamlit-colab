@@ -1,0 +1,31 @@
+{
+  "experiment": "llm",
+  "protocol": "sentiment-disjoint-v1",
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "transfer_text_sha256": "0a2efe32571bb8269d0e9b78c20e15c27c301b55405c0eff6be771ff714bd268",
+  "runs": {
+    "qwen7b-s1": {
+      "family": "qwen7b",
+      "validation": {
+        "accuracy": 0.6778797145769623,
+        "macro_f1": 0.6717700517966122
+      },
+      "selected_epoch": 3,
+      "hours": 1.596
+    },
+    "qwen7b-s2": {
+      "family": "qwen7b",
+      "validation": {
+        "accuracy": 0.6890927624872579,
+        "macro_f1": 0.6818197165715681
+      },
+      "selected_epoch": 3,
+      "hours": 1.56
+    }
+  },
+  "skipped": [],
+  "kept_models": {
+    "qwen7b": "qwen7b-s2"
+  },
+  "hours": 3.16
+}
