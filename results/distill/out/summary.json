@@ -1,0 +1,50 @@
+{
+  "experiment": "distill",
+  "protocol": "sentiment-disjoint-v1",
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "transfer_text_sha256": "0a2efe32571bb8269d0e9b78c20e15c27c301b55405c0eff6be771ff714bd268",
+  "runs": {
+    "student-app-s1": {
+      "family": "student-app",
+      "validation": {
+        "accuracy": 0.7910295616717635,
+        "macro_f1": 0.7896898590854402
+      },
+      "selected_epoch": 3,
+      "hours": 1.035
+    },
+    "student-app-s2": {
+      "family": "student-app",
+      "validation": {
+        "accuracy": 0.7910295616717635,
+        "macro_f1": 0.7871440105344633
+      },
+      "selected_epoch": 2,
+      "hours": 1.034
+    },
+    "student-mbert-s1": {
+      "family": "student-mbert",
+      "validation": {
+        "accuracy": 0.7971457696228338,
+        "macro_f1": 0.7946039938043449
+      },
+      "selected_epoch": 3,
+      "hours": 1.039
+    },
+    "student-mbert-s2": {
+      "family": "student-mbert",
+      "validation": {
+        "accuracy": 0.7879714576962283,
+        "macro_f1": 0.7864184787661529
+      },
+      "selected_epoch": 3,
+      "hours": 1.035
+    }
+  },
+  "skipped": [],
+  "kept_models": {
+    "student-app": "student-app-s1",
+    "student-mbert": "student-mbert-s1"
+  },
+  "hours": 4.148
+}

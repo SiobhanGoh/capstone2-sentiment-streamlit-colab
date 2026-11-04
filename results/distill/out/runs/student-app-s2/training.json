@@ -1,0 +1,220 @@
+{
+  "base_model": "SiobhanGoh/CP2_Emotion_Model_New",
+  "base_revision": "9bc6645ce7a8e02761c59386ffd16969bed1bc55",
+  "init_from": null,
+  "train_data": "gold train + extra tweets, teacher soft labels",
+  "train_rows": 154853,
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "epochs": 3,
+  "batch_size": 16,
+  "accumulation": 2,
+  "learning_rate": 2e-05,
+  "max_length": 128,
+  "seed": 2,
+  "device": "cuda",
+  "selection": "validation macro-F1 only",
+  "subfolder": "corrected-2026-10",
+  "distillation": {
+    "alpha": 0.5,
+    "temperature": 2.0,
+    "rows_without_gold_label": 150276
+  },
+  "status": "complete",
+  "selected_epoch": 2,
+  "selected_validation": {
+    "accuracy": 0.7910295616717635,
+    "macro_f1": 0.7871440105344633
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.058324720320051364,
+      "validation": {
+        "accuracy": 0.7747196738022426,
+        "macro_f1": 0.7712602460982527,
+        "confusion_matrix": [
+          [
+            338,
+            21,
+            40
+          ],
+          [
+            36,
+            195,
+            25
+          ],
+          [
+            68,
+            31,
+            227
+          ]
+        ],
+        "classification_report": {
+          "NEGATIVE": {
+            "precision": 0.7647058823529411,
+            "recall": 0.8471177944862155,
+            "f1-score": 0.8038049940546967,
+            "support": 399.0
+          },
+          "NEUTRAL": {
+            "precision": 0.7894736842105263,
+            "recall": 0.76171875,
+            "f1-score": 0.7753479125248509,
+            "support": 256.0
+          },
+          "POSITIVE": {
+            "precision": 0.7773972602739726,
+            "recall": 0.696319018404908,
+            "f1-score": 0.7346278317152104,
+            "support": 326.0
+          },
+          "accuracy": 0.7747196738022426,
+          "macro avg": {
+            "precision": 0.7771922756124799,
+            "recall": 0.7683851876303743,
+            "f1-score": 0.7712602460982527,
+            "support": 981.0
+          },
+          "weighted avg": {
+            "precision": 0.7753867656126742,
+            "recall": 0.7747196738022426,
+            "f1-score": 0.7733903479850606,
+            "support": 981.0
+          }
+        }
+      },
+      "seconds": 1167.37
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.03156826388692615,
+      "validation": {
+        "accuracy": 0.7910295616717635,
+        "macro_f1": 0.7871440105344633,
+        "confusion_matrix": [
+          [
+            350,
+            18,
+            31
+          ],
+          [
+            37,
+            194,
+            25
+          ],
+          [
+            69,
+            25,
+            232
+          ]
+        ],
+        "classification_report": {
+          "NEGATIVE": {
+            "precision": 0.7675438596491229,
+            "recall": 0.8771929824561403,
+            "f1-score": 0.8187134502923976,
+            "support": 399.0
+          },
+          "NEUTRAL": {
+            "precision": 0.8185654008438819,
+            "recall": 0.7578125,
+            "f1-score": 0.7870182555780934,
+            "support": 256.0
+          },
+          "POSITIVE": {
+            "precision": 0.8055555555555556,
+            "recall": 0.7116564417177914,
+            "f1-score": 0.755700325732899,
+            "support": 326.0
+          },
+          "accuracy": 0.7910295616717635,
+          "macro avg": {
+            "precision": 0.7972216053495201,
+            "recall": 0.7822206413913105,
+            "f1-score": 0.7871440105344633,
+            "support": 981.0
+          },
+          "weighted avg": {
+            "precision": 0.793490166898211,
+            "recall": 0.7910295616717635,
+            "f1-score": 0.7895021878527865,
+            "support": 981.0
+          }
+        }
+      },
+      "seconds": 1190.38
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.021994687059802023,
+      "validation": {
+        "accuracy": 0.7869520897043832,
+        "macro_f1": 0.7851718477068482,
+        "confusion_matrix": [
+          [
+            326,
+            31,
+            42
+          ],
+          [
+            27,
+            210,
+            19
+          ],
+          [
+            56,
+            34,
+            236
+          ]
+        ],
+        "classification_report": {
+          "NEGATIVE": {
+            "precision": 0.7970660146699267,
+            "recall": 0.8170426065162907,
+            "f1-score": 0.806930693069307,
+            "support": 399.0
+          },
+          "NEUTRAL": {
+            "precision": 0.7636363636363637,
+            "recall": 0.8203125,
+            "f1-score": 0.7909604519774012,
+            "support": 256.0
+          },
+          "POSITIVE": {
+            "precision": 0.7946127946127947,
+            "recall": 0.7239263803680982,
+            "f1-score": 0.7576243980738363,
+            "support": 326.0
+          },
+          "accuracy": 0.7869520897043832,
+          "macro avg": {
+            "precision": 0.785105057639695,
+            "recall": 0.787093828961463,
+            "f1-score": 0.7851718477068482,
+            "support": 981.0
+          },
+          "weighted avg": {
+            "precision": 0.7875270336268918,
+            "recall": 0.7869520897043832,
+            "f1-score": 0.7863779571997338,
+            "support": 981.0
+          }
+        }
+      },
+      "seconds": 1192.5
+    }
+  ],
+  "spec": {
+    "name": "student-app-s2",
+    "family": "student-app",
+    "base": "SiobhanGoh/CP2_Emotion_Model_New",
+    "revision": "9bc6645ce7a8e02761c59386ffd16969bed1bc55",
+    "subfolder": "corrected-2026-10",
+    "learning_rate": 2e-05,
+    "epochs": 3,
+    "seed": 2,
+    "distill": true,
+    "batch_size": 16,
+    "accumulation": 2
+  }
+}
