@@ -1,0 +1,31 @@
+name: Fresh test comments
+# Fetches public YouTube comments for a fresh test set through the site's /api/youtube endpoint and
+# hands them over on a short-lived branch (fresh-transfer). "action": "cleanup" deletes that branch.
+on:
+  push:
+    branches: [browser-model]
+    paths: [training/fresh_videos.json]
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch comments
+        if: ${{ !contains(github.event.head_commit.message, '[cleanup]') }}
+        run: |
+          test "$(jq -r .action training/fresh_videos.json)" = fetch || exit 0
+          mkdir out
+          for id in $(jq -r '.videos[][]' training/fresh_videos.json); do
+            curl -sS --max-time 60 "https://capstone2-sentiment-streamlit-colab.pages.dev/api/youtube?id=$id&max=100" -o "out/$id.json" || echo "{\"error\":\"fetch failed\"}" > "out/$id.json"
+            echo "$id: $(jq -r 'if .error then .error else "\(.comments|length) comments, \(.meta.title)" end' out/$id.json)"
+          done
+          cp training/fresh_videos.json out/
+          cd out && git init -q -b fresh-transfer && git config user.name "SiobhanGoh" && git config user.email "siobhangoh17@gmail.com"
+          git add -A && git commit -q -m "Temporary fresh test comments"
+          for i in 1 2 3 4; do git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" fresh-transfer && break; sleep $((i*20)); done
+      - name: Delete the transfer branch
+        if: ${{ contains(github.event.head_commit.message, '[cleanup]') }}
+        run: git push origin --delete fresh-transfer || echo "No transfer branch to delete."
