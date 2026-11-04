@@ -234,3 +234,29 @@ def test_train_bert_distils_end_to_end_with_a_tiny_model(tmp_path):
     assert meta["status"] == "complete" and meta["distillation"]["rows_without_gold_label"] == 1
     with pytest.raises(ValueError, match="align"):
         train_bert(tmp_path / "data", tmp_path / "out2", epochs=1, init_from=tiny, train_frame=train, soft_targets=soft[:2])
+
+
+def test_kaggle_export_converts_and_scores_the_student(corpus, monkeypatch):
+    pytest.importorskip("onnxruntime")
+    transformers = pytest.importorskip("transformers")
+    from training import kaggle_export
+    from training.protocol import LABELS
+    words = ["teruk", "biasa", "bagus", "nombor"] + [str(i) for i in range(20)]
+    vocab = corpus / "vocab.txt"
+    vocab.write_text("\n".join(["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]", *words]))
+    student = corpus / "input" / "rojak-sentiment-distill" / "out" / "models" / "student-app-s1"
+    transformers.BertTokenizerFast(vocab_file=str(vocab), do_lower_case=True).save_pretrained(student)
+    config = transformers.BertConfig(vocab_size=len(words) + 5, hidden_size=16, num_hidden_layers=1, num_attention_heads=2,
+                                     intermediate_size=32, num_labels=3, id2label=dict(enumerate(LABELS)),
+                                     label2id={l: i for i, l in enumerate(LABELS)})
+    transformers.BertForSequenceClassification(config).half().save_pretrained(student)
+    runs = corpus / "input" / "rojak-sentiment-distill" / "out" / "runs" / "student-app-s1"
+    runs.mkdir(parents=True)
+    np.savez(runs / "logits.npz", validation=np.zeros((9, 3)), test=np.zeros((9, 3)))
+    summary = kaggle_export.run(corpus / "input", corpus / "out", work_dir=corpus / "w")
+    assert "model.onnx" in summary["variants"] and "onnx/model.onnx" in summary["files"]
+    v = summary["variants"]["model.onnx"]
+    assert 0 <= v["test_accuracy"] <= 1 and v["sha256"] == summary["files"]["onnx/model.onnx"]["sha256"]
+    with np.load(corpus / "out" / "onnx_eval" / "model" / "logits.npz") as z:
+        assert z["test"].shape == (9, 3) and z["validation"].shape == (9, 3)
+    assert (corpus / "out" / "models" / "browser-model" / "onnx" / "model.onnx").exists()

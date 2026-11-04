@@ -23,7 +23,7 @@ on:
         required: true
         default: smoke
         type: choice
-        options: [smoke, large, large2, silver, distill]
+        options: [smoke, large, large2, silver, distill, export]
 permissions:
   contents: write
 concurrency:
@@ -46,7 +46,7 @@ jobs:
             ACTION=$(jq -r .action training/kaggle_request.json); EXPERIMENT=$(jq -r .experiment training/kaggle_request.json)
           fi
           case "$ACTION" in launch|status|collect) ;; *) echo "::error::Unknown action $ACTION"; exit 1;; esac
-          case "$EXPERIMENT" in smoke|large|large2|silver|distill) ;; *) echo "::error::Unknown experiment $EXPERIMENT"; exit 1;; esac
+          case "$EXPERIMENT" in smoke|large|large2|silver|distill|export) ;; *) echo "::error::Unknown experiment $EXPERIMENT"; exit 1;; esac
           echo "action=$ACTION" >> "$GITHUB_OUTPUT"; echo "experiment=$EXPERIMENT" >> "$GITHUB_OUTPUT"
           echo "KERNEL=$KAGGLE_USERNAME/rojak-sentiment-$EXPERIMENT" >> "$GITHUB_ENV"
           echo "### $ACTION $EXPERIMENT" >> "$GITHUB_STEP_SUMMARY"
@@ -71,6 +71,9 @@ jobs:
           python training/kaggle_entry.py "${{ steps.req.outputs.experiment }}" "$GITHUB_SHA" kernel/kaggle_entry.py
           # Distillation reads the teacher's logits from the earlier runs' outputs.
           sources='[]'
+          if [ "${{ steps.req.outputs.experiment }}" = export ]; then
+            sources="[\"$KAGGLE_USERNAME/rojak-sentiment-distill\"]"
+          fi
           if [ "${{ steps.req.outputs.experiment }}" = distill ]; then
             sources="[\"$KAGGLE_USERNAME/rojak-sentiment-large\", \"$KAGGLE_USERNAME/rojak-sentiment-large2\", \"$KAGGLE_USERNAME/rojak-sentiment-silver\"]"
           fi

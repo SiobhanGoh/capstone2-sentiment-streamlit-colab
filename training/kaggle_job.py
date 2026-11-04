@@ -68,6 +68,8 @@ EXPERIMENTS = {
         *[{"name": f"student-mbert-s{s}", "family": "student-mbert", **MBERT, "learning_rate": 3e-5, "epochs": 3, "seed": s,
            "distill": True, **BATCH} for s in range(1, 3)],
     ],
+    # Not training: converts the chosen student to ONNX and scores the files (training/kaggle_export.py).
+    "export": [],
     "smoke": [
         {"name": "smoke-stage1", "family": "stage1", **MBERT, "learning_rate": 2e-5, "epochs": 1, "seed": 1,
          "data": "silver", "batch_size": 16, "accumulation": 1, "limit": 300},
@@ -221,6 +223,10 @@ def main():
     parser.add_argument("--input", default="/kaggle/input")
     parser.add_argument("--out", default="/kaggle/working/out")
     a = parser.parse_args()
+    if a.experiment == "export":
+        from training.kaggle_export import run as export_run
+        print(json.dumps(export_run(a.input, a.out)["variants"], indent=1), flush=True)
+        return
     print(json.dumps(run(a.experiment, a.input, a.out), indent=1), flush=True)
 
 

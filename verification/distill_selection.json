@@ -1,0 +1,77 @@
+{
+  "protocol": "sentiment-disjoint-v1",
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "selection_rule": "Highest 5-fold CV macro-F1 inside validation among single students, alone or + TF-IDF.",
+  "students_validation_macro_f1": {
+    "student-app-s1": 0.7896898590854402,
+    "student-app-s2": 0.7871440105344633,
+    "student-mbert-s1": 0.7946039938043449,
+    "student-mbert-s2": 0.7864184787661529
+  },
+  "validation_cv_macro_f1": {
+    "student-app-s1": 0.7896898590854402,
+    "student-app-s1+tfidf": 0.801097894555003,
+    "student-app-s2": 0.7871440105344633,
+    "student-app-s2+tfidf": 0.7989056603558377,
+    "student-mbert-s1": 0.7946039938043449,
+    "student-mbert-s1+tfidf": 0.791078280703252,
+    "student-mbert-s2": 0.7864184787661529,
+    "student-mbert-s2+tfidf": 0.7838994659474646
+  },
+  "selected": "student-app-s1+tfidf",
+  "selected_params": {
+    "temperature": 1.080890589729962,
+    "weight": 0.65,
+    "offsets": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "test": {
+    "selected": {
+      "accuracy": 0.8022426095820592,
+      "macro_f1": 0.798987248069583,
+      "ece": 0.06643825766894289
+    },
+    "live_app": {
+      "accuracy": 0.7737003058103975,
+      "macro_f1": 0.7667621578426006
+    },
+    "original_mbert": {
+      "accuracy": 0.7604485219164119,
+      "macro_f1": 0.7556863945342297
+    },
+    "teacher": {
+      "accuracy": 0.7900101936799184,
+      "macro_f1": 0.7845602384052225
+    },
+    "vs_live_app": {
+      "only_reference_right": 49,
+      "only_candidate_right": 77,
+      "p_value": 0.015818204008052113,
+      "accuracy_diff_95ci": [
+        0.007135575942915362,
+        0.050968399592252744
+      ],
+      "macro_f1_diff_95ci": [
+        0.009604396845415577,
+        0.05527582174851227
+      ]
+    },
+    "vs_original_mbert": {
+      "only_reference_right": 51,
+      "only_candidate_right": 92,
+      "p_value": 0.0007643052018738874,
+      "accuracy_diff_95ci": [
+        0.01834862385321101,
+        0.06523955147808358
+      ],
+      "macro_f1_diff_95ci": [
+        0.018778602731266848,
+        0.06781458068632296
+      ]
+    }
+  },
+  "note": "Retrospective internal evaluation. Validation has guided many choices in this project (epochs, seeds, teacher, student), and the test split has been scored for earlier experiments too, so treat small differences with caution."
+}
