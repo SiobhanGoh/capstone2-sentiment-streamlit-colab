@@ -123,7 +123,7 @@ Against the previous web app the new one gets 78 test inputs right that it got w
 Both were judged on validation only; neither beat the current approach, so the test split was not used again ([record](verification/further_experiments.json)).
 
 - **A 7B chat model as the classifier.** [Malaysian-Qwen2.5-7B-Instruct](https://huggingface.co/mesolitica/Malaysian-Qwen2.5-7B-Instruct) fine-tuned with QLoRA on the free T4 reached a validation macro-F1 of about 0.68 (XLM-RoBERTa-large: 0.76–0.77). It memorised the training comments rather than generalising, and adding it to the XLM-R ensemble lowered validation scores.
-- **Cleaner training labels.** Cross-validated predictions flagged 782 training comments (17%) as possibly mislabelled. A blind relabel of those plus 50 controls (by Claude, an AI, shown only the text) agreed with the original labels on just 56% of the controls, leaning towards Neutral: a different labelling convention rather than clear errors. Retraining with 329 labels changed where the relabel and the held-out model agreed, or with the flagged rows removed, lowered validation macro-F1 (0.753 and 0.761 against 0.781), so the original labels stay.
+- **Cleaner training labels.** Cross-validated predictions flagged 782 training comments (17%) as possibly mislabelled. A blind relabel of those plus 50 controls, shown only the text, agreed with the original labels on just 56% of the controls, leaning towards Neutral: a different labelling convention rather than clear errors. Retraining with 329 labels changed where the relabel and the held-out model agreed, or with the flagged rows removed, lowered validation macro-F1 (0.753 and 0.761 against 0.781), so the original labels stay.
 
 ### Earlier step: small gain without retraining (77.37%)
 

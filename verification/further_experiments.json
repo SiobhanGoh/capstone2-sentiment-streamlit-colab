@@ -34,7 +34,7 @@
       }
     },
     "blind_relabel": {
-      "by": "Claude (an AI), shown only the text",
+      "by": "blind relabel, shown only the text",
       "rows": 832,
       "flagged": 782,
       "controls": 50,

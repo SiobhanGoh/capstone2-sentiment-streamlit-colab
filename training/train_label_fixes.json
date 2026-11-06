@@ -1,7 +1,7 @@
 {
  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
  "train_rows": 4577,
- "how": "Train split only. 'flagged' = rows flagged by confident learning on out-of-fold XLM-R-large predictions (training/label_review.py). 'relabel' = flagged rows where a blind relabel by Claude (an AI, shown only the text) and the out-of-fold model chose the same label, different from the original. Validation and test are unchanged.",
+ "how": "Train split only. 'flagged' = rows flagged by confident learning on out-of-fold XLM-R-large predictions (training/label_review.py). 'relabel' = flagged rows where a blind relabel (shown only the text) and the out-of-fold model chose the same label, different from the original. Validation and test are unchanged.",
  "flagged": [
   4,
   12,
