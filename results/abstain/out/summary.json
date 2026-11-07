@@ -1,0 +1,31 @@
+{
+  "experiment": "abstain",
+  "validation": {
+    "aurc": {
+      "confidence": 0.09559945269308111,
+      "margin": 0.09503857157449663
+    },
+    "chosen_signal": "margin",
+    "cutoff": 0.5587551329963807,
+    "coverage": 0.5341488277268094,
+    "answered": 524,
+    "not_sure": 457,
+    "answered_accuracy": 0.9007633587786259,
+    "not_sure_accuracy": 0.6892778993435449
+  },
+  "test_at_cutoff": {
+    "coverage": 0.5565749235474006,
+    "answered": 546,
+    "not_sure": 435,
+    "answered_accuracy": 0.9029304029304029,
+    "not_sure_accuracy": 0.6781609195402298,
+    "coverage_95": [
+      0.5249490316004077,
+      0.5881753312945973
+    ],
+    "answered_accuracy_95": [
+      0.8766108331411496,
+      0.9257145445134576
+    ]
+  }
+}

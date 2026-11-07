@@ -1,0 +1,7 @@
+{
+  "commit": "b71294fc6e0d89a4d24cba551cec88687674c932",
+  "experiment": "abstain",
+  "torch": "2.11.0+cpu",
+  "transformers": "4.57.6",
+  "gpu": null
+}

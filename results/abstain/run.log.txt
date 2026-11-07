@@ -1,0 +1,42 @@
+[{"stream_name":"stderr","time":33.081151535,"data":"ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.\n"}
+,{"stream_name":"stderr","time":33.081266985,"data":"gradio-client 2.7.2 requires huggingface-hub\u003c3.0,\u003e=1.16.0, but you have huggingface-hub 0.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":33.081273731,"data":"gradio 6.30.0 requires huggingface-hub\u003c3.0,\u003e=1.16.0, but you have huggingface-hub 0.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":33.081278296,"data":"gradio 6.30.0 requires pillow\u003c13.0,\u003e=8.0, but you have pillow 13.0.0 which is incompatible.\n"}
+,{"stream_name":"stderr","time":33.081282609,"data":"diffusers 0.42.0 requires huggingface-hub\u003c3.0,\u003e=1.32.0, but you have huggingface-hub 0.36.2 which is incompatible.\n"}
+,{"stream_name":"stdout","time":48.561376318,"data":"{\n"}
+,{"stream_name":"stdout","time":48.561417954,"data":" \"validation\": {\n"}
+,{"stream_name":"stdout","time":48.561423674,"data":"  \"aurc\": {\n"}
+,{"stream_name":"stdout","time":48.561427342,"data":"   \"confidence\": 0.09559945269308111,\n"}
+,{"stream_name":"stdout","time":48.561431055,"data":"   \"margin\": 0.09503857157449663\n"}
+,{"stream_name":"stdout","time":48.561434745,"data":"  },\n"}
+,{"stream_name":"stdout","time":48.561438119,"data":"  \"chosen_signal\": \"margin\",\n"}
+,{"stream_name":"stdout","time":48.561441698,"data":"  \"cutoff\": 0.5587551329963807,\n"}
+,{"stream_name":"stdout","time":48.561445234,"data":"  \"coverage\": 0.5341488277268094,\n"}
+,{"stream_name":"stdout","time":48.561448946,"data":"  \"answered\": 524,\n"}
+,{"stream_name":"stdout","time":48.561452356,"data":"  \"not_sure\": 457,\n"}
+,{"stream_name":"stdout","time":48.561455889,"data":"  \"answered_accuracy\": 0.9007633587786259,\n"}
+,{"stream_name":"stdout","time":48.561459468,"data":"  \"not_sure_accuracy\": 0.6892778993435449\n"}
+,{"stream_name":"stdout","time":48.561463254,"data":" },\n"}
+,{"stream_name":"stdout","time":48.56146681,"data":" \"test_at_cutoff\": {\n"}
+,{"stream_name":"stdout","time":48.561470301,"data":"  \"coverage\": 0.5565749235474006,\n"}
+,{"stream_name":"stdout","time":48.561473708,"data":"  \"answered\": 546,\n"}
+,{"stream_name":"stdout","time":48.561477293,"data":"  \"not_sure\": 435,\n"}
+,{"stream_name":"stdout","time":48.561480823,"data":"  \"answered_accuracy\": 0.9029304029304029,\n"}
+,{"stream_name":"stdout","time":48.561484578,"data":"  \"not_sure_accuracy\": 0.6781609195402298,\n"}
+,{"stream_name":"stdout","time":48.561487896,"data":"  \"coverage_95\": [\n"}
+,{"stream_name":"stdout","time":48.561491201,"data":"   0.5249490316004077,\n"}
+,{"stream_name":"stdout","time":48.561494575,"data":"   0.5881753312945973\n"}
+,{"stream_name":"stdout","time":48.561498048,"data":"  ],\n"}
+,{"stream_name":"stdout","time":48.561501391,"data":"  \"answered_accuracy_95\": [\n"}
+,{"stream_name":"stdout","time":48.561505221,"data":"   0.8766108331411496,\n"}
+,{"stream_name":"stdout","time":48.561508866,"data":"   0.9257145445134576\n"}
+,{"stream_name":"stdout","time":48.56151227,"data":"  ]\n"}
+,{"stream_name":"stdout","time":48.561515514,"data":" }\n"}
+,{"stream_name":"stdout","time":48.561518774,"data":"}\n"}
+,{"stream_name":"stderr","time":52.326651485,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":52.326693271,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":52.687399909,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":52.687440365,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":53.654129508,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":55.033398979,"data":"[NbConvertApp] Writing 650413 bytes to __results__.html\n"}
+]
