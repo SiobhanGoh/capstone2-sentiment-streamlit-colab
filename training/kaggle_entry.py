@@ -39,7 +39,9 @@ def bundle():
     buf = io.BytesIO()
     with tarfile.open(fileobj=buf, mode="w:gz") as tar:
         # The training code, plus the teacher choice for distillation once one exists (numbers only).
-        extra = [ROOT / "training" / "distill_teacher.json", ROOT / "training" / "train_label_fixes.json"]
+        # The 'abstain' run also needs the app's own scoring settings and TF-IDF file.
+        extra = [ROOT / "training" / "distill_teacher.json", ROOT / "training" / "train_label_fixes.json",
+                 ROOT / "web" / "src" / "model_release.json", ROOT / "web" / "public" / "tfidf.json"]
         for path in sorted((ROOT / "training").glob("*.py")) + [p for p in extra if p.exists()]:
             tar.add(path, arcname=f"training/{path.name}")
     return base64.b64encode(buf.getvalue()).decode()
