@@ -6,7 +6,7 @@ import { SAMPLE_NOTE, SCORE_NOTE, pct, summarise, title } from '../lib/analysis.
 import { cleanText } from '../lib/clean.js';
 import { download, rowsToRecords, toCsv } from '../lib/csv.js';
 import { NOTES_DISCLAIMER, creatorNotes, isQuestion } from '../lib/insights.js';
-import { NEAR_SPLIT, isNearSplit } from '../lib/pipeline.js';
+import { CHECK_EVIDENCE, CHECK_GAP, isNearSplit, topGap } from '../lib/pipeline.js';
 import { summaryText } from '../lib/summaryText.js';
 import { PERIODS, filterRows, periodCounts, timeBuckets } from '../lib/timeline.js';
 import { Ripple, TONE } from './ui.jsx';
@@ -216,7 +216,7 @@ function Column({ label, rows, total, query, sort, source, focus, flash, onlyQue
     let l = rows.filter((r) => (!q || cleanText(r.comment).includes(q)) && (!onlyQuestions || isQuestion(r.comment)));
     if (sort === 'score') l = [...l].sort((a, b) => b.score - a.score);
     if (sort === 'likes') l = [...l].sort((a, b) => (b.likes ?? 0) - (a.likes ?? 0));
-    if (sort === 'unsure') l = [...l].sort((a, b) => a.score - b.score);
+    if (sort === 'unsure') l = [...l].sort((a, b) => topGap(a) - topGap(b));
     return l;
   }, [rows, query, sort, onlyQuestions]);
   useEffect(() => {
@@ -246,7 +246,7 @@ function Column({ label, rows, total, query, sort, source, focus, flash, onlyQue
                 <span className="tabular-nums">#{r.no}</span>
                 {Number.isFinite(r.likes) && <span className="inline-flex items-center gap-1 tabular-nums" title={likesText(r.likes)}><ThumbsUp size={12} aria-hidden />{r.likes.toLocaleString()}</span>}
                 {r.truncated && <span className="chip bg-kaya-100 text-kaya-700">truncated</span>}
-                {isNearSplit(r) && <span className="chip bg-ube-100 text-ube-700 dark:bg-ube-700/30 dark:text-ube-100">nearly split</span>}
+                {isNearSplit(r) && <span className="chip bg-ube-100 text-ube-700 dark:bg-ube-700/30 dark:text-ube-100">check by hand</span>}
                 <span className="transition-opacity duration-hover [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
                   <WrongLabel compact text={r.comment} predicted={r.sentiment} scores={r.scores} source={source} />
                 </span>
@@ -347,7 +347,7 @@ export default function CommentResults({ analysis, exporting, onPdf }) {
               <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 <Stat label="Comments" value={s.total} hint={analysis.meta.excluded ? <InfoTip>{analysis.meta.excluded} were empty after removing links and mentions.</InfoTip> : null} />
                 <Stat label="Worth checking" value={rows.filter((r) => isNearSplit(r)).length} active={sort === 'unsure'}
-                  hint={<InfoTip label="What counts as worth checking">The model's top two scores were within {Math.round(NEAR_SPLIT * 100)} points, so it was nearly split. Click to list these first.</InfoTip>}
+                  hint={<InfoTip label="What counts as worth checking">The model's top two scores were less than {Math.round(CHECK_GAP * 100)} points apart. In testing, labels like these were right {Math.round(CHECK_EVIDENCE.not_sure_accuracy * 100)}% of the time, against {Math.round(CHECK_EVIDENCE.answered_accuracy * 100)}% for the rest. Click to list these first.</InfoTip>}
                   onClick={() => { setSort('unsure'); setQuery(''); jumpToList(); }} />
                 <Stat label="Questions" value={n.questions.length} active={onlyQuestions} onClick={() => { setOnlyQuestions((q) => !q); setQuery(''); jumpToList(); }} />
                 <Stat label="Top theme" value={n.posWords[0]?.word ?? n.negWords[0]?.word ?? '–'}

@@ -118,6 +118,22 @@ Every choice (schedule, teacher, student, blend) was made on validation; each te
 
 Against the previous web app the new one gets 78 test inputs right that it got wrong, and 49 the other way round (McNemar exact p = 0.013; 95% bootstrap interval for the accuracy gain +0.7 to +5.2 points). Against the original mBERT: 93 and 51 (p < 0.001). The published 16-bit file gives the same label as the trained PyTorch student on every validation and test input, and the web app's own code in headless Chrome reproduces the Python result on all 981 test inputs. Average calibration error on test is about 6.6 points. Caveat: validation guided many choices across this project and the test split has been scored for several experiments, so the true gain is probably somewhat smaller than measured; this remains retrospective internal evidence. Because training used mesolitica data offered for research, non-commercial use, the published model carries the same restriction.
 
+### Knowing when not to trust a label
+
+A model that must label every comment has to guess on the hard ones. If it may instead mark its least clear labels "check by hand", the rest are right more often, at the cost of labelling fewer. [training/abstain.py](training/abstain.py) measured this for the exact scores the web app shows ([record](verification/abstain_evaluation.json)):
+
+1. **Same scores as the app.** It rebuilt the app's blended scores on Kaggle, and would have stopped unless they reproduced the recorded 80.33% test accuracy exactly. They did.
+2. **Chosen on validation.** It compared two signals and kept the gap between the top two scores. It set the cut-off at the lowest gap (0.559) whose labels were at least 90% right on validation. The 90% target was fixed in advance.
+3. **Checked once on test.**
+
+| Test, 981 inputs | Share of comments | Right |
+|---|---:|---:|
+| Confident (gap at least 0.56) | 55.7% (52.5–58.8%) | **90.3%** (87.7–92.6%) |
+| Check by hand | 44.3% | 67.8% |
+| All comments | 100% | 80.3% |
+
+In the app, each result now says whether it is confident or worth checking, with these figures. The comment lists sort the closest calls first, and the About page shows the reliability and accuracy-vs-coverage charts. Reaching 9 in 10 means sending about 44% of comments to a person: that is the honest price of this accuracy on this corpus.
+
 ### Tried after that, and not adopted
 
 Both were judged on validation only; neither beat the current approach, so the test split was not used again ([record](verification/further_experiments.json)).
@@ -173,7 +189,7 @@ assets/                   # Architecture and real app screenshot
 
 ## Remaining work
 
-- Assess near-duplicates, source/time-based generalisation and probability calibration.
+- Assess near-duplicates and source/time-based generalisation. (Calibration and when to mark a label "check by hand" are now measured; see above.)
 - Evaluate a new external sample before making broader deployment-performance claims.
 - Rerun explainability experiments for the corrected checkpoint if needed; historical explanations do not describe this release.
 
