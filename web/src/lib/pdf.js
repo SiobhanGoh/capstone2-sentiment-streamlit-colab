@@ -9,7 +9,7 @@ import release from '../model_release.json';
 import { LABELS } from './inference.js';
 import { SCORE_NOTE, pct, summarise, title } from './analysis.js';
 import { NOTES_DISCLAIMER, creatorNotes } from './insights.js';
-import { isNearSplit } from './pipeline.js';
+import { CHECK_GAP, isNearSplit } from './pipeline.js';
 
 const C = {
   ink: [43, 37, 64], soft: [90, 83, 115], faint: [138, 132, 160], mist: [244, 241, 251], white: [255, 255, 255],
@@ -197,7 +197,7 @@ export async function buildReport(rows, meta) {
   font('display', 22); doc.text(String(unsure), M + 14, y + 46);
   const uw = doc.getTextWidth(String(unsure));
   font('regular', 10, C.soft); doc.text(`of ${s.total}`, M + 20 + uw, y + 46);
-  font('regular', 7.5, C.faint); doc.text('Top two scores within 20 points', M + 14, y + 64);
+  font('regular', 7.5, C.faint); doc.text(`Top two scores under ${Math.round(CHECK_GAP * 100)} points apart`, M + 14, y + 64);
   LABELS.forEach((l, i) => {
     const x = M + wide + gap + i * (narrow + gap);
     card(x, y, narrow, tileH, TONE[l].soft, 1);

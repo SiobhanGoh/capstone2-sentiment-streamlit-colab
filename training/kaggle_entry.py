@@ -35,13 +35,16 @@ subprocess.run([sys.executable, "-m", "training.kaggle_job", "--experiment", EXP
 '''
 
 
-def bundle():
+# The 'abstain' run scores the live app, so it also needs the app's scoring settings and TF-IDF file.
+APP_FILES = {"abstain": ["web/src/model_release.json", "web/public/tfidf.json"]}
+
+
+def bundle(experiment=None):
     buf = io.BytesIO()
     with tarfile.open(fileobj=buf, mode="w:gz") as tar:
         # The training code, plus the teacher choice for distillation once one exists (numbers only).
-        # The 'abstain' run also needs the app's own scoring settings and TF-IDF file.
-        extra = [ROOT / "training" / "distill_teacher.json", ROOT / "training" / "train_label_fixes.json",
-                 ROOT / "web" / "src" / "model_release.json", ROOT / "web" / "public" / "tfidf.json"]
+        extra = [ROOT / "training" / "distill_teacher.json", ROOT / "training" / "train_label_fixes.json"]
+        extra += [ROOT / f for f in APP_FILES.get(experiment, [])]
         for path in sorted((ROOT / "training").glob("*.py")) + [p for p in extra if p.exists()]:
             tar.add(path, arcname=f"training/{path.name}")
     return base64.b64encode(buf.getvalue()).decode()
@@ -51,7 +54,7 @@ def render(experiment, commit):
     from training.kaggle_job import EXPERIMENTS
     if experiment not in EXPERIMENTS:
         raise ValueError(f"Unknown experiment {experiment!r}.")
-    return TEMPLATE.format(experiment=experiment, commit=commit, blob=bundle(), pip=PIP)
+    return TEMPLATE.format(experiment=experiment, commit=commit, blob=bundle(experiment), pip=PIP)
 
 
 if __name__ == "__main__":

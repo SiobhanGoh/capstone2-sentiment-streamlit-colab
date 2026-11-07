@@ -150,6 +150,10 @@ def test_kaggle_entry_embeds_this_commits_training_code(tmp_path):
     assert {"training/kaggle_job.py", "training/run.py", "training/protocol.py", "training/extra_data.py"} <= set(names)
     assert all(n.startswith("training/") and (n.endswith(".py") or n in ("training/distill_teacher.json", "training/train_label_fixes.json",
                                                                                  "training/model_release.json", "training/tfidf.json")) for n in names)
+    assert "training/tfidf.json" not in names  # app files travel only with the run that needs them
+    blob = re.search(r"b64decode\('([A-Za-z0-9+/=]+)'\)", kaggle_entry.render("abstain", "abc1234")).group(1)
+    names = tarfile.open(fileobj=io.BytesIO(base64.b64decode(blob)), mode="r:gz").getnames()
+    assert {"training/abstain.py", "training/model_release.json", "training/tfidf.json"} <= set(names)
     with pytest.raises(ValueError):
         kaggle_entry.render("nope", "x")
 
