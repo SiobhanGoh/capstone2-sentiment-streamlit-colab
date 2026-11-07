@@ -2,6 +2,7 @@
 import { buildRows, usableComments } from './analysis.js';
 import { fetchComments } from './youtube.js';
 import { LABELS } from './inference.js';
+import abstain from '../abstain.json';
 
 export async function analyseComments(comments, meta, predict, onProgress, extras = {}) {
   const { valid, excluded } = usableComments(comments);
@@ -26,11 +27,18 @@ export async function analyseYouTube(url, max, predict, onProgress) {
   });
 }
 
-// Comments where the top two class scores are within `margin` of each other.
-export const NEAR_SPLIT = 0.2;
-export function isNearSplit(r, margin = NEAR_SPLIT) {
+// When a label is worth checking by hand. The gap between the top two scores is the signal and the
+// cut-off was chosen on the validation split only (training/abstain.py): labels with a gap at least
+// this wide were right about 9 times in 10 on the held-out test split; the rest far less often.
+// See abstain.json for the measured numbers.
+export const CHECK_GAP = abstain.cutoff;
+export const CHECK_EVIDENCE = abstain.test;
+export function topGap(r) {
   const [a, b] = [...r.scores].sort((x, y) => y - x);
-  return a - b < margin;
+  return a - b;
+}
+export function isNearSplit(r, margin = CHECK_GAP) {
+  return topGap(r) < margin;
 }
 
 export function shareDiffs(a, b) {

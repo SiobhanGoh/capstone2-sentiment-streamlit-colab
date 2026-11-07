@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { explain, splitWords, variantsWithoutEachWord, wordImpacts } from '../src/lib/explain.js';
 import { addCorrection, clearCorrections, correctionsCsv, findCorrection, loadCorrections, removeCorrection } from '../src/lib/feedback.js';
 import { bucketLabel, timeBuckets } from '../src/lib/timeline.js';
-import { isNearSplit, shareDiffs } from '../src/lib/pipeline.js';
+import { CHECK_GAP, isNearSplit, shareDiffs } from '../src/lib/pipeline.js';
 import { summarise } from '../src/lib/analysis.js';
 import { summaryText } from '../src/lib/summaryText.js';
 import { shouldAutoLoad } from '../src/lib/useModel.js';
@@ -63,7 +63,13 @@ describe('timeline', () => {
 describe('comparison and summaries', () => {
   it('flags comments where the top two scores are close', () => {
     expect(isNearSplit({ scores: [0.45, 0.35, 0.2] })).toBe(true);
-    expect(isNearSplit({ scores: [0.8, 0.1, 0.1] })).toBe(false);
+    expect(isNearSplit({ scores: [0.85, 0.1, 0.05] })).toBe(false);
+    // The validated cut-off (abstain.json): a gap just under it needs checking, just over it does not.
+    expect(CHECK_GAP).toBeGreaterThan(0.5);
+    expect(CHECK_GAP).toBeLessThan(0.6);
+    const at = (gap) => ({ scores: [(1 + gap) / 2, (1 - gap) / 2, 0] });
+    expect(isNearSplit(at(CHECK_GAP - 0.01))).toBe(true);
+    expect(isNearSplit(at(CHECK_GAP + 0.01))).toBe(false);
   });
   it('reports share differences in points', () => {
     const a = summarise([row(1, 'NEGATIVE', [1, 0, 0]), row(2, 'POSITIVE', [0, 0, 1])]);

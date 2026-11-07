@@ -23,7 +23,7 @@ on:
         required: true
         default: smoke
         type: choice
-        options: [smoke, large, large2, silver, distill, export, llm, llm-smoke, oof, clean]
+        options: [smoke, large, large2, silver, distill, export, llm, llm-smoke, oof, clean, abstain]
 permissions:
   contents: write
 concurrency:
@@ -46,7 +46,7 @@ jobs:
             ACTION=$(jq -r .action training/kaggle_request.json); EXPERIMENT=$(jq -r .experiment training/kaggle_request.json)
           fi
           case "$ACTION" in launch|status|collect|publish|cleanup) ;; *) echo "::error::Unknown action $ACTION"; exit 1;; esac
-          case "$EXPERIMENT" in smoke|large|large2|silver|distill|export|llm|llm-smoke|oof|clean) ;; *) echo "::error::Unknown experiment $EXPERIMENT"; exit 1;; esac
+          case "$EXPERIMENT" in smoke|large|large2|silver|distill|export|llm|llm-smoke|oof|clean|abstain) ;; *) echo "::error::Unknown experiment $EXPERIMENT"; exit 1;; esac
           echo "action=$ACTION" >> "$GITHUB_OUTPUT"; echo "experiment=$EXPERIMENT" >> "$GITHUB_OUTPUT"
           echo "KERNEL=$KAGGLE_USERNAME/rojak-sentiment-$EXPERIMENT" >> "$GITHUB_ENV"
           echo "### $ACTION $EXPERIMENT" >> "$GITHUB_STEP_SUMMARY"
@@ -74,17 +74,26 @@ jobs:
           if [ "${{ steps.req.outputs.experiment }}" = export ]; then
             sources="[\"$KAGGLE_USERNAME/rojak-sentiment-distill\"]"
           fi
+          # 'abstain' only reads the export run's ONNX logits and runs on CPU, so it uses no GPU quota.
+          gpu=true
+          if [ "${{ steps.req.outputs.experiment }}" = abstain ]; then
+            sources="[\"$KAGGLE_USERNAME/rojak-sentiment-export\"]"; gpu=false
+          fi
           if [ "${{ steps.req.outputs.experiment }}" = distill ]; then
             sources="[\"$KAGGLE_USERNAME/rojak-sentiment-large\", \"$KAGGLE_USERNAME/rojak-sentiment-large2\", \"$KAGGLE_USERNAME/rojak-sentiment-silver\", \"$KAGGLE_USERNAME/rojak-sentiment-llm\"]"
           fi
           cat > kernel/kernel-metadata.json <<EOF
           {"id": "$KERNEL", "title": "rojak-sentiment-${{ steps.req.outputs.experiment }}", "code_file": "kaggle_entry.py",
-           "language": "python", "kernel_type": "script", "is_private": true, "enable_gpu": true,
+           "language": "python", "kernel_type": "script", "is_private": true, "enable_gpu": $gpu,
            "enable_internet": true, "dataset_sources": ["$KAGGLE_USERNAME/rojak-sentiment-private"],
            "competition_sources": [], "kernel_sources": $sources, "model_sources": []}
           EOF
           # Ask for a T4: recent PyTorch builds may not support the older P100 default.
-          kaggle kernels push -p kernel --accelerator NvidiaTeslaT4 || kaggle kernels push -p kernel
+          if [ "$gpu" = true ]; then
+            kaggle kernels push -p kernel --accelerator NvidiaTeslaT4 || kaggle kernels push -p kernel
+          else
+            kaggle kernels push -p kernel
+          fi
       - name: Status
         id: status
         if: steps.req.outputs.action != 'launch'

@@ -105,6 +105,7 @@ EXPERIMENTS = {
     ],
     # Not training: converts the chosen student to ONNX and scores the files (training/kaggle_export.py).
     "export": [],
+    "abstain": [],  # CPU only: reads the export run's ONNX logits, see training/abstain.py
     "smoke": [
         {"name": "smoke-stage1", "family": "stage1", **MBERT, "learning_rate": 2e-5, "epochs": 1, "seed": 1,
          "data": "silver", "batch_size": 16, "accumulation": 1, "limit": 300},
@@ -329,6 +330,11 @@ def main():
     parser.add_argument("--input", default="/kaggle/input")
     parser.add_argument("--out", default="/kaggle/working/out")
     a = parser.parse_args()
+    if a.experiment == "abstain":
+        from training.abstain import kaggle_run as abstain_run
+        report = abstain_run(a.input, a.out)
+        print(json.dumps({"validation": report["validation"], "test_at_cutoff": report["test"]["at_cutoff"]}, indent=1), flush=True)
+        return
     if a.experiment == "export":
         from training.kaggle_export import run as export_run
         print(json.dumps(export_run(a.input, a.out)["variants"], indent=1), flush=True)

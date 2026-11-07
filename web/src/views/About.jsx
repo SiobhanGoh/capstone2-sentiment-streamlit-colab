@@ -3,6 +3,8 @@ import { motion, useReducedMotion } from 'framer-motion';
 import release from '../model_release.json';
 import { SCORE_NOTE, pct } from '../lib/analysis.js';
 import { Card, Tilt } from '../components/ui.jsx';
+import { CoverageChart, ReliabilityChart } from '../components/reliability.jsx';
+import abstain from '../abstain.json';
 
 const REPO = 'https://github.com/SiobhanGoh/capstone2-sentiment-streamlit-colab';
 
@@ -47,6 +49,22 @@ export default function About() {
         <FactCard front="Longest input read" value={`${release.max_length} tokens`}
           back="Longer text is cut to its first 128 model tokens, and the result says when that happened." />
       </div>
+      <Card>
+        <h2 className="text-xl font-semibold">When to trust a label</h2>
+        <p className="mt-2 max-w-[70ch] text-ink-soft dark:text-ube-100">
+          When the gap between the top two scores is at least {Math.round(abstain.cutoff * 100)} points, a label is marked confident; otherwise it is marked &ldquo;check by hand&rdquo;. That cut-off was chosen on the validation split only, to keep confident labels about 9 in 10 right. Checked once on {abstain.test.rows} held-out test comments: {pct(abstain.test.coverage)} were confident and {pct(abstain.test.answered_accuracy)} of those were right (likely {pct(abstain.test.answered_accuracy_95[0])} to {pct(abstain.test.answered_accuracy_95[1])}); the rest were right {pct(abstain.test.not_sure_accuracy)} of the time.
+        </p>
+        <div className="mt-5 grid gap-6 md:grid-cols-2">
+          <figure>
+            <ReliabilityChart />
+            <figcaption className="mt-1 text-sm text-ink-soft dark:text-ube-300">Higher top scores were right more often. Bars near the dashed line mean the score matched how often the label was right.</figcaption>
+          </figure>
+          <figure>
+            <CoverageChart />
+            <figcaption className="mt-1 text-sm text-ink-soft dark:text-ube-300">Labelling only the clearest comments raises accuracy, at the cost of sending more to a person.</figcaption>
+          </figure>
+        </div>
+      </Card>
       <div className="grid gap-5 lg:grid-cols-2">
         <Card>
           <h2 className="text-xl font-semibold">Use it with care</h2>
