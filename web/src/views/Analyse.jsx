@@ -5,6 +5,7 @@ import { useModel } from '../lib/useModel.js';
 import { cleanText } from '../lib/clean.js';
 import { LABELS } from '../lib/inference.js';
 import { SCORE_NOTE, pct, title } from '../lib/analysis.js';
+import { CHECK_EVIDENCE, isNearSplit } from '../lib/pipeline.js';
 import { download, toCsv } from '../lib/csv.js';
 import { explain } from '../lib/explain.js';
 import { clearCorrections, correctionNote, correctionsCsv, useCorrections } from '../lib/feedback.js';
@@ -91,6 +92,11 @@ function ResultCard({ result, busy, text }) {
                   <InfoTip>{SCORE_NOTE}</InfoTip>
                 </div>
               </div>
+              <p className="mt-3 text-sm text-ink-soft dark:text-ube-100">
+                {isNearSplit(result)
+                  ? <><strong className="text-jambu-700 dark:text-jambu-300">Check this one.</strong> In testing, labels this close were right {Math.round(CHECK_EVIDENCE.not_sure_accuracy * 100)}% of the time.</>
+                  : <><strong className="text-pandan-700 dark:text-pandan-300">Confident.</strong> In testing, labels this clear were right {Math.round(CHECK_EVIDENCE.answered_accuracy * 100)}% of the time.</>}
+              </p>
               {result.truncated && <div className="mt-4"><Notice tone="warn">Long input: only the first 128 model tokens were read.</Notice></div>}
               <div className="mt-5 grid items-center gap-4 sm:grid-cols-[1fr_170px]">
                 <ScoreBars scores={result.scores} />

@@ -1,0 +1,175 @@
+{
+  "protocol": "sentiment-disjoint-v1",
+  "split_sha256": "692d03d208495810fcd1c7fa85906b2cfc1f4fc18628b6a39998c898770b9929",
+  "what": "Live app scores (fp16 student + TF-IDF blend) on the frozen splits: when to say 'not sure'.",
+  "scoring": {
+    "method": "blend",
+    "temperature": 1.080890589729962,
+    "blend_weight": 0.65,
+    "tfidf": {
+      "file": "/tfidf.json",
+      "sha256": "c82313378fbf302c8bb3e922b9e10d8250d40e4e3c53a8b778e91ec3e05b9afa"
+    }
+  },
+  "target_accuracy": 0.9,
+  "selection_rule": "Signal with the lower area under the validation risk-coverage curve; cut-off = lowest value whose answered validation comments reach the target accuracy. Test scored once afterwards.",
+  "validation": {
+    "aurc": {
+      "confidence": 0.09559945269308111,
+      "margin": 0.09503857157449663
+    },
+    "chosen_signal": "margin",
+    "cutoff": 0.5587551329963807,
+    "coverage": 0.5341488277268094,
+    "answered": 524,
+    "not_sure": 457,
+    "answered_accuracy": 0.9007633587786259,
+    "not_sure_accuracy": 0.6892778993435449
+  },
+  "test": {
+    "rows": 981,
+    "parity": {
+      "accuracy": 0.8032619775739042,
+      "macro_f1": 0.8001012481560873,
+      "matches_browser_record": true
+    },
+    "ece": 0.06628726313978034,
+    "aurc": {
+      "confidence": 0.08348152227178653,
+      "margin": 0.0841329420048783
+    },
+    "at_cutoff": {
+      "coverage": 0.5565749235474006,
+      "answered": 546,
+      "not_sure": 435,
+      "answered_accuracy": 0.9029304029304029,
+      "not_sure_accuracy": 0.6781609195402298,
+      "coverage_95": [
+        0.5249490316004077,
+        0.5881753312945973
+      ],
+      "answered_accuracy_95": [
+        0.8766108331411496,
+        0.9257145445134576
+      ]
+    },
+    "curve": [
+      {
+        "coverage": 1.0,
+        "answered_accuracy": 0.8032619775739042
+      },
+      {
+        "coverage": 0.95,
+        "answered_accuracy": 0.822961373390558
+      },
+      {
+        "coverage": 0.9,
+        "answered_accuracy": 0.8346545866364666
+      },
+      {
+        "coverage": 0.85,
+        "answered_accuracy": 0.8489208633093526
+      },
+      {
+        "coverage": 0.8,
+        "answered_accuracy": 0.8636942675159236
+      },
+      {
+        "coverage": 0.75,
+        "answered_accuracy": 0.873641304347826
+      },
+      {
+        "coverage": 0.7,
+        "answered_accuracy": 0.8820960698689956
+      },
+      {
+        "coverage": 0.65,
+        "answered_accuracy": 0.8887147335423198
+      },
+      {
+        "coverage": 0.6,
+        "answered_accuracy": 0.8947368421052632
+      },
+      {
+        "coverage": 0.55,
+        "answered_accuracy": 0.9037037037037037
+      },
+      {
+        "coverage": 0.5,
+        "answered_accuracy": 0.9204081632653062
+      }
+    ],
+    "reliability": [
+      {
+        "from": 0.3333,
+        "to": 0.4,
+        "count": 2,
+        "mean_confidence": 0.36426483654934194,
+        "accuracy": 0.5
+      },
+      {
+        "from": 0.4,
+        "to": 0.4667,
+        "count": 24,
+        "mean_confidence": 0.44020768534543614,
+        "accuracy": 0.4583333333333333
+      },
+      {
+        "from": 0.4667,
+        "to": 0.5333,
+        "count": 45,
+        "mean_confidence": 0.5043229287419366,
+        "accuracy": 0.37777777777777777
+      },
+      {
+        "from": 0.5333,
+        "to": 0.6,
+        "count": 82,
+        "mean_confidence": 0.5679261828930476,
+        "accuracy": 0.6341463414634146
+      },
+      {
+        "from": 0.6,
+        "to": 0.6667,
+        "count": 138,
+        "mean_confidence": 0.6332922978224517,
+        "accuracy": 0.717391304347826
+      },
+      {
+        "from": 0.6667,
+        "to": 0.7333,
+        "count": 127,
+        "mean_confidence": 0.7036505443131499,
+        "accuracy": 0.7637795275590551
+      },
+      {
+        "from": 0.7333,
+        "to": 0.8,
+        "count": 137,
+        "mean_confidence": 0.7657951323390623,
+        "accuracy": 0.8394160583941606
+      },
+      {
+        "from": 0.8,
+        "to": 0.8667,
+        "count": 175,
+        "mean_confidence": 0.8359767918525368,
+        "accuracy": 0.8857142857142857
+      },
+      {
+        "from": 0.8667,
+        "to": 0.9333,
+        "count": 234,
+        "mean_confidence": 0.8966765896796712,
+        "accuracy": 0.9572649572649573
+      },
+      {
+        "from": 0.9333,
+        "to": 1.0,
+        "count": 17,
+        "mean_confidence": 0.9419479775109809,
+        "accuracy": 1.0
+      }
+    ]
+  }
+}
